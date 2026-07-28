@@ -177,8 +177,61 @@ const spareParts = [
   { oem: "MST-9102", name: "Cadena de Elevación Flar (BL634)", machine: "Hangcha CPCD35", system: "mastil", category: "mecanico", price: 460, stock: "low", desc: "Cadena de eslabones de acero aleado de alta tensión", image: "assets/forklift_parts.png" }
 ];
 
+function ensureDatabaseSeeded() {
+  try {
+    if (!localStorage.getItem('m9-inventory-db')) {
+      const initialDB = {
+        autoelevadores: [
+          { id: 1, name: 'Hangcha XS-20 Eléctrico', brand: 'Hangcha', capacity: '2.000 kg', motor: 'Eléctrico', hours: 1200, price: 18500, status: 'active', visible: true, img: 'assets/electric_forklift.png' },
+          { id: 2, name: 'HELI CPD15 Eléctrico',     brand: 'HELI',    capacity: '1.500 kg', motor: 'Eléctrico', hours: 850,  price: 14200, status: 'active', visible: true, img: 'assets/apiladora.jpg' },
+          { id: 3, name: 'Toyota 8FGF15 GLP',         brand: 'Toyota',  capacity: '1.500 kg', motor: 'GLP',       hours: 3400, price: 22000, status: 'active', visible: true, img: 'assets/autoelevador.jpg' },
+          { id: 4, name: 'Hangcha CPCD35 Diesel',     brand: 'Hangcha', capacity: '3.500 kg', motor: 'Diesel',    hours: 2100, price: 27500, status: 'active', visible: true, img: 'assets/diesel_forklift.png' },
+          { id: 5, name: 'Hecha CBD20 Eléctrico',     brand: 'Hecha',   capacity: '2.000 kg', motor: 'Eléctrico', hours: 600,  price: 12800, status: 'paused', visible: false, img: 'assets/apilador.png' },
+        ],
+        repuestos: [
+          { id: 1, oem: 'OEM-BAT-48500', name: 'Batería 48V 500Ah',   category: 'Eléctrico',  stock: 12, price: 1850, status: 'active', compat: 'Hangcha XS-20, HELI CPD15', img: 'assets/bateria_electrica.jpg' },
+          { id: 2, oem: 'OEM-FIL-HID',  name: 'Filtro Hidráulico',    category: 'Hidráulico', stock: 45, price: 85,   status: 'active', compat: 'Universal',                   img: 'assets/forklift_parts.png' },
+          { id: 3, oem: 'OEM-PAF-T15',  name: 'Pastillas de Freno',   category: 'Frenos',     stock: 8,  price: 120,  status: 'active', compat: 'Toyota 8FGF15, HELI CPD15',   img: 'assets/forklift_parts.png' },
+          { id: 4, oem: 'OEM-BOM-H20',  name: 'Bomba Hidráulica',     category: 'Hidráulico', stock: 3,  price: 2200, status: 'active', compat: 'Hangcha XS-20, Hangcha CPCD35', img: 'assets/bomba_hidraulica.jpg' },
+          { id: 5, oem: 'OEM-CAR-4880', name: 'Cargador 48V 80A',     category: 'Eléctrico',  stock: 6,  price: 780,  status: 'active', compat: 'Universal eléctrico',         img: 'assets/bateria_electrica.jpg' },
+          { id: 6, oem: 'OEM-MAS-T3M',  name: 'Mástil Telescópico 3m',category: 'Estructura', stock: 0,  price: 4500, status: 'paused', compat: 'Hangcha XS-20',                 img: 'assets/forklift_parts.png' },
+        ],
+        camiones: [
+          { id: 1, name: 'Mercedes Benz Actros 2651', brand: 'Mercedes Benz', capacity: '26 Tn', motor: 'Diesel', hours: 380000, price: 95000, status: 'active', visible: true, img: 'assets/truck.png' },
+          { id: 2, name: 'Volvo FH 460',              brand: 'Volvo',         capacity: '24 Tn', motor: 'Diesel', hours: 210000, price: 110000, status: 'active', visible: true, img: 'assets/truck.png' },
+          { id: 3, name: 'Scania R450 6×2',           brand: 'Scania',        capacity: '22 Tn', motor: 'Diesel', hours: 290000, price: 88000, status: 'paused', visible: false, img: 'assets/truck.png' },
+        ],
+        leads: {
+          nuevas: [
+            { id: 'L001', client: 'Juan García', phone: '+54 9 11 5678-1234', product: 'Autoelevador Eléctrico 2T', date: '2026-07-23', urgency: 'alta', notes: [] },
+            { id: 'L002', client: 'Logística del Sur SRL', phone: '+54 9 11 8765-4321', product: '5 unidades Hangcha XS-20', date: '2026-07-22', urgency: 'alta', notes: [] },
+          ],
+          cotizacion: [
+            { id: 'L003', client: 'Carlos Mendoza', phone: '+54 9 11 5555-4444', product: 'Filtro hidráulico OEM-FIL-HID x10', date: '2026-07-21', urgency: 'media', notes: ['Cliente pidió precio final el viernes'] },
+          ],
+          enviado: [
+            { id: 'L004', client: 'Frigorífico Norte SA', phone: '+54 9 11 7777-8888', product: 'Hangcha CPCD35 Diesel 3.5T', date: '2026-07-19', urgency: 'media', notes: ['Presupuesto enviado por mail el 19/07'] },
+          ],
+          ganado: [
+            { id: 'L005', client: 'Distribuidora Pérez', phone: '+54 9 11 9999-0000', product: '2× HELI CPD15 Eléctrico', date: '2026-07-15', urgency: 'normal', notes: ['¡Cerrado! Entrega programada para 30/07'] },
+          ],
+        },
+        reviews: [
+          { id: 'R001', author: 'Carlos Mendoza', stars: 5, date: 'hace 2 meses', text: 'Excelente atención y servicio. Compramos un autoelevador Toyota y quedamos muy conformes con la calidad del equipo y el asesoramiento del equipo de ventas. Muy profesionales.', visible: true },
+          { id: 'R002', author: 'Logística del Sur SRL', stars: 4, date: 'hace 4 meses', text: 'Adquirimos 3 unidades Hangcha para nuestro depósito. El servicio postventa es impecable, responden rápido y los repuestos son originales. Los recomendamos sin dudas.', visible: true },
+          { id: 'R003', author: 'María González', stars: 5, date: 'hace 1 mes', text: 'Muy buena experiencia. El equipo de trabajo es muy atento y nos asesoraron perfectamente para elegir el apilador eléctrico que necesitábamos. Entrega en tiempo y forma.', visible: true },
+          { id: 'R004', author: 'Distribuidora Norte SA', stars: 4, date: 'hace 6 meses', text: 'Buen servicio técnico y atención al cliente. Los repuestos OEM llegan rápido y a buen precio. Seguimos eligiéndolos para el mantenimiento de toda nuestra flota.', visible: true },
+          { id: 'R005', author: 'Ricardo Flores', stars: 5, date: 'hace 3 semanas', text: 'Compramos un autoelevador diesel de segunda mano en excelente estado. Precio justo, documentación en orden y garantía real. Muy recomendable para empresas que buscan calidad.', visible: true },
+        ]
+      };
+      localStorage.setItem('m9-inventory-db', JSON.stringify(initialDB));
+    }
+  } catch(e) {}
+}
+
 // 2. DOM CONTENT LOADER & ROUTING
 document.addEventListener("DOMContentLoaded", () => {
+  ensureDatabaseSeeded();
   setupNavbar();
   
   // Detect current page

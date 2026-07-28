@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Catálogo | Maquinarias 9 de Abril</title>
+  <meta name="description" content="Explore nuestra flota premium de autoelevadores nuevos y usados. Filtre por capacidad, tipo de motorización y altura de elevación.">
+  <link rel="icon" type="image/png" href="assets/logotipo_png.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- --- NAVIGATION BAR --- -->
+  <nav class="navbar" id="main-nav">
+    <div class="navbar-container">
+      <a href="index.html" class="nav-logo">
+        <img src="assets/logotipo_png.png" alt="Maquinarias 9 de Abril" class="nav-logo-img">
+      </a>
+      <button class="nav-toggle" aria-label="Abrir Menú">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link">Inicio</a></li>
+        <li><a href="catalog.html" class="nav-link">Catálogo</a></li>
+        <li><a href="repuestos.html" class="nav-link">Repuestos</a></li>
+        <li><a href="index.html#transporte" class="nav-link">Camiones</a></li>
+        <li><a href="#" class="nav-link open-quote-modal" data-product="Contacto General">Contacto</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="catalog.html" class="btn btn-outline-yellow" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">Cotizar Equipo</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- --- SUBHEADER / HERO TITLE --- -->
+  <div style="background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 9.5rem 0 3rem 0;">
+    <div class="container">
+      <span class="section-tag">Flota Completa</span>
+      <h1 style="font-size: 2.8rem; font-family: var(--font-headings); font-weight: 800; line-height: 1.2;">Catálogo de Autoelevadores</h1>
+      <p style="color: var(--text-secondary); margin-top: 0.5rem; max-width: 600px;">
+        Seleccione las características técnicas requeridas para desplegar los modelos que mejor se adapten a su flujo de trabajo.
+      </p>
+    </div>
+  </div>
+
+  <!-- --- CATALOG LAYOUT --- -->
+  <main class="container section-padding" style="padding-top: 3rem;">
+    <div class="catalog-layout">
+      
+      <!-- Technical Filter Sidebar -->
+      <aside class="filters-sidebar" id="catalog-sidebar">
+        
+        <button class="mobile-filter-toggle" id="mobile-filter-toggle" aria-expanded="false">
+          <div class="mft-left">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            <span>Filtros Técnicos</span>
+          </div>
+          <div class="mft-right">
+            <span class="filter-count-badge" id="filter-count-badge" style="display:none;">0</span>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" class="filter-chevron" id="mobile-filter-chevron">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </button>
+
+        <div class="filters-sidebar-content collapsed-mobile" id="filters-sidebar-content">
+
+          <!-- Filter 1: Tipo de Equipo -->
+          <div class="filter-group">
+            <h4 class="filter-title">Tipo de Equipo</h4>
+            <div class="filter-options">
+              <label class="checkbox-label">
+                <input type="checkbox" value="Autoelevador" data-filter="type" class="filter-checkbox">
+                Autoelevadores
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" value="Apiladora" data-filter="type" class="filter-checkbox">
+                Apiladoras
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" value="Zorra Transpallet" data-filter="type" class="filter-checkbox">
+                Zorras Transpallet
+              </label>
+            </div>
+          </div>
+
+          <!-- Filter 2: Capacidad Slider -->
+          <div class="filter-group">
+            <h4 class="filter-title">Capacidad Máxima</h4>
+            <div class="range-slider">
+              <div class="range-values">
+                <span>1.0 TN</span>
+                <span id="capacity-val" style="color: var(--primary-yellow); font-weight: 700;">7.0 TN</span>
+              </div>
+              <input type="range" id="filter-capacity" min="1000" max="7000" step="100" value="7000">
+            </div>
+          </div>
+
+          <!-- Filter 3: Marca -->
+          <div class="filter-group">
+            <h4 class="filter-title">Marca</h4>
+            <div class="filter-options" id="brand-filter-options">
+              <label class="checkbox-label">
+                <input type="checkbox" value="Toyota" data-filter="brand" class="filter-checkbox">
+                Toyota
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" value="Hecha" data-filter="brand" class="filter-checkbox">
+                Hecha
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" value="Hangcha" data-filter="brand" class="filter-checkbox">
+                Hangcha
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" value="HELI" data-filter="brand" class="filter-checkbox">
+                HELI
+              </label>
+            </div>
+          </div>
+
+          <!-- Filter 4: Condición -->
+          <div class="filter-group">
+            <h4 class="filter-title">Estado</h4>
+            <div class="filter-options">
+              <label class="checkbox-label">
+                <input type="checkbox" value="Nuevo" data-filter="condition" class="filter-checkbox">
+                Equipos Nuevos
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" value="Usado" data-filter="condition" class="filter-checkbox">
+                Usados Seleccionados
+              </label>
+            </div>
+          </div>
+
+        </div><!-- /filters-sidebar-content -->
+
+      </aside>
+
+      <!-- Products Grid -->
+      <section class="products-grid" id="catalog-grid">
+        <!-- Rendered by JavaScript dynamically -->
+      </section>
+
+    </div>
+  </main>
+
+  <!-- --- FOOTER --- -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-logo"><img src="assets/logotipo_png.png" alt="Maquinarias 9 de Abril" class="footer-logo-img"></div>
+          <p class="footer-desc">Desde 2019, venta de autoelevadores y zorras de primeras marcas (nuevos y usados), repuestos, neumáticos y servicio técnico integral.</p>
+          <div class="footer-socials">
+            <a href="https://www.instagram.com/autoelevadores9abril.oficial/" target="_blank" rel="noopener noreferrer" class="footer-social-link" title="Instagram">ig</a>
+            <a href="https://maps.app.goo.gl/mhy4bSas3qtBY5Lr8" target="_blank" rel="noopener noreferrer" class="footer-social-link" title="Ubicación en Google Maps">map</a>
+          </div>
+        </div>
+        <div>
+          <h4 class="footer-title">Equipos</h4>
+          <ul class="footer-links">
+            <li><a href="catalog.html" class="footer-link">Línea Eléctrica</a></li>
+            <li><a href="catalog.html" class="footer-link">Línea Diésel</a></li>
+            <li><a href="catalog.html" class="footer-link">Apiladores Retráctiles</a></li>
+            <li><a href="catalog.html" class="footer-link">Usados Garantizados</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Servicio</h4>
+          <ul class="footer-links">
+            <li><a href="repuestos.html" class="footer-link">Buscador OEM</a></li>
+            <li><a href="repuestos.html" class="footer-link">Mantenimiento</a></li>
+            <li><a href="#" class="footer-link open-quote-modal" data-product="Servicio de Emergencia 24/7">Asistencia 24/7</a></li>
+            <li><a href="#" class="footer-link open-quote-modal" data-product="Financiación Flexible">Financiamiento</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Sede Central</h4>
+          <ul class="footer-links" style="color: var(--text-secondary); font-size: 0.9rem;">
+            <li style="margin-bottom: 0.5rem;">📍 <a href="https://maps.app.goo.gl/mhy4bSas3qtBY5Lr8" target="_blank" rel="noopener noreferrer" class="footer-link" style="display: inline-block; padding-left: 0;">San Antonio 1722, B1839CIT 9 de Abril, Buenos Aires</a></li>
+            <li style="margin-bottom: 0.5rem;">📞 <a href="https://wa.me/5491121699968" target="_blank" rel="noopener noreferrer" class="footer-link" style="display: inline-block; padding-left: 0;">+54 9 11 2169-9968</a></li>
+            <li>✉ <a href="mailto:info@autoelevadores9deabril.com" class="footer-link" style="display: inline-block; padding-left: 0;">info@autoelevadores9deabril.com</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Maquinarias 9 de Abril S.A. Todos los derechos reservados.</p>
+        <p>Desarrollado con Estándares Industriales Premium.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- --- QUOTE MODAL --- -->
+  <div class="modal" id="quote-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-icon">📨</div>
+      <h3>Solicitud de Cotización</h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">
+        Por favor complete el formulario técnico. Cotizaremos el producto <span id="modal-product-title" style="color: var(--primary-yellow); font-weight: 700;"></span> en menos de 2 horas hábiles.
+      </p>
+      <form id="modal-quote-form">
+        <div class="form-group">
+          <label for="modal-client-name">Nombre Completo</label>
+          <input type="text" id="modal-client-name" required placeholder="Su nombre o Razón Social">
+        </div>
+        <div class="form-group">
+          <label for="modal-client-email">Email Corporativo</label>
+          <input type="email" id="modal-client-email" required placeholder="ejemplo@empresa.com">
+        </div>
+        <div class="form-group">
+          <label for="modal-client-phone">Teléfono de Contacto</label>
+          <input type="text" id="modal-client-phone" required placeholder="+54 9 11 ...">
+        </div>
+        <div class="form-group">
+          <label for="modal-message">Especificación Adicional (Opcional)</label>
+          <textarea id="modal-message" rows="3" placeholder="Detalle si requiere accesorios, altura específica o condiciones de entrega..."></textarea>
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+          <button type="button" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="flex: 1.5;">Enviar Consulta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- WHATSAPP FLOATING BUTTON -->
+  <a href="https://wa.me/5491126738983?text=Hola%2C%20quisiera%20consultar%20sobre%20sus%20productos" target="_blank" rel="noopener noreferrer" class="whatsapp-float" id="whatsapp-btn" aria-label="Contactar por WhatsApp">
+    <span class="whatsapp-float__tooltip">¡Consultanos por WhatsApp!</span>
+    <span class="whatsapp-float__btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </span>
+  </a>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

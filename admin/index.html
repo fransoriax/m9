@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Panel Admin | Maquinarias 9 de Abril</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════
+       LOGIN SCREEN
+  ═══════════════════════════════════════════════════════ -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-noise"></div>
+    <div class="login-card">
+      <div class="login-logo-wrap">
+        <img src="../assets/logotipo_png.png" alt="Logo Maquinarias 9 de Abril" class="login-logo-img">
+        <div>
+          <h1 class="login-brand">Maquinarias 9 de Abril</h1>
+          <p class="login-subtitle">Panel de Administración CRM</p>
+        </div>
+      </div>
+      <form id="login-form" class="login-form" novalidate>
+        <div class="lf-group">
+          <label class="lf-label" for="login-user">Usuario</label>
+          <div class="lf-input-wrap">
+            <svg class="lf-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="login-user" class="lf-input" placeholder="admin" autocomplete="username">
+          </div>
+        </div>
+        <div class="lf-group">
+          <label class="lf-label" for="login-pass">Contraseña</label>
+          <div class="lf-input-wrap">
+            <svg class="lf-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="login-pass" class="lf-input" placeholder="••••••••" autocomplete="current-password">
+          </div>
+        </div>
+        <p id="login-error" class="login-error" aria-live="polite"></p>
+        <button type="submit" class="btn-login">
+          Ingresar al Panel
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </form>
+      <p class="login-notice">🔒 Acceso restringido — Solo personal autorizado</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       MAIN APPLICATION SHELL
+  ═══════════════════════════════════════════════════════ -->
+  <div id="app" class="app" style="display:none">
+
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-logo-block">
+        <img src="../assets/logo.jpeg" alt="M9" class="sb-logo-img">
+        <div>
+          <span class="sb-brand-name">M9 Admin</span>
+          <span class="sb-brand-sub">Panel de Control</span>
+        </div>
+      </div>
+
+      <nav class="sb-nav">
+        <span class="sb-section-title">MÓDULOS</span>
+
+        <button class="sb-item active" data-view="inventario" id="nav-inventario">
+          <span class="sb-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          </span>
+          <span class="sb-item-label">Inventario & Stock</span>
+          <span class="sb-badge" id="badge-inv">18</span>
+        </button>
+
+        <button class="sb-item" data-view="cotizaciones" id="nav-cotizaciones">
+          <span class="sb-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+          </span>
+          <span class="sb-item-label">Cotizaciones</span>
+          <span class="sb-badge sb-badge--hot" id="badge-cot">5</span>
+        </button>
+
+        <button class="sb-item" data-view="postventa" id="nav-postventa">
+          <span class="sb-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </span>
+          <span class="sb-item-label">Post-Venta & Service</span>
+        </button>
+
+        <button class="sb-item" data-view="resenas" id="nav-resenas">
+          <span class="sb-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </span>
+          <span class="sb-item-label">Reseñas Google</span>
+          <span class="sb-badge" id="badge-resenas">0</span>
+        </button>
+      </nav>
+
+      <div class="sb-footer">
+        <a href="../index.html" target="_blank" class="sb-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Ver Sitio Web
+        </a>
+        <button class="sb-link" id="logout-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Cerrar Sesión
+        </button>
+      </div>
+    </aside>
+
+    <!-- ── CONTENT AREA ── -->
+    <div class="content-area">
+
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="th-left" style="display: flex; align-items: center; gap: 0.8rem;">
+          <button id="btn-back-home" class="btn-back-home" style="display: none;" aria-label="Volver al Inicio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Inicio
+          </button>
+          <button id="sb-toggle-mobile" class="btn-icon" style="display: none; background: transparent; border: none; color: var(--y); font-size: 1.4rem; cursor: pointer;" aria-label="Abrir Menú">☰</button>
+          <div>
+            <h2 class="th-title" id="view-title">Inicio</h2>
+            <span class="th-crumb" id="view-crumb">Panel de Control M9</span>
+          </div>
+        </div>
+        <div class="th-right">
+          <div class="th-user-pill">
+            <div class="th-avatar">A</div>
+            <div class="th-user-info">
+              <span class="th-user-name">Admin</span>
+              <span class="th-user-role">Administrador</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ══════════════════════════════════════
+           VIEW 0 — MOBILE HOME HUB (PANTALLA INICIAL MÓVIL)
+      ══════════════════════════════════════ -->
+      <section id="view-home" class="view-panel">
+        
+        <!-- Welcome Hero Banner -->
+        <div class="crm-home-hero">
+          <div class="crm-hh-text">
+            <span class="crm-hh-tag">SISTEMA DE GESTIÓN M9</span>
+            <h1 class="crm-hh-title">Bienvenido, Admin</h1>
+            <p class="crm-hh-desc">Seleccioná un módulo para gestionar tu inventario y clientes</p>
+          </div>
+          <div class="crm-hh-avatar">A</div>
+        </div>
+
+        <!-- 4 Modules Selector Cards Grid (Prominent Cards with Big Icons) -->
+        <div class="crm-home-section-hdr">
+          <h3 class="crm-hsec-title">Módulos del CRM</h3>
+          <span class="crm-hsec-sub">Toque para ingresar</span>
+        </div>
+
+        <div class="crm-home-modules-grid">
+          <div class="crm-hmod-card" data-view="inventario">
+            <div class="crm-hmod-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                <line x1="12" y1="22.08" x2="12" y2="12"/>
+              </svg>
+              <span class="crm-hmod-badge" id="hmbadge-inv">18</span>
+            </div>
+            <span class="crm-hmod-title">Inventario &amp; Stock</span>
+            <span class="crm-hmod-sub">Maquinaria, Equipos &amp; Repuestos</span>
+          </div>
+
+          <div class="crm-hmod-card" data-view="cotizaciones">
+            <div class="crm-hmod-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                <rect x="8" y="2" width="8" height="4" rx="1"/>
+                <path d="M9 12h6M9 16h4"/>
+              </svg>
+              <span class="crm-hmod-badge crm-hmod-badge--hot" id="hmbadge-cot">5</span>
+            </div>
+            <span class="crm-hmod-title">Cotizaciones &amp; Leads</span>
+            <span class="crm-hmod-sub">Seguimiento Comercial Kanban</span>
+          </div>
+
+          <div class="crm-hmod-card" data-view="postventa">
+            <div class="crm-hmod-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+              </svg>
+            </div>
+            <span class="crm-hmod-title">Post-Venta &amp; Service</span>
+            <span class="crm-hmod-sub">Garantías &amp; Mantenimiento</span>
+          </div>
+
+          <div class="crm-hmod-card" data-view="resenas">
+            <div class="crm-hmod-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+            </div>
+            <span class="crm-hmod-title">Reseñas Google</span>
+            <span class="crm-hmod-sub">Opiniones del Sitio Web</span>
+          </div>
+        </div>
+
+        <!-- Quick Summary Stats Grid -->
+        <div class="crm-home-stats">
+          <div class="crm-hstat-card">
+            <span class="crm-hstat-val" id="hs-equipos">18</span>
+            <span class="crm-hstat-lbl">Equipos en Stock</span>
+          </div>
+          <div class="crm-hstat-card">
+            <span class="crm-hstat-val crm-hstat-val--gold" id="hs-leads">5</span>
+            <span class="crm-hstat-lbl">Consultas Activas</span>
+          </div>
+          <div class="crm-hstat-card">
+            <span class="crm-hstat-val" id="hs-repuestos">12</span>
+            <span class="crm-hstat-lbl">Repuestos OEM</span>
+          </div>
+          <div class="crm-hstat-card">
+            <span class="crm-hstat-val crm-hstat-val--green">4.9 ★</span>
+            <span class="crm-hstat-lbl">Puntaje Google</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══════════════════════════════════════
+           VIEW 1 — INVENTARIO & STOCK
+      ══════════════════════════════════════ -->
+      <section id="view-inventario" class="view-panel active-panel">
+
+        <!-- Category Tabs (Desktop) -->
+        <div class="cat-tabs-bar">
+          <button class="cat-tab active" data-tab="autoelevadores">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            Autoelevadores
+          </button>
+          <button class="cat-tab" data-tab="repuestos">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93a10 10 0 0 0 14.14 14.14"/><circle cx="12" cy="12" r="7"/></svg>
+            Repuestos
+          </button>
+          <button class="cat-tab" data-tab="camiones">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            Camiones
+          </button>
+        </div>
+
+        <!-- Mobile Visual Category Grid (Interactive Cards with Product Photos) -->
+        <div class="crm-mobile-cat-grid" id="crm-mobile-cat-grid">
+          <div class="crm-mcat-card active" data-tab="autoelevadores">
+            <div class="crm-mcat-img-wrap">
+              <img src="../assets/electric_forklift.png" alt="Autoelevadores">
+            </div>
+            <span class="crm-mcat-title">Autoelevadores</span>
+            <span class="crm-mcat-sub">Nuevos y Usados</span>
+          </div>
+
+          <div class="crm-mcat-card" data-tab="repuestos">
+            <div class="crm-mcat-img-wrap">
+              <img src="../assets/bateria_electrica.jpg" alt="Repuestos OEM">
+            </div>
+            <span class="crm-mcat-title">Repuestos</span>
+            <span class="crm-mcat-sub">Componentes OEM</span>
+          </div>
+
+          <div class="crm-mcat-card" data-tab="camiones">
+            <div class="crm-mcat-img-wrap">
+              <img src="../assets/truck.png" alt="Camiones">
+            </div>
+            <span class="crm-mcat-title">Camiones</span>
+            <span class="crm-mcat-sub">Flota Pesada</span>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="inv-toolbar">
+          <div class="search-field">
+            <svg class="sf-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="search" id="inv-search" class="sf-input" placeholder="Buscar por nombre, código o marca...">
+          </div>
+          <div class="inv-filters">
+            <select class="filter-select" id="filter-status">
+              <option value="">Todos los estados</option>
+              <option value="active">✅ Activo</option>
+              <option value="paused">⏸ Pausado</option>
+            </select>
+            <select class="filter-select" id="filter-brand">
+              <option value="">Todas las marcas</option>
+            </select>
+          </div>
+          <button class="btn-primary btn-add" id="btn-add-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Agregar
+          </button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+          <table class="data-table" id="inv-table">
+            <thead id="inv-thead"></thead>
+            <tbody id="inv-tbody"></tbody>
+          </table>
+          <div id="inv-empty" class="empty-state" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <p>Sin resultados</p>
+            <span>Probá ajustando los filtros o la búsqueda</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           VIEW 2 — COTIZACIONES (KANBAN)
+      ══════════════════════════════════════ -->
+      <section id="view-cotizaciones" class="view-panel">
+        <div class="kanban-topbar">
+          <button class="btn-primary btn-add" id="btn-add-lead">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nueva Consulta
+          </button>
+        </div>
+
+        <!-- Mobile Stage Switcher Pills -->
+        <div class="crm-kanban-stage-tabs" id="crm-kanban-stage-tabs">
+          <button class="kstage-tab active" data-col="nuevas">
+            <span class="kcol-dot kcol-dot--nuevas"></span> Nuevas
+          </button>
+          <button class="kstage-tab" data-col="cotizacion">
+            <span class="kcol-dot kcol-dot--cotizacion"></span> Cotización
+          </button>
+          <button class="kstage-tab" data-col="enviado">
+            <span class="kcol-dot kcol-dot--enviado"></span> Enviado
+          </button>
+          <button class="kstage-tab" data-col="ganado">
+            <span class="kcol-dot kcol-dot--ganado"></span> Ganado
+          </button>
+        </div>
+
+        <div class="kanban-board" id="kanban-board">
+
+          <!-- Col: Nuevas -->
+          <div class="kanban-col" id="kcol-wrap-nuevas">
+            <div class="kcol-hdr kcol-hdr--nuevas">
+              <div class="kcol-hdr-left">
+                <span class="kcol-dot kcol-dot--nuevas"></span>
+                <h3>Nuevas Consultas</h3>
+              </div>
+              <span class="kcol-count" id="count-nuevas">0</span>
+            </div>
+            <div class="kcol-body" id="col-nuevas" data-col="nuevas"
+              ondragover="event.preventDefault();this.classList.add('drag-active')"
+              ondragleave="this.classList.remove('drag-active')"
+              ondrop="K.drop(event,'nuevas')"></div>
+          </div>
+
+          <!-- Col: En Cotización -->
+          <div class="kanban-col" id="kcol-wrap-cotizacion">
+            <div class="kcol-hdr kcol-hdr--cotizacion">
+              <div class="kcol-hdr-left">
+                <span class="kcol-dot kcol-dot--cotizacion"></span>
+                <h3>En Cotización</h3>
+              </div>
+              <span class="kcol-count" id="count-cotizacion">0</span>
+            </div>
+            <div class="kcol-body" id="col-cotizacion" data-col="cotizacion"
+              ondragover="event.preventDefault();this.classList.add('drag-active')"
+              ondragleave="this.classList.remove('drag-active')"
+              ondrop="K.drop(event,'cotizacion')"></div>
+          </div>
+
+          <!-- Col: Presupuesto Enviado -->
+          <div class="kanban-col" id="kcol-wrap-enviado">
+            <div class="kcol-hdr kcol-hdr--enviado">
+              <div class="kcol-hdr-left">
+                <span class="kcol-dot kcol-dot--enviado"></span>
+                <h3>Presupuesto Enviado</h3>
+              </div>
+              <span class="kcol-count" id="count-enviado">0</span>
+            </div>
+            <div class="kcol-body" id="col-enviado" data-col="enviado"
+              ondragover="event.preventDefault();this.classList.add('drag-active')"
+              ondragleave="this.classList.remove('drag-active')"
+              ondrop="K.drop(event,'enviado')"></div>
+          </div>
+
+          <!-- Col: Cerrado / Ganado -->
+          <div class="kanban-col" id="kcol-wrap-ganado">
+            <div class="kcol-hdr kcol-hdr--ganado">
+              <div class="kcol-hdr-left">
+                <span class="kcol-dot kcol-dot--ganado"></span>
+                <h3>Cerrado / Ganado</h3>
+              </div>
+              <span class="kcol-count" id="count-ganado">0</span>
+            </div>
+            <div class="kcol-body" id="col-ganado" data-col="ganado"
+              ondragover="event.preventDefault();this.classList.add('drag-active')"
+              ondragleave="this.classList.remove('drag-active')"
+              ondrop="K.drop(event,'ganado')"></div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           VIEW 3 — POST-VENTA & SERVICE
+      ══════════════════════════════════════ -->
+      <section id="view-postventa" class="view-panel">
+        <div class="pv-topbar">
+          <div class="search-field" style="max-width:420px">
+            <svg class="sf-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="search" id="pv-search" class="sf-input" placeholder="Buscar por N° de Serie, Chasis o Cliente...">
+          </div>
+        </div>
+        <div class="pv-layout">
+          <div class="pv-list-col" id="pv-list"></div>
+          <div class="pv-detail-col" id="pv-detail">
+            <div class="pv-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <p>Seleccioná una unidad</p>
+              <span>Hacé clic en una unidad para ver su ficha completa e historial de service</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           VIEW 4 — RESEÑAS GOOGLE
+      ══════════════════════════════════════ -->
+      <section id="view-resenas" class="view-panel">
+        <div class="inv-toolbar">
+          <div class="search-field">
+            <svg class="sf-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="search" id="rev-search" class="sf-input" placeholder="Buscar reseña por nombre o texto...">
+          </div>
+          <button class="btn-primary btn-add" id="btn-add-review">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nueva Reseña
+          </button>
+        </div>
+        <div class="table-container">
+          <table class="data-table" id="rev-table">
+            <thead id="rev-thead"></thead>
+            <tbody id="rev-tbody"></tbody>
+          </table>
+          <div id="rev-empty" class="empty-state" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <p>Sin reseñas cargadas</p>
+            <span>Agregá reseñas reales de Google Maps para mostrarlas en el sitio</span>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /.content-area -->
+
+  <!-- Toast notifications -->
+  <div id="toast-container" class="toast-container"></div>
+
+  </div><!-- /#app -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       MODALS
+  ═══════════════════════════════════════════════════════ -->
+
+  <!-- Modal: Maquinaria / Camión -->
+  <div id="modal-machinery" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box modal-lg">
+      <div class="modal-hdr">
+        <h3 id="modal-machinery-title">Nueva Maquinaria</h3>
+        <button class="modal-close-btn" data-close="modal-machinery">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="form-machinery" class="modal-form" novalidate>
+        <div class="form-grid-2">
+          <div class="mf-group">
+            <label class="mf-label">Nombre del Equipo *</label>
+            <input type="text" class="mf-input" id="m-name" placeholder="Ej: Hangcha XS-20 Eléctrico">
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Marca *</label>
+            <select class="mf-input" id="m-brand">
+              <option value="">Seleccionar marca</option>
+              <option>Hangcha</option><option>HELI</option><option>Toyota</option>
+              <option>Crown</option><option>Hecha</option><option>Linde</option>
+              <option>Jungheinrich</option><option>Mercedes Benz</option>
+              <option>Volvo</option><option>Scania</option>
+            </select>
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Capacidad de Carga</label>
+            <input type="text" class="mf-input" id="m-capacity" placeholder="Ej: 2.000 kg">
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Motorización</label>
+            <select class="mf-input" id="m-motor">
+              <option value="">Seleccionar</option>
+              <option>Eléctrico</option><option>GLP</option>
+              <option>Diesel</option><option>Nafta</option>
+            </select>
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Horas de Uso</label>
+            <input type="number" class="mf-input" id="m-hours" placeholder="Ej: 1200" min="0">
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Precio (USD) *</label>
+            <input type="number" class="mf-input" id="m-price" placeholder="Ej: 18500" min="0">
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Estado</label>
+            <select class="mf-input" id="m-status">
+              <option value="active">✅ Activo</option>
+              <option value="paused">⏸ Pausado</option>
+            </select>
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Visibilidad en Web</label>
+            <div class="toggle-row">
+              <label class="toggle-switch">
+                <input type="checkbox" id="m-visible" checked>
+                <span class="toggle-knob"></span>
+              </label>
+              <span class="toggle-lbl" id="m-vis-lbl">Visible en el sitio</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mf-group mf-group--full" style="margin-top:.75rem">
+          <label class="mf-label">Ficha Técnica PDF</label>
+          <div class="upload-zone" id="pdf-zone" tabindex="0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            <p>Arrastrá el PDF aquí o <span class="upload-link">hacé clic</span></p>
+            <small id="pdf-filename">Ningún archivo seleccionado</small>
+            <input type="file" id="m-pdf" accept=".pdf" style="display:none">
+          </div>
+        </div>
+
+        <div class="mf-group mf-group--full" style="margin-top:.75rem">
+          <label class="mf-label">Imágenes del Equipo</label>
+          <div class="upload-zone img-drop-zone" id="img-drop-zone" tabindex="0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <p>Arrastrá imágenes aquí o <span class="upload-link">hacé clic</span></p>
+            <small>JPG, PNG, WebP — máx. 5 MB por imagen</small>
+            <input type="file" id="m-imgs" accept="image/*" multiple style="display:none">
+          </div>
+          <div class="img-preview-grid" id="img-preview"></div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close="modal-machinery">Cancelar</button>
+          <button type="submit" class="btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Guardar Equipo
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Repuesto -->
+  <div id="modal-repuesto" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box">
+      <div class="modal-hdr">
+        <h3 id="modal-repuesto-title">Nuevo Repuesto</h3>
+        <button class="modal-close-btn" data-close="modal-repuesto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="form-repuesto" class="modal-form" novalidate>
+        <div class="form-grid-2">
+          <div class="mf-group">
+            <label class="mf-label">Código OEM / N° Pieza *</label>
+            <input type="text" class="mf-input mf-input--oem" id="r-oem" placeholder="Ej: OEM-BAT-48500">
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Nombre del Repuesto *</label>
+            <input type="text" class="mf-input" id="r-name" placeholder="Ej: Batería 48V 500Ah">
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Categoría</label>
+            <select class="mf-input" id="r-category">
+              <option value="">Seleccionar</option>
+              <option>Eléctrico</option><option>Hidráulico</option><option>Frenos</option>
+              <option>Transmisión</option><option>Motor</option><option>Estructura</option><option>Otros</option>
+            </select>
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Precio Unitario (USD) *</label>
+            <input type="number" class="mf-input" id="r-price" placeholder="Ej: 350">
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Stock Actual</label>
+            <div class="stock-ctrl">
+              <button type="button" class="stock-btn" id="stock-minus">−</button>
+              <input type="number" class="mf-input stock-num" id="r-stock" value="0" min="0">
+              <button type="button" class="stock-btn" id="stock-plus">+</button>
+            </div>
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Estado</label>
+            <select class="mf-input" id="r-status">
+              <option value="active">✅ Activo</option>
+              <option value="paused">⏸ Pausado</option>
+            </select>
+          </div>
+        </div>
+        <div class="mf-group mf-group--full" style="margin-top:.75rem">
+          <label class="mf-label">Compatibilidad con Modelos</label>
+          <input type="text" class="mf-input" id="r-compat" placeholder="Ej: Hangcha XS-20, HELI CPD15, Universal">
+        </div>
+        <div class="mf-group mf-group--full" style="margin-top:.75rem">
+          <label class="mf-label">Foto / Imagen del Repuesto</label>
+          <div class="upload-zone img-drop-zone" id="r-img-zone" tabindex="0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <p>Arrastrá una imagen aquí o <span class="upload-link">hacé clic para seleccionar</span></p>
+            <small id="r-img-filename">JPG, PNG, WebP — Foto de producto del repuesto</small>
+            <input type="file" id="r-img-input" accept="image/*" style="display:none">
+          </div>
+          <div class="img-preview-grid" id="r-img-preview" style="margin-top:0.75rem"></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close="modal-repuesto">Cancelar</button>
+          <button type="submit" class="btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Guardar Repuesto
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Lead Detail + Quote Generator -->
+  <div id="modal-lead" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box modal-xl">
+      <div class="modal-hdr">
+        <h3 id="modal-lead-title">Detalle de Consulta</h3>
+        <button class="modal-close-btn" data-close="modal-lead">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="lead-grid">
+        <!-- Left -->
+        <div class="lead-left-col">
+          <div class="lead-client-card" id="lead-client-card"></div>
+          <div class="lead-notes-section">
+            <h4 class="section-lbl">📝 Notas Internas</h4>
+            <div class="notes-feed" id="notes-feed"></div>
+            <textarea class="mf-input notes-textarea" id="note-input" rows="2" placeholder="Escribí una nota interna..."></textarea>
+            <button class="btn-secondary" id="btn-add-note" style="margin-top:.5rem;width:100%">Agregar Nota</button>
+          </div>
+        </div>
+        <!-- Right -->
+        <div class="lead-right-col">
+          <h4 class="section-lbl">💰 Pre-Presupuesto</h4>
+          <div class="mf-group">
+            <label class="mf-label">Producto / Servicio</label>
+            <input type="text" class="mf-input" id="q-product" placeholder="Ej: Autoelevador Hangcha XS-20 Eléctrico">
+          </div>
+          <div class="form-grid-2">
+            <div class="mf-group">
+              <label class="mf-label">Precio Final (USD)</label>
+              <input type="number" class="mf-input" id="q-price" placeholder="18500">
+            </div>
+            <div class="mf-group">
+              <label class="mf-label">Validez</label>
+              <input type="text" class="mf-input" id="q-validity" placeholder="Ej: 15 días">
+            </div>
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Condiciones de Pago</label>
+            <input type="text" class="mf-input" id="q-payment" placeholder="30% anticipo, saldo contra entrega">
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Observaciones</label>
+            <textarea class="mf-input" id="q-obs" rows="3" placeholder="Incluye transporte, puesta en marcha, capacitación..."></textarea>
+          </div>
+          <button class="btn-print" id="btn-print-quote">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Descargar Vista Previa PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Nuevo Service -->
+  <div id="modal-service" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box">
+      <div class="modal-hdr">
+        <h3>Registrar Service / Mantenimiento</h3>
+        <button class="modal-close-btn" data-close="modal-service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="form-service" class="modal-form" novalidate>
+        <div class="form-grid-2">
+          <div class="mf-group">
+            <label class="mf-label">Fecha del Service *</label>
+            <input type="date" class="mf-input" id="sv-date">
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Horas de Uso del Equipo</label>
+            <input type="number" class="mf-input" id="sv-hours" placeholder="Ej: 1500" min="0">
+          </div>
+        </div>
+        <div class="mf-group">
+          <label class="mf-label">Tipo de Service</label>
+          <select class="mf-input" id="sv-type">
+            <option>Mantenimiento preventivo</option>
+            <option>Cambio de aceite y filtros</option>
+            <option>Reparación</option>
+            <option>Service general</option>
+            <option>Cambio de batería</option>
+            <option>Ajuste de frenos</option>
+            <option>Revisión hidráulica</option>
+          </select>
+        </div>
+        <div class="mf-group">
+          <label class="mf-label">Repuestos Utilizados</label>
+          <input type="text" class="mf-input" id="sv-parts" placeholder="Ej: Filtro hidráulico OEM-FIL-HID, Aceite 10W40 5L">
+        </div>
+        <div class="mf-group">
+          <label class="mf-label">Observaciones del Técnico *</label>
+          <textarea class="mf-input" id="sv-notes" rows="4" placeholder="Descripción del trabajo realizado, estado general del equipo, recomendaciones..."></textarea>
+        </div>
+        <div class="mf-group">
+          <label class="mf-label">Técnico Responsable</label>
+          <input type="text" class="mf-input" id="sv-tech" placeholder="Nombre completo del técnico">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close="modal-service">Cancelar</button>
+          <button type="submit" class="btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Registrar Service
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Confirmar Eliminación -->
+  <div id="modal-delete" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box modal-sm">
+      <div class="modal-hdr">
+        <h3>Confirmar Eliminación</h3>
+        <button class="modal-close-btn" data-close="modal-delete">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="delete-body">
+        <div class="delete-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+        </div>
+        <p id="delete-msg">¿Confirmás la eliminación de este registro?</p>
+        <small>Esta acción no se puede deshacer.</small>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" data-close="modal-delete">Cancelar</button>
+        <button type="button" class="btn-danger" id="confirm-delete-btn">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modal-review" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box">
+      <div class="modal-hdr">
+        <h3 id="modal-review-title">Nueva Reseña</h3>
+        <button class="modal-close-btn" data-close="modal-review">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="form-review" class="modal-form" novalidate>
+        <div class="form-grid-2">
+          <div class="mf-group">
+            <label class="mf-label">Nombre del autor *</label>
+            <input type="text" class="mf-input" id="rv-author" placeholder="Ej: Carlos Mendoza">
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Estrellas *</label>
+            <select class="mf-input" id="rv-stars">
+              <option value="5">⭐⭐⭐⭐⭐ (5 estrellas)</option>
+              <option value="4">⭐⭐⭐⭐ (4 estrellas)</option>
+              <option value="3">⭐⭐⭐ (3 estrellas)</option>
+              <option value="2">⭐⭐ (2 estrellas)</option>
+              <option value="1">⭐ (1 estrella)</option>
+            </select>
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Fecha (ej: "hace 2 meses") *</label>
+            <input type="text" class="mf-input" id="rv-date" placeholder="Ej: hace 3 semanas">
+          </div>
+          <div class="mf-group">
+            <label class="mf-label">Visible en el sitio</label>
+            <select class="mf-input" id="rv-visible">
+              <option value="true">✅ Visible</option>
+              <option value="false">⏸ Oculta</option>
+            </select>
+          </div>
+        </div>
+        <div class="mf-group" style="margin-top:1rem">
+          <label class="mf-label">Texto de la reseña *</label>
+          <textarea class="mf-input" id="rv-text" rows="4" placeholder="Copiá aquí el texto real de la reseña de Google Maps..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close="modal-review">Cancelar</button>
+          <button type="submit" class="btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Guardar Reseña
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       PRINT TEMPLATE (solo visible al imprimir)
+  ═══════════════════════════════════════════════════════ -->
+  <div id="print-doc" class="print-only">
+    <div class="pd-header">
+      <div class="pd-logo-area">
+        <img src="../assets/logo.jpeg" alt="M9" class="pd-logo">
+        <div>
+          <h1 class="pd-brand">Maquinarias 9 de Abril</h1>
+          <p>Autoelevadores · Repuestos · Service Industrial</p>
+          <p>📞 (011) 2673-8983 &nbsp;|&nbsp; WhatsApp: (011) 2673-8983</p>
+        </div>
+      </div>
+      <div class="pd-meta">
+        <div class="pd-badge">PRE-PRESUPUESTO</div>
+        <table class="pd-meta-table">
+          <tr><td>N°:</td><td id="pd-num"></td></tr>
+          <tr><td>Fecha:</td><td id="pd-date"></td></tr>
+          <tr><td>Validez:</td><td id="pd-validity"></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="pd-section">
+      <h2 class="pd-section-title">DATOS DEL CLIENTE</h2>
+      <table class="pd-info-table">
+        <tr><td><strong>Cliente:</strong></td><td id="pd-client"></td></tr>
+        <tr><td><strong>Teléfono:</strong></td><td id="pd-phone"></td></tr>
+        <tr><td><strong>Consulta:</strong></td><td id="pd-consulta"></td></tr>
+      </table>
+    </div>
+    <div class="pd-section">
+      <h2 class="pd-section-title">DESCRIPCIÓN DEL PRESUPUESTO</h2>
+      <table class="pd-items-table">
+        <thead><tr><th>Producto / Servicio</th><th>Precio (USD)</th></tr></thead>
+        <tbody>
+          <tr><td id="pd-product"></td><td id="pd-price"></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pd-section">
+      <h2 class="pd-section-title">CONDICIONES COMERCIALES</h2>
+      <p><strong>Condiciones de pago:</strong> <span id="pd-payment"></span></p>
+      <p style="margin-top:.5rem"><strong>Observaciones:</strong> <span id="pd-obs"></span></p>
+    </div>
+    <div class="pd-footer">
+      <p>Este presupuesto tiene carácter de pre-cotización y no implica compromiso contractual hasta la firma de contrato.</p>
+      <p>Maquinarias 9 de Abril — Todos los derechos reservados.</p>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

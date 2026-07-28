@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Buscador de Repuestos OEM | Maquinarias 9 de Abril</title>
+  <meta name="description" content="Buscador técnico avanzado de repuestos para autoelevadores. Filtrado en cascada por modelo, sistema y categoría de pieza original.">
+  <link rel="icon" type="image/png" href="assets/logotipo_png.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- --- NAVIGATION BAR --- -->
+  <nav class="navbar" id="main-nav">
+    <div class="navbar-container">
+      <a href="index.html" class="nav-logo">
+        <img src="assets/logotipo_png.png" alt="Maquinarias 9 de Abril" class="nav-logo-img">
+      </a>
+      <button class="nav-toggle" aria-label="Abrir Menú">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link">Inicio</a></li>
+        <li><a href="catalog.html" class="nav-link">Catálogo</a></li>
+        <li><a href="repuestos.html" class="nav-link">Repuestos</a></li>
+        <li><a href="index.html#transporte" class="nav-link">Camiones</a></li>
+        <li><a href="#" class="nav-link open-quote-modal" data-product="Contacto General">Contacto</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="catalog.html" class="btn btn-outline-yellow" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">Cotizar Equipo</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- --- PARTS HEADER --- -->
+  <div class="parts-header-layout" style="padding: 9.5rem 0 3rem 0;">
+    <div class="container">
+      <span class="section-tag">Área de Repuestos</span>
+      <h1 class="parts-main-title">Buscador Técnico de Componentes</h1>
+      <p class="parts-main-subtitle">
+        Encuentre la pieza exacta utilizando nuestra barra lateral de filtros ágiles en cascada o realice una consulta directa por código OEM.
+      </p>
+    </div>
+  </div>
+
+  <!-- --- PARTS PAGE CONTENT --- -->
+  <main class="container" style="padding-bottom: 8rem;">
+    
+    <!-- --- CATEGORÍAS DESTACADAS DE REPUESTOS --- -->
+    <div class="part-cat-section" style="margin-bottom: 3.5rem;">
+      <div style="margin-bottom: 1.5rem;">
+        <span class="section-tag">Categorías Frecuentes</span>
+        <h2 style="font-family: var(--font-headings); font-size: 1.8rem; font-weight: 800; margin-top: 0.3rem;">Selección Rápida por Familia de Componente</h2>
+      </div>
+
+      <div class="part-cat-cards-grid">
+        <div class="part-cat-card" data-cat-key="bombas">
+          <div class="part-cat-img-wrap">
+            <img src="assets/bomba_hidraulica.jpg" alt="Bombas Hidráulicas">
+            <div class="part-cat-overlay"></div>
+          </div>
+          <div class="part-cat-info">
+            <h3>Bombas Hidráulicas</h3>
+            <p>Bombas de engranajes, distribuidores multipista y sellos de presión.</p>
+            <span class="part-cat-btn">Ver Repuestos <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </div>
+        </div>
+
+        <div class="part-cat-card" data-cat-key="neumaticos">
+          <div class="part-cat-img-wrap">
+            <img src="assets/neumaticos_ruedas.jpg" alt="Neumáticos y Ruedas">
+            <div class="part-cat-overlay"></div>
+          </div>
+          <div class="part-cat-info">
+            <h3>Neumáticos y Ruedas</h3>
+            <p>Cubiertas macizas superelásticas, rodillos de poliuretano y llantas.</p>
+            <span class="part-cat-btn">Ver Repuestos <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </div>
+        </div>
+
+        <div class="part-cat-card" data-cat-key="carburadores">
+          <div class="part-cat-img-wrap">
+            <img src="assets/carburador_motor.jpg" alt="Carburadores y Motor">
+            <div class="part-cat-overlay"></div>
+          </div>
+          <div class="part-cat-info">
+            <h3>Carburadores y Motor</h3>
+            <p>Carburadores Toyota 4Y/Nissan, kit GNC, alternadores y filtros.</p>
+            <span class="part-cat-btn">Ver Repuestos <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </div>
+        </div>
+
+        <div class="part-cat-card" data-cat-key="electrico">
+          <div class="part-cat-img-wrap">
+            <img src="assets/bateria_electrica.jpg" alt="Baterías y Eléctrico">
+            <div class="part-cat-overlay"></div>
+          </div>
+          <div class="part-cat-info">
+            <h3>Baterías y Eléctrico</h3>
+            <p>Controladores Zapi/Curtis, baterías 24V/48V, joysticks y luces LED.</p>
+            <span class="part-cat-btn">Ver Repuestos <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="parts-layout">
+      
+      <!-- Search & Table results -->
+      <section class="parts-results-section" style="width: 100%;">
+        
+        <!-- Search Input Bar -->
+        <div class="glass-card" style="padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem;">
+          <div class="input-group" style="max-width: 650px;">
+            <input type="text" id="parts-search-input" placeholder="Escriba código OEM, nombre de pieza o modelo compatible...">
+            <span class="icon">🔍</span>
+          </div>
+          <div class="results-meta">
+            <span style="font-size: 0.95rem;">Repuestos coincidentes: <strong id="parts-count-val" style="color: var(--primary-yellow);">0</strong></span>
+          </div>
+        </div>
+
+        <!-- Cascading Technical Selector Filters (Horizontal Bar below Search & above Catalog Table) -->
+        <div class="glass-card parts-cascading-bar" style="padding: 1.5rem; margin-top: 1.5rem; margin-bottom: 2rem;">
+          <div class="cascading-bar-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+            <span style="font-family: var(--font-headings); font-weight: 700; font-size: 0.95rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--primary-yellow)" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              Filtros Técnicos en Cascada
+            </span>
+            <button id="clear-parts-filters" class="btn btn-secondary btn-sm" style="font-size: 0.8rem; padding: 0.35rem 0.9rem;">
+              Limpiar Filtros
+            </button>
+          </div>
+
+          <div class="cascading-selects-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; margin-top: 1.2rem;">
+            <!-- Dropdown 1: Machine -->
+            <div class="select-group" style="margin-bottom: 0;">
+              <label for="select-machine" style="font-size: 0.8rem; margin-bottom: 0.4rem;">1. Modelo de Máquina</label>
+              <div class="custom-select-wrapper">
+                <select id="select-machine">
+                  <option value="">-- Seleccionar Equipo --</option>
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+            </div>
+
+            <!-- Dropdown 2: System -->
+            <div class="select-group" style="margin-bottom: 0;">
+              <label for="select-system" style="font-size: 0.8rem; margin-bottom: 0.4rem;">2. Sistema de la Máquina</label>
+              <div class="custom-select-wrapper">
+                <select id="select-system" disabled>
+                  <option value="">-- Primero seleccione equipo --</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Dropdown 3: Category -->
+            <div class="select-group" style="margin-bottom: 0;">
+              <label for="select-category" style="font-size: 0.8rem; margin-bottom: 0.4rem;">3. Categoría de Componente</label>
+              <div class="custom-select-wrapper">
+                <select id="select-category" disabled>
+                  <option value="">-- Primero seleccione sistema --</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="parts-table-wrapper">
+          <table class="parts-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">Imagen</th>
+                <th>Código OEM</th>
+                <th>Descripción / Compatibilidad</th>
+                <th>Precio (USD)</th>
+                <th>Disponibilidad</th>
+                <th style="text-align: right;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="parts-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- --- FLOATING CART TOGGLE BUTTON --- -->
+  <button id="cart-toggle-btn" class="cart-floating-btn" aria-label="Abrir Carrito de Repuestos">
+    <div class="cart-floating-icon">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+      </svg>
+      <span id="cart-badge-count" class="cart-badge">0</span>
+    </div>
+    <div class="cart-floating-info">
+      <span class="cart-floating-label">Carrito Repuestos</span>
+      <span id="cart-floating-total" class="cart-floating-total">USD $0</span>
+    </div>
+  </button>
+
+  <!-- --- SHOPPING CART DRAWER OVERLAY --- -->
+  <div id="cart-drawer-overlay" class="cart-drawer-overlay" aria-hidden="true">
+    <div class="cart-drawer">
+      <div class="cart-drawer-header">
+        <div class="cart-drawer-title">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--primary-yellow)" stroke-width="2">
+            <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          <h3>Carrito de Repuestos</h3>
+        </div>
+        <button id="cart-close-btn" class="cart-close-btn" aria-label="Cerrar Carrito">✕</button>
+      </div>
+
+      <div id="cart-items-container" class="cart-drawer-body">
+        <!-- Cart items list rendered by JS -->
+      </div>
+
+      <div class="cart-drawer-footer">
+        <div class="cart-total-row">
+          <span>Total Estimado (USD)</span>
+          <strong id="cart-total-price">USD $0</strong>
+        </div>
+        <button id="cart-checkout-whatsapp" class="btn btn-primary btn-full" style="padding: 0.9rem 1.2rem; font-size: 0.95rem; width: 100%;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+          Finalizar Pedido por WhatsApp
+        </button>
+        <button id="cart-clear-btn" class="btn btn-secondary btn-full" style="padding: 0.6rem 1rem; font-size: 0.85rem; width: 100%; margin-top: 0.5rem;">
+          Vaciar Carrito
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- --- FOOTER --- -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-logo"><img src="assets/logotipo_png.png" alt="Maquinarias 9 de Abril" class="footer-logo-img"></div>
+          <p class="footer-desc">Desde 2019, venta de autoelevadores y zorras de primeras marcas (nuevos y usados), repuestos, neumáticos y servicio técnico integral.</p>
+          <div class="footer-socials">
+            <a href="https://www.instagram.com/autoelevadores9abril.oficial/" target="_blank" rel="noopener noreferrer" class="footer-social-link" title="Instagram">ig</a>
+            <a href="https://maps.app.goo.gl/mhy4bSas3qtBY5Lr8" target="_blank" rel="noopener noreferrer" class="footer-social-link" title="Ubicación en Google Maps">map</a>
+          </div>
+        </div>
+        <div>
+          <h4 class="footer-title">Equipos</h4>
+          <ul class="footer-links">
+            <li><a href="catalog.html" class="footer-link">Línea Eléctrica</a></li>
+            <li><a href="catalog.html" class="footer-link">Línea Diésel</a></li>
+            <li><a href="catalog.html" class="footer-link">Apiladores Retráctiles</a></li>
+            <li><a href="catalog.html" class="footer-link">Usados Garantizados</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Servicio</h4>
+          <ul class="footer-links">
+            <li><a href="repuestos.html" class="footer-link">Buscador OEM</a></li>
+            <li><a href="repuestos.html" class="footer-link">Mantenimiento</a></li>
+            <li><a href="#" class="footer-link open-quote-modal" data-product="Servicio de Emergencia 24/7">Asistencia 24/7</a></li>
+            <li><a href="#" class="footer-link open-quote-modal" data-product="Financiación Flexible">Financiamiento</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Sede Central</h4>
+          <ul class="footer-links" style="color: var(--text-secondary); font-size: 0.9rem;">
+            <li style="margin-bottom: 0.5rem;">📍 <a href="https://maps.app.goo.gl/mhy4bSas3qtBY5Lr8" target="_blank" rel="noopener noreferrer" class="footer-link" style="display: inline-block; padding-left: 0;">San Antonio 1722, B1839CIT 9 de Abril, Buenos Aires</a></li>
+            <li style="margin-bottom: 0.5rem;">📞 <a href="https://wa.me/5491121699968" target="_blank" rel="noopener noreferrer" class="footer-link" style="display: inline-block; padding-left: 0;">+54 9 11 2169-9968</a></li>
+            <li>✉ <a href="mailto:info@autoelevadores9deabril.com" class="footer-link" style="display: inline-block; padding-left: 0;">info@autoelevadores9deabril.com</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Maquinarias 9 de Abril S.A. Todos los derechos reservados.</p>
+        <p>Desarrollado con Estándares Industriales Premium.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- --- QUOTE MODAL --- -->
+  <div class="modal" id="quote-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-icon">📨</div>
+      <h3>Solicitud de Cotización</h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">
+        Por favor complete el formulario técnico. Cotizaremos el producto <span id="modal-product-title" style="color: var(--primary-yellow); font-weight: 700;"></span> en menos de 2 horas hábiles.
+      </p>
+      <form id="modal-quote-form">
+        <div class="form-group">
+          <label for="modal-client-name">Nombre Completo</label>
+          <input type="text" id="modal-client-name" required placeholder="Su nombre o Razón Social">
+        </div>
+        <div class="form-group">
+          <label for="modal-client-email">Email Corporativo</label>
+          <input type="email" id="modal-client-email" required placeholder="ejemplo@empresa.com">
+        </div>
+        <div class="form-group">
+          <label for="modal-client-phone">Teléfono de Contacto</label>
+          <input type="text" id="modal-client-phone" required placeholder="+54 9 11 ...">
+        </div>
+        <div class="form-group">
+          <label for="modal-message">Especificación Adicional (Opcional)</label>
+          <textarea id="modal-message" rows="3" placeholder="Detalle si requiere accesorios, altura específica o condiciones de entrega..."></textarea>
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+          <button type="button" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="flex: 1.5;">Enviar Consulta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- WHATSAPP FLOATING BUTTON -->
+  <a href="https://wa.me/5491126738983?text=Hola%2C%20quisiera%20consultar%20sobre%20sus%20productos" target="_blank" rel="noopener noreferrer" class="whatsapp-float" id="whatsapp-btn" aria-label="Contactar por WhatsApp">
+    <span class="whatsapp-float__tooltip">¡Consultanos por WhatsApp!</span>
+    <span class="whatsapp-float__btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </span>
+  </a>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

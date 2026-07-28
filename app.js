@@ -234,17 +234,18 @@ document.addEventListener("DOMContentLoaded", () => {
   ensureDatabaseSeeded();
   setupNavbar();
   
-  // Detect current page
+  // Detect current page with cleanUrls support (.html optional)
   const path = window.location.pathname;
-  const page = path.split("/").pop() || "index.html";
+  const rawPage = path.split("/").pop() || "index.html";
+  const cleanPage = rawPage.replace(".html", "").toLowerCase();
   
-  if (page === "index.html" || page === "") {
+  if (cleanPage === "index" || cleanPage === "") {
     initHomePage();
-  } else if (page === "catalog.html") {
+  } else if (cleanPage === "catalog") {
     initCatalogPage();
-  } else if (page === "repuestos.html") {
+  } else if (cleanPage === "repuestos") {
     initPartsPage();
-  } else if (page === "detalle.html") {
+  } else if (cleanPage === "detalle") {
     initDetailPage();
   }
   
@@ -275,11 +276,12 @@ function setupNavbar() {
   
   // Highlight active link based on current page
   const links = document.querySelectorAll(".nav-link");
-  const pageName = window.location.pathname.split("/").pop() || "index.html";
+  const rawPage = window.location.pathname.split("/").pop() || "index.html";
+  const currentClean = rawPage.replace(".html", "").toLowerCase();
   
   links.forEach(link => {
-    const href = link.getAttribute("href");
-    if (href === pageName) {
+    const href = (link.getAttribute("href") || "").replace(".html", "").toLowerCase();
+    if (href === currentClean || (currentClean === "" && (href === "index" || href === "/"))) {
       link.classList.add("active");
     } else {
       link.classList.remove("active");

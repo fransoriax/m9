@@ -1244,12 +1244,7 @@ const App = {
     if (backdrop) backdrop.addEventListener('click', closeSidebar);
     $$('.sb-item').forEach(btn => btn.addEventListener('click', closeSidebar));
 
-    const isMobile = window.innerWidth <= 992;
-    if (isMobile) {
-      Router.go('home');
-    } else {
-      Router.go('inventario');
-    }
+    Router.go('home');
   }
 };
 

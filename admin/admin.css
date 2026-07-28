@@ -1265,13 +1265,7 @@ textarea.mf-input { resize: vertical; }
   display: none !important;
 }
 
-@media (min-width: 993px) {
-  #view-home,
-  .btn-back-home,
-  #btn-back-home {
-    display: none !important;
-  }
-}
+
 
 @media (max-width: 992px) {
   :root {

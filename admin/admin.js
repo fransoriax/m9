@@ -24,27 +24,27 @@ let state = {
   serviceUnitId: null,
 };
 
-// ─── MOCK DATA ────────────────────────────────────────────────────────────────
+// ─── MOCK DATA & STORAGE ──────────────────────────────────────────────────────
 let DB = {
   autoelevadores: [
-    { id: 1, name: 'Hangcha XS-20 Eléctrico', brand: 'Hangcha', capacity: '2.000 kg', motor: 'Eléctrico', hours: 1200, price: 18500, status: 'active', visible: true, img: '../assets/electric_forklift.png' },
-    { id: 2, name: 'HELI CPD15 Eléctrico',     brand: 'HELI',    capacity: '1.500 kg', motor: 'Eléctrico', hours: 850,  price: 14200, status: 'active', visible: true, img: '../assets/apiladora.jpg' },
-    { id: 3, name: 'Toyota 8FGF15 GLP',         brand: 'Toyota',  capacity: '1.500 kg', motor: 'GLP',       hours: 3400, price: 22000, status: 'active', visible: true, img: '../assets/autoelevador.jpg' },
-    { id: 4, name: 'Hangcha CPCD35 Diesel',     brand: 'Hangcha', capacity: '3.500 kg', motor: 'Diesel',    hours: 2100, price: 27500, status: 'active', visible: true, img: '../assets/diesel_forklift.png' },
-    { id: 5, name: 'Hecha CBD20 Eléctrico',     brand: 'Hecha',   capacity: '2.000 kg', motor: 'Eléctrico', hours: 600,  price: 12800, status: 'paused', visible: false, img: '../assets/apilador.png' },
+    { id: 1, name: 'Hangcha XS-20 Eléctrico', brand: 'Hangcha', capacity: '2.000 kg', motor: 'Eléctrico', hours: 1200, price: 18500, status: 'active', visible: true, img: '/assets/electric_forklift.png' },
+    { id: 2, name: 'HELI CPD15 Eléctrico',     brand: 'HELI',    capacity: '1.500 kg', motor: 'Eléctrico', hours: 850,  price: 14200, status: 'active', visible: true, img: '/assets/apiladora.jpg' },
+    { id: 3, name: 'Toyota 8FGF15 GLP',         brand: 'Toyota',  capacity: '1.500 kg', motor: 'GLP',       hours: 3400, price: 22000, status: 'active', visible: true, img: '/assets/autoelevador.jpg' },
+    { id: 4, name: 'Hangcha CPCD35 Diesel',     brand: 'Hangcha', capacity: '3.500 kg', motor: 'Diesel',    hours: 2100, price: 27500, status: 'active', visible: true, img: '/assets/diesel_forklift.png' },
+    { id: 5, name: 'Hecha CBD20 Eléctrico',     brand: 'Hecha',   capacity: '2.000 kg', motor: 'Eléctrico', hours: 600,  price: 12800, status: 'paused', visible: false, img: '/assets/apilador.png' },
   ],
   repuestos: [
-    { id: 1, oem: 'OEM-BAT-48500', name: 'Batería 48V 500Ah',   category: 'Eléctrico',  stock: 12, price: 1850, status: 'active', compat: 'Hangcha XS-20, HELI CPD15', img: '../assets/bateria_electrica.jpg' },
-    { id: 2, oem: 'OEM-FIL-HID',  name: 'Filtro Hidráulico',    category: 'Hidráulico', stock: 45, price: 85,   status: 'active', compat: 'Universal',                   img: '../assets/forklift_parts.png' },
-    { id: 3, oem: 'OEM-PAF-T15',  name: 'Pastillas de Freno',   category: 'Frenos',     stock: 8,  price: 120,  status: 'active', compat: 'Toyota 8FGF15, HELI CPD15',   img: '../assets/forklift_parts.png' },
-    { id: 4, oem: 'OEM-BOM-H20',  name: 'Bomba Hidráulica',     category: 'Hidráulico', stock: 3,  price: 2200, status: 'active', compat: 'Hangcha XS-20, Hangcha CPCD35', img: '../assets/bomba_hidraulica.jpg' },
-    { id: 5, oem: 'OEM-CAR-4880', name: 'Cargador 48V 80A',     category: 'Eléctrico',  stock: 6,  price: 780,  status: 'active', compat: 'Universal eléctrico',         img: '../assets/bateria_electrica.jpg' },
-    { id: 6, oem: 'OEM-MAS-T3M',  name: 'Mástil Telescópico 3m',category: 'Estructura', stock: 0,  price: 4500, status: 'paused', compat: 'Hangcha XS-20',                 img: '../assets/forklift_parts.png' },
+    { id: 1, oem: 'OEM-BAT-48500', name: 'Batería 48V 500Ah',   category: 'Eléctrico',  stock: 12, price: 1850, status: 'active', compat: 'Hangcha XS-20, HELI CPD15', img: '/assets/bateria_electrica.jpg' },
+    { id: 2, oem: 'OEM-FIL-HID',  name: 'Filtro Hidráulico',    category: 'Hidráulico', stock: 45, price: 85,   status: 'active', compat: 'Universal',                   img: '/assets/forklift_parts.png' },
+    { id: 3, oem: 'OEM-PAF-T15',  name: 'Pastillas de Freno',   category: 'Frenos',     stock: 8,  price: 120,  status: 'active', compat: 'Toyota 8FGF15, HELI CPD15',   img: '/assets/forklift_parts.png' },
+    { id: 4, oem: 'OEM-BOM-H20',  name: 'Bomba Hidráulica',     category: 'Hidráulico', stock: 3,  price: 2200, status: 'active', compat: 'Hangcha XS-20, Hangcha CPCD35', img: '/assets/bomba_hidraulica.jpg' },
+    { id: 5, oem: 'OEM-CAR-4880', name: 'Cargador 48V 80A',     category: 'Eléctrico',  stock: 6,  price: 780,  status: 'active', compat: 'Universal eléctrico',         img: '/assets/bateria_electrica.jpg' },
+    { id: 6, oem: 'OEM-MAS-T3M',  name: 'Mástil Telescópico 3m',category: 'Estructura', stock: 0,  price: 4500, status: 'paused', compat: 'Hangcha XS-20',                 img: '/assets/forklift_parts.png' },
   ],
   camiones: [
-    { id: 1, name: 'Mercedes Benz Actros 2651', brand: 'Mercedes Benz', capacity: '26 Tn', motor: 'Diesel', hours: 380000, price: 95000, status: 'active', visible: true, img: '../assets/truck.png' },
-    { id: 2, name: 'Volvo FH 460',              brand: 'Volvo',         capacity: '24 Tn', motor: 'Diesel', hours: 210000, price: 110000, status: 'active', visible: true, img: '../assets/truck.png' },
-    { id: 3, name: 'Scania R450 6×2',           brand: 'Scania',        capacity: '22 Tn', motor: 'Diesel', hours: 290000, price: 88000, status: 'paused', visible: false, img: '../assets/truck.png' },
+    { id: 1, name: 'Mercedes Benz Actros 2651', brand: 'Mercedes Benz', capacity: '26 Tn', motor: 'Diesel', hours: 380000, price: 95000, status: 'active', visible: true, img: '/assets/truck.png' },
+    { id: 2, name: 'Volvo FH 460',              brand: 'Volvo',         capacity: '24 Tn', motor: 'Diesel', hours: 210000, price: 110000, status: 'active', visible: true, img: '/assets/truck.png' },
+    { id: 3, name: 'Scania R450 6×2',           brand: 'Scania',        capacity: '22 Tn', motor: 'Diesel', hours: 290000, price: 88000, status: 'paused', visible: false, img: '/assets/truck.png' },
   ],
   leads: {
     nuevas: [
@@ -65,7 +65,7 @@ let DB = {
     {
       id: 'U001', model: 'Hangcha XS-20 Eléctrico', serial: 'HC-2024-001', chassis: 'CHX20240001',
       client: 'Logística del Sur SRL', saleDate: '2024-03-15', warrantyExpiry: '2025-03-15',
-      img: '../assets/electric_forklift.png',
+      img: '/assets/electric_forklift.png',
       services: [
         { id: 'S1', date: '2024-06-01', hours: 500,  type: 'Cambio de aceite y filtros',  parts: 'Filtro OEM-FIL-HID, Aceite 10W40 5L', notes: 'Equipo en perfecto estado. Se realizó el primer service de 500hs sin novedades.', tech: 'Ramiro Blanco' },
         { id: 'S2', date: '2024-09-15', hours: 1000, type: 'Service general',               parts: 'Filtro OEM-FIL-HID, Pastillas OEM-PAF-T15, Aceite 10W40 5L', notes: 'Se reemplazaron pastillas de freno por desgaste. Todo lo demás OK. Próximo service: 1500hs.', tech: 'Pablo Ríos' },
@@ -74,7 +74,7 @@ let DB = {
     {
       id: 'U002', model: 'HELI CPD15 Eléctrico', serial: 'HE-2023-087', chassis: 'HLC20230087',
       client: 'Frigorífico Norte SA', saleDate: '2023-11-10', warrantyExpiry: '2024-11-10',
-      img: '../assets/apiladora.jpg',
+      img: '/assets/apiladora.jpg',
       services: [
         { id: 'S3', date: '2024-02-15', hours: 300, type: 'Ajuste de frenos', parts: 'Pastillas OEM-PAF-T15', notes: 'Cliente reportó frenado con vibración. Se ajustaron pastillas traseras. Solución aplicada con éxito.', tech: 'Ramiro Blanco' },
         { id: 'S4', date: '2024-05-20', hours: 600, type: 'Cambio de batería', parts: 'Batería OEM-BAT-48500, Cargador OEM-CAR-4880', notes: 'Batería original con capacidad reducida al 60%. Se reemplazó por unidad nueva. Rendimiento óptimo restaurado.', tech: 'Pablo Ríos' },
@@ -83,7 +83,7 @@ let DB = {
     {
       id: 'U003', model: 'Toyota 8FGF15 GLP', serial: 'TY-2024-022', chassis: 'TOY20240022',
       client: 'Distribuidora Pérez', saleDate: '2024-05-20', warrantyExpiry: '2025-05-20',
-      img: '../assets/autoelevador.jpg',
+      img: '/assets/autoelevador.jpg',
       services: [
         { id: 'S5', date: '2024-09-10', hours: 200, type: 'Mantenimiento preventivo', parts: 'Filtro OEM-FIL-HID, Aceite 10W40 3L', notes: 'Primera revisión preventiva. Equipo en excelentes condiciones. Sin observaciones.', tech: 'Matías Sosa' },
       ]
@@ -97,6 +97,32 @@ let DB = {
     { id: 'R005', author: 'Ricardo Flores', stars: 5, date: 'hace 3 semanas', text: 'Compramos un autoelevador diesel de segunda mano en excelente estado. Precio justo, documentación en orden y garantía real. Muy recomendable para empresas que buscan calidad.', visible: true },
   ],
 };
+
+function loadDatabase() {
+  try {
+    const saved = localStorage.getItem('m9-inventory-db');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      DB = { ...DB, ...parsed };
+    } else {
+      saveDatabase();
+    }
+  } catch(e) {
+    console.error('Error al cargar base de datos:', e);
+  }
+}
+
+function saveDatabase() {
+  try {
+    localStorage.setItem('m9-inventory-db', JSON.stringify(DB));
+    if (DB.reviews) {
+      const visible = DB.reviews.filter(r => r.visible !== false);
+      localStorage.setItem('m9-reviews', JSON.stringify(visible));
+    }
+  } catch(e) {
+    console.error('Error al guardar base de datos:', e);
+  }
+}
 
 let nextId = { auto: 6, rep: 7, cam: 4, lead: 6, service: 6 };
 
@@ -528,7 +554,7 @@ const Inv = {
     } else {
       const tab = state.activeTab;
       const newId = tab === 'camiones' ? nextId.cam++ : nextId.auto++;
-      DB[state.activeTab].unshift({ id: newId, ...item, img: '../assets/electric_forklift.png' });
+      DB[state.activeTab].unshift({ id: newId, ...item, img: '/assets/electric_forklift.png' });
       toast('Equipo agregado correctamente');
     }
     Modal.close('modal-machinery');
@@ -536,7 +562,7 @@ const Inv = {
     this.render();
   },
   publish() {
-    localStorage.setItem('m9-inventory-db', JSON.stringify(DB));
+    saveDatabase();
   },
   saveRepuesto() {
     const oem  = $('r-oem').value.trim();
@@ -550,7 +576,7 @@ const Inv = {
       stock:    parseInt($('r-stock').value) || 0,
       status:   $('r-status').value,
       compat:   $('r-compat').value.trim(),
-      img:      state.editingRepImg || '../assets/forklift_parts.png',
+      img:      state.editingRepImg || '/assets/forklift_parts.png',
     };
     if (state.editingId) {
       const idx = DB.repuestos.findIndex(x => x.id === state.editingId);
@@ -1192,6 +1218,7 @@ const Rev = {
 // ─── APP INIT ─────────────────────────────────────────────────────────────────
 const App = {
   init() {
+    loadDatabase();
     Modal.init();
     Router.init();
     Inv.init();

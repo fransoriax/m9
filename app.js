@@ -548,6 +548,47 @@ function initCatalogPage() {
   applyFilters();
 }
 
+function getMergedSpareParts() {
+  let list = [...spareParts];
+  try {
+    const rawDB = localStorage.getItem('m9-inventory-db');
+    if (rawDB) {
+      const parsedDB = JSON.parse(rawDB);
+      if (parsedDB.repuestos && Array.isArray(parsedDB.repuestos)) {
+        parsedDB.repuestos.forEach(r => {
+          if (r.status !== 'paused' && !list.some(x => x.oem === r.oem)) {
+            let cat = "mecanico";
+            const cLower = (r.category || "").toLowerCase();
+            if (cLower.includes("eléctrico") || cLower.includes("electrico")) cat = "baterias";
+            else if (cLower.includes("hidráulico") || cLower.includes("hidraulico")) cat = "bombas";
+            else if (cLower.includes("filtro")) cat = "filtros";
+            else if (cLower.includes("freno")) cat = "mecanico";
+
+            let sys = "motor";
+            if (cat === "baterias") sys = "electrico";
+            if (cat === "bombas") sys = "hidraulico";
+
+            let img = r.img ? r.img.replace('../', '').replace(/^\//, '') : "assets/forklift_parts.png";
+
+            list.push({
+              oem: r.oem,
+              name: r.name,
+              machine: r.compat || "Universal",
+              system: sys,
+              category: cat,
+              price: r.price,
+              stock: r.stock > 0 ? "in" : "low",
+              desc: `Repuesto ${r.name} (${r.oem}). Compatible con ${r.compat || 'varios modelos'}.`,
+              image: img
+            });
+          }
+        });
+      }
+    }
+  } catch(e) {}
+  return list;
+}
+
 // 5. TECHNICAL PARTS SEARCH ENGINE (image_2.png style)
 function initPartsPage() {
   const machineSelect = document.getElementById("select-machine");
@@ -560,8 +601,10 @@ function initPartsPage() {
 
   if (!partsTableBody) return;
 
+  const currentSpareParts = getMergedSpareParts();
+
   // Initialize unique selector values
-  const machines = [...new Set(spareParts.map(p => p.machine))];
+  const machines = [...new Set(currentSpareParts.map(p => p.machine))];
   
   machines.forEach(m => {
     const option = document.createElement("option");
@@ -575,7 +618,7 @@ function initPartsPage() {
     // Enable and update systems
     if (machineSelect.value) {
       systemSelect.removeAttribute("disabled");
-      const matchedSystems = [...new Set(spareParts.filter(p => p.machine === machineSelect.value).map(p => p.system))];
+      const matchedSystems = [...new Set(currentSpareParts.filter(p => p.machine === machineSelect.value).map(p => p.system))];
       
       systemSelect.innerHTML = `<option value="">-- Seleccionar Sistema --</option>`;
       matchedSystems.forEach(s => {
@@ -596,7 +639,7 @@ function initPartsPage() {
   systemSelect.addEventListener("change", () => {
     if (systemSelect.value) {
       categorySelect.removeAttribute("disabled");
-      const matchedCats = [...new Set(spareParts.filter(p => 
+      const matchedCats = [...new Set(currentSpareParts.filter(p => 
         p.machine === machineSelect.value && 
         p.system === systemSelect.value
       ).map(p => p.category))];
@@ -634,15 +677,15 @@ function initPartsPage() {
       // Filter logic according to key
       let matched = [];
       if (catKey === "bombas") {
-        matched = spareParts.filter(p => p.system === "hidraulico" || p.category === "bombas");
+        matched = currentSpareParts.filter(p => p.system === "hidraulico" || p.category === "bombas");
       } else if (catKey === "neumaticos") {
-        matched = spareParts.filter(p => p.category === "neumaticos" || p.system === "rodado");
+        matched = currentSpareParts.filter(p => p.category === "neumaticos" || p.system === "rodado");
       } else if (catKey === "carburadores") {
-        matched = spareParts.filter(p => p.system === "motor" || p.category === "carburadores");
+        matched = currentSpareParts.filter(p => p.system === "motor" || p.category === "carburadores");
       } else if (catKey === "electrico") {
-        matched = spareParts.filter(p => p.system === "electrico" || p.category === "baterias" || p.category === "controladores");
+        matched = currentSpareParts.filter(p => p.system === "electrico" || p.category === "baterias" || p.category === "controladores");
       } else {
-        matched = spareParts;
+        matched = currentSpareParts;
       }
 
       renderPartsTable(matched);
@@ -702,7 +745,7 @@ function initPartsPage() {
     const selectedCategory = categorySelect.value;
     const searchQuery = partsSearchInput ? partsSearchInput.value.toLowerCase().trim() : "";
 
-    const matchedParts = spareParts.filter(part => {
+    const matchedParts = currentSpareParts.filter(part => {
       const matchMachine = !selectedMachine || part.machine === selectedMachine;
       const matchSystem = !selectedSystem || part.system === selectedSystem;
       const matchCategory = !selectedCategory || part.category === selectedCategory;
@@ -784,7 +827,7 @@ function initPartsPage() {
     partsSearchInput.value = searchParam;
     applyPartsFilter();
   } else {
-    renderPartsTable(spareParts);
+    renderPartsTable(currentSpareParts);
   }
 }
 
@@ -1424,7 +1467,8 @@ const PartsCart = {
   },
 
   addItem(oem) {
-    const part = spareParts.find(p => p.oem === oem);
+    const allParts = getMergedSpareParts();
+    const part = allParts.find(p => p.oem === oem);
     if (!part) return;
 
     const existing = this.items.find(i => i.oem === oem);

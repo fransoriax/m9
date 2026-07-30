@@ -11,7 +11,7 @@ const CREDENTIALS = { user: 'admin', pass: 'admin' };
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let state = {
-  activeView: 'inventario',
+  activeView: 'home',
   activeTab: 'autoelevadores',
   searchQuery: '',
   filterStatus: '',
@@ -96,6 +96,59 @@ let DB = {
     { id: 'R004', author: 'Distribuidora Norte SA', stars: 4, date: 'hace 6 meses', text: 'Buen servicio técnico y atención al cliente. Los repuestos OEM llegan rápido y a buen precio. Seguimos eligiéndolos para el mantenimiento de toda nuestra flota.', visible: true },
     { id: 'R005', author: 'Ricardo Flores', stars: 5, date: 'hace 3 semanas', text: 'Compramos un autoelevador diesel de segunda mano en excelente estado. Precio justo, documentación en orden y garantía real. Muy recomendable para empresas que buscan calidad.', visible: true },
   ],
+  accounts: [
+    {
+      id: 'acc-1',
+      user: 'admin',
+      pass: 'admin',
+      name: 'Administrador General',
+      role: 'Superadmin CRM',
+      isSuperAdmin: true,
+      modules: ['inventario', 'cotizaciones', 'presupuestos', 'postventa', 'resenas', 'reportes', 'cuentas']
+    },
+    {
+      id: 'acc-2',
+      user: 'vendedor',
+      pass: 'vendedor123',
+      name: 'Carlos Mendoza',
+      role: 'Ejecutivo de Ventas',
+      isSuperAdmin: false,
+      modules: ['inventario', 'cotizaciones', 'presupuestos']
+    },
+    {
+      id: 'acc-3',
+      user: 'tecnico',
+      pass: 'tecnico123',
+      name: 'Ramiro Blanco',
+      role: 'Técnico de Servicio',
+      isSuperAdmin: false,
+      modules: ['postventa']
+    }
+  ],
+  quotes: [
+    {
+      id: 'Q001', number: 'PRE-2026-001', client: 'Logística del Sur SRL', company: 'Logística del Sur SRL',
+      phone: '+54 9 11 8765-4321', email: 'compras@logisticadelsur.com', cuit: '30-71234567-9',
+      date: '2026-07-20', validUntil: '2026-08-20', status: 'enviado',
+      items: [
+        { desc: 'Hangcha XS-20 Eléctrico 2T', qty: 2, unit: 'unidad', price: 18500 },
+        { desc: 'Batería 48V 500Ah OEM-BAT-48500', qty: 2, unit: 'unidad', price: 1850 }
+      ],
+      conditions: 'Precio en USD. Entrega en 15 días hábiles. Garantía 12 meses.',
+      notes: 'Cliente interesado en financiación en cuotas.'
+    },
+    {
+      id: 'Q002', number: 'PRE-2026-002', client: 'Carlos Mendoza', company: 'Frigorífico Norte SA',
+      phone: '+54 9 11 5555-4444', email: 'carlos@fnorte.com', cuit: '20-28765432-5',
+      date: '2026-07-25', validUntil: '2026-08-25', status: 'borrador',
+      items: [
+        { desc: 'Filtro Hidráulico OEM-FIL-HID', qty: 10, unit: 'unidad', price: 85 },
+        { desc: 'Aceite Hidráulico 20L', qty: 5, unit: 'bidón', price: 120 }
+      ],
+      conditions: 'Precio en USD. Stock disponible inmediato.',
+      notes: ''
+    }
+  ],
 };
 
 function loadDatabase() {
@@ -104,6 +157,28 @@ function loadDatabase() {
     if (saved) {
       const parsed = JSON.parse(saved);
       DB = { ...DB, ...parsed };
+      if (!parsed.accounts) DB.accounts = DB.accounts || [];
+      if (DB.accounts) {
+        DB.accounts.forEach(acc => {
+          if (acc.isSuperAdmin || acc.user === 'admin') {
+            ['inventario','cotizaciones','presupuestos','postventa','resenas','reportes','cuentas'].forEach(m => {
+              if (!acc.modules.includes(m)) acc.modules.push(m);
+            });
+          }
+        });
+      }
+      try {
+        const rawSu = sessionStorage.getItem('m9-user');
+        if (rawSu) {
+          const su = JSON.parse(rawSu);
+          if (su.isSuperAdmin || su.user === 'admin') {
+            ['inventario','cotizaciones','presupuestos','postventa','resenas','reportes','cuentas'].forEach(m => {
+              if (!su.modules.includes(m)) su.modules.push(m);
+            });
+            sessionStorage.setItem('m9-user', JSON.stringify(su));
+          }
+        }
+      } catch(e) {}
     } else {
       saveDatabase();
     }
@@ -124,7 +199,7 @@ function saveDatabase() {
   }
 }
 
-let nextId = { auto: 6, rep: 7, cam: 4, lead: 6, service: 6 };
+let nextId = { auto: 6, rep: 7, cam: 4, lead: 6, service: 6, quote: 3 };
 
 // ─── UTILS ────────────────────────────────────────────────────────────────────
 function $(id) { return document.getElementById(id); }
@@ -161,24 +236,54 @@ function toast(msg, type = 'success') {
   setTimeout(() => el.remove(), 3200);
 }
 
-// ─── AUTH MODULE ──────────────────────────────────────────────────────────────
+// ─── AUTHENTICATION ───────────────────────────────────────────────────────────
 const Auth = {
   check() {
-    return sessionStorage.getItem('m9-auth') === '1';
+    return sessionStorage.getItem('m9-auth') === '1' && sessionStorage.getItem('m9-user') !== null;
+  },
+  getCurrentUser() {
+    let u = null;
+    try {
+      const raw = sessionStorage.getItem('m9-user');
+      if (raw) u = JSON.parse(raw);
+    } catch(e) {}
+    if (!u) u = (DB.accounts && DB.accounts[0]) || { user: 'admin', name: 'Admin', role: 'Superadmin', modules: ['inventario','cotizaciones','presupuestos','postventa','resenas','reportes','cuentas'], isSuperAdmin: true };
+    if (u && (u.isSuperAdmin || u.user === 'admin')) {
+      if (!u.modules) u.modules = [];
+      ['inventario','cotizaciones','presupuestos','postventa','resenas','reportes','cuentas'].forEach(m => {
+        if (!u.modules.includes(m)) u.modules.push(m);
+      });
+    }
+    return u;
   },
   login(user, pass) {
-    return user === CREDENTIALS.user && pass === CREDENTIALS.pass;
+    const acc = (DB.accounts || []).find(a => a.user.toLowerCase() === user.toLowerCase() && a.pass === pass);
+    if (acc) {
+      sessionStorage.setItem('m9-auth', '1');
+      sessionStorage.setItem('m9-user', JSON.stringify(acc));
+      return true;
+    }
+    return false;
   },
   logout() {
     sessionStorage.removeItem('m9-auth');
+    sessionStorage.removeItem('m9-user');
     $('app').style.display = 'none';
     $('login-screen').style.display = 'flex';
     $('login-user').value = '';
     $('login-pass').value = '';
+    const bnav = $('bottom-nav');
+    if (bnav) bnav.style.display = 'none';
   },
   init() {
+    loadDatabase();
     if (this.check()) {
       this.showApp();
+    } else {
+      $('login-screen').style.display = 'flex';
+      $('app').style.display = 'none';
+      const bnav = $('bottom-nav');
+      if (bnav) bnav.style.display = 'none';
     }
     $('login-form').addEventListener('submit', e => {
       e.preventDefault();
@@ -199,10 +304,14 @@ const Auth = {
       }
     });
     $('logout-btn').addEventListener('click', () => this.logout());
+    const headerLogout = $('logout-btn-header');
+    if (headerLogout) headerLogout.addEventListener('click', () => this.logout());
   },
   showApp() {
     $('login-screen').style.display = 'none';
     $('app').style.display = 'flex';
+    const bnav = $('bottom-nav');
+    if (bnav) bnav.style.display = '';
     App.init();
   }
 };
@@ -210,34 +319,55 @@ const Auth = {
 // ─── ROUTER ───────────────────────────────────────────────────────────────────
 const Router = {
   titles: {
-    home:         { title: 'Inicio',                     crumb: 'Panel de Control M9' },
-    inventario:   { title: 'Inventario & Stock',         crumb: 'Gestión de productos, maquinaria y stock' },
-    cotizaciones: { title: 'Cotizaciones & Leads',       crumb: 'Tablero Kanban de seguimiento comercial' },
-    postventa:    { title: 'Post-Venta & Service',       crumb: 'Historial de unidades vendidas y mantenimientos' },
-    resenas:      { title: 'Reseñas Google',             crumb: 'Gestión de opiniones visibles en el sitio web' },
+    home:          { title: 'Inicio',                     crumb: 'Panel de Control M9' },
+    inventario:    { title: 'Inventario & Stock',         crumb: 'Gestión de productos, maquinaria y stock' },
+    cotizaciones:  { title: 'Cotizaciones & Leads',       crumb: 'Tablero Kanban de seguimiento comercial' },
+    presupuestos:  { title: 'Presupuestos',               crumb: 'Generador de presupuestos en PDF para clientes' },
+    postventa:     { title: 'Post-Venta & Service',       crumb: 'Historial de unidades vendidas y mantenimientos' },
+    resenas:       { title: 'Reseñas Google',             crumb: 'Gestión de opiniones visibles en el sitio web' },
+    reportes:      { title: 'Reportes',                   crumb: 'Métricas del negocio, alertas y rendimiento comercial' },
+    cuentas:       { title: 'Centro de Cuentas',          crumb: 'Gestión de usuarios y permisos de acceso al CRM' },
   },
   go(view) {
+    const user = Auth.getCurrentUser();
+    const allowed = user.modules || ['inventario','cotizaciones','presupuestos','postventa','resenas','reportes'];
+    if (user.isSuperAdmin || user.user === 'admin') {
+      ['cuentas','presupuestos','reportes'].forEach(m => {
+        if (!allowed.includes(m)) allowed.push(m);
+      });
+    }
+
+    // Permission enforcement: if user doesn't have access to this view, redirect to first allowed view
+    if (view !== 'home' && !allowed.includes(view)) {
+      view = allowed[0] || 'inventario';
+    }
+
+    if (window.innerWidth >= 769 && view === 'home') {
+      view = allowed[0] || 'inventario';
+    }
     state.activeView = view;
     $$('.view-panel').forEach(p => p.classList.remove('active-panel'));
     $$('.sb-item').forEach(b => b.classList.remove('active'));
-    $$('.bnav-item').forEach(b => b.classList.remove('active'));
     $$('.crm-hmod-card').forEach(b => b.classList.remove('active'));
 
     const targetPanel = $(`view-${view}`);
     const targetSb = $(`nav-${view}`);
-    const targetBnav = $(`bnav-${view}`);
 
     if (targetPanel) targetPanel.classList.add('active-panel');
     if (targetSb) targetSb.classList.add('active');
-    if (targetBnav) targetBnav.classList.add('active');
 
-    // Control de botón volver al inicio en celulares
+    // Bottom nav only has Inicio — keep it always active so user knows it navigates home
+    const bnavHome = $('bnav-home');
+    if (bnavHome) bnavHome.classList.add('active');
+
+    // Botón volver al inicio: solo en mobile, nunca en desktop
     const backBtn = $('btn-back-home');
     if (backBtn) {
-      if (view === 'home') {
-        backBtn.style.display = 'none';
-      } else {
+      const isMobile = window.innerWidth < 769;
+      if (isMobile && view !== 'home') {
         backBtn.style.display = 'inline-flex';
+      } else {
+        backBtn.style.display = 'none';
       }
     }
 
@@ -249,8 +379,11 @@ const Router = {
     // Render on first visit or re-visit
     if (view === 'inventario')   Inv.render();
     if (view === 'cotizaciones') K.render();
+    if (view === 'presupuestos') Quotes.render();
     if (view === 'postventa')    PV.render();
     if (view === 'resenas')      Rev.render();
+    if (view === 'reportes')     Reports.render();
+    if (view === 'cuentas')      Cuentas.render();
   },
   init() {
     $$('.sb-item[data-view], .bnav-item[data-view], .crm-hmod-card[data-view]').forEach(btn => {
@@ -698,14 +831,23 @@ const K = {
       $(`count-${col}`).textContent = DB.leads[col].length;
       // Rebind drag events
       el.querySelectorAll('.kcard').forEach(card => {
-        card.addEventListener('dragstart', e => {
+        const handle = card.querySelector('.kcard-drag-handle');
+        const dragElem = handle || card;
+        dragElem.addEventListener('dragstart', e => {
           this.draggingId   = card.dataset.id;
           this.draggingFrom = col;
           card.classList.add('dragging');
-          e.dataTransfer.effectAllowed = 'move';
+          if (e.dataTransfer) {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', card.dataset.id || '');
+          }
         });
-        card.addEventListener('dragend', () => card.classList.remove('dragging'));
-        this.initTouchDrag(card, col);
+        dragElem.addEventListener('dragend', () => {
+          card.classList.remove('dragging');
+          this.draggingId = null;
+          this.draggingFrom = null;
+          document.querySelectorAll('.kboard-col, .kcol-body').forEach(c => c.classList.remove('drag-active'));
+        });
       });
     });
     // Total badge
@@ -789,12 +931,11 @@ const K = {
     const urg = { alta: 'badge--urgency--alta alta', media: 'badge--urgency--media media', normal: 'badge--urgency--normal normal' };
     const urgLabel = { alta: '🔴 Alta', media: '🟡 Media', normal: '🟢 Normal' };
     const waUrl = `https://wa.me/${WA_NUMBER.replace(/\D/g,'')}?text=Hola%20${encodeURIComponent(l.client)}%2C%20te%20contactamos%20desde%20Maquinarias%209%20de%20Abril.`;
-    const isMobile = window.innerWidth <= 992;
-    const draggableAttr = isMobile ? '' : 'draggable="true"';
-    return `<div class="kcard" ${draggableAttr} data-id="${l.id}">
+    return `<div class="kcard" data-id="${l.id}">
       <div class="kcard-top-bar">
         <span class="kcard-urgency kcard-urgency--${l.urgency}">${urgLabel[l.urgency]||l.urgency}</span>
         <div class="kcard-actions-row">
+          <span class="kcard-drag-handle" draggable="true" title="Arrastrar para mover">⋮⋮</span>
           <button class="kcard-btn-move" onclick="K.openMoveMenu(event, '${l.id}')" ontouchstart="event.stopPropagation()" title="Mover etapa">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
             Mover
@@ -817,15 +958,20 @@ const K = {
   },
   drop(event, targetCol) {
     event.preventDefault();
-    $(`col-${targetCol}`).classList.remove('drag-active');
-    if (!this.draggingId || this.draggingFrom === targetCol) return;
-    const leadIdx = DB.leads[this.draggingFrom].findIndex(l => l.id === this.draggingId);
+    const targetColEl = $(`col-${targetCol}`);
+    if (targetColEl) targetColEl.classList.remove('drag-active');
+    const dragId = this.draggingId;
+    const dragFrom = this.draggingFrom;
+    this.draggingId = null;
+    this.draggingFrom = null;
+
+    if (!dragId || dragFrom === targetCol || !dragFrom) return;
+    const leadIdx = DB.leads[dragFrom].findIndex(l => l.id === dragId);
     if (leadIdx === -1) return;
-    const [lead] = DB.leads[this.draggingFrom].splice(leadIdx, 1);
+    const [lead] = DB.leads[dragFrom].splice(leadIdx, 1);
     DB.leads[targetCol].push(lead);
     this.render();
     toast(`Lead movido a "${targetCol === 'cotizacion' ? 'En Cotización' : targetCol === 'enviado' ? 'Presupuesto Enviado' : targetCol === 'ganado' ? 'Cerrado/Ganado' : 'Nuevas'}"`, 'info');
-    this.draggingId = null; this.draggingFrom = null;
   },
   findLead(id) {
     for (const col of Object.values(DB.leads)) {
@@ -1061,9 +1207,64 @@ const PV = {
     });
     this.renderList(filtered);
   },
+
+  openUnit() {
+    $('modal-unit-title').textContent = 'Nueva Venta — Seguimiento Post-Venta';
+    $('form-unit').reset();
+    // Default sale date = today, warranty = 1 year from today
+    const today = new Date().toISOString().split('T')[0];
+    const nextYear = new Date(Date.now() + 365 * 86400000).toISOString().split('T')[0];
+    $('un-sale-date').value = today;
+    $('un-warranty').value = nextYear;
+    Modal.open('modal-unit');
+  },
+
+  saveUnit() {
+    const model   = $('un-model').value.trim();
+    const client  = $('un-client').value.trim();
+    const serial  = $('un-serial').value.trim();
+    const chassis = $('un-chassis').value.trim();
+    const saleDate    = $('un-sale-date').value;
+    const warrantyExpiry = $('un-warranty').value;
+    const img     = $('un-img').value.trim() || '/assets/electric_forklift.png';
+    const phone   = $('un-phone').value.trim();
+    const notes   = $('un-notes').value.trim();
+
+    if (!model || !client || !serial || !saleDate || !warrantyExpiry) {
+      toast('Completá los campos obligatorios (*)', 'error');
+      return;
+    }
+
+    const newUnit = {
+      id: `U${Date.now()}`,
+      model,
+      client,
+      serial,
+      chassis: chassis || '—',
+      saleDate,
+      warrantyExpiry,
+      img,
+      phone: phone || '',
+      notes: notes || '',
+      services: []
+    };
+
+    DB.units.push(newUnit);
+    saveDatabase();
+    Modal.close('modal-unit');
+    this.renderList(DB.units);
+    state.activeUnitId = newUnit.id;
+    this.renderList(DB.units);
+    this.renderDetail(newUnit);
+    toast(`Venta de "${model}" registrada ✓`);
+  },
+
   init() {
     $('pv-search').addEventListener('input', e => this.search(e.target.value));
     $('form-service').addEventListener('submit', e => { e.preventDefault(); this.saveService(); });
+    $('form-unit').addEventListener('submit', e => { e.preventDefault(); this.saveUnit(); });
+    const addUnitBtn = $('btn-add-unit');
+    if (addUnitBtn) addUnitBtn.addEventListener('click', () => this.openUnit());
     this.render();
   }
 };
@@ -1210,13 +1411,701 @@ const Rev = {
     $('btn-add-review').addEventListener('click', () => this.openNew());
     $('rev-search').addEventListener('input', e => this.search(e.target.value));
     $('form-review').addEventListener('submit', e => { e.preventDefault(); this.save(); });
-    this.publish(); // publicar datos de ejemplo al cargar
     this.render();
   }
 };
 
+// ─── CENTRO DE CUENTAS MODULE ──────────────────────────────────────────────────
+const Cuentas = {
+  filtered(q = '') {
+    let list = DB.accounts || [];
+    if (q) {
+      const query = q.toLowerCase();
+      list = list.filter(a =>
+        a.user.toLowerCase().includes(query) ||
+        a.name.toLowerCase().includes(query) ||
+        a.role.toLowerCase().includes(query)
+      );
+    }
+    return list;
+  },
+
+  render(q = '') {
+    const list = this.filtered(q);
+    const thead = $('acc-thead');
+    const tbody = $('acc-tbody');
+    const empty = $('acc-empty');
+
+    if (!thead || !tbody) return;
+
+    thead.innerHTML = `<tr>
+      <th>Usuario / Login</th>
+      <th>Nombre y Apellido</th>
+      <th>Cargo / Rol</th>
+      <th>Módulos Habilitados</th>
+      <th>Acciones</th>
+    </tr>`;
+
+    if (!list.length) {
+      tbody.innerHTML = '';
+      if (empty) empty.style.display = 'flex';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+
+    const modLabels = {
+      inventario: '📦 Stock',
+      cotizaciones: '📋 Leads',
+      postventa: '🛠️ Service',
+      resenas: '⭐ Reseñas',
+      cuentas: '👑 Cuentas'
+    };
+
+    tbody.innerHTML = list.map(a => {
+      const isSuper = a.isSuperAdmin || a.user === 'admin';
+      const permsHTML = (a.modules || []).map(m =>
+        `<span class="badge ${m === 'cuentas' ? 'badge--oem' : 'badge--brand'}" style="margin:2px">${modLabels[m]||m}</span>`
+      ).join('');
+
+      return `<tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:.6rem">
+            <div style="width:32px;height:32px;border-radius:50%;background:${isSuper ? '#FFB800' : 'rgba(255,184,0,0.2)'};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;color:${isSuper ? '#000' : 'var(--y)'};flex-shrink:0">${(a.name||a.user).charAt(0).toUpperCase()}</div>
+            <span style="font-weight:700;color:var(--t1)">@${a.user}</span>
+          </div>
+        </td>
+        <td><span style="font-weight:600">${a.name}</span></td>
+        <td><span class="badge ${isSuper ? 'badge--oem' : 'badge--vis-on'}">${a.role}</span></td>
+        <td><div style="display:flex;flex-wrap:wrap;gap:4px">${permsHTML}</div></td>
+        <td>
+          <div class="row-actions">
+            <button class="action-btn action-btn--edit" title="Editar Permisos" onclick="Cuentas.edit('${a.id}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            ${isSuper ? '' : `
+            <button class="action-btn action-btn--del" title="Eliminar Cuenta" onclick="Cuentas.confirmDelete('${a.id}','${a.user}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+            </button>
+            `}
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+
+    const badge = $('badge-cuentas');
+    if (badge) badge.textContent = list.length;
+  },
+
+  openNew() {
+    state.editingId = null;
+    $('modal-account-title').textContent = 'Nueva Cuenta CRM';
+    $('form-account').reset();
+    $('acc-user').disabled = false;
+    $('perm-inventario').checked = true;
+    $('perm-cotizaciones').checked = true;
+    $('perm-presupuestos').checked = true;
+    $('perm-postventa').checked = false;
+    $('perm-resenas').checked = false;
+    $('perm-reportes').checked = false;
+    Modal.open('modal-account');
+  },
+
+  edit(id) {
+    const a = DB.accounts.find(x => x.id === id);
+    if (!a) return;
+    state.editingId = id;
+    $('modal-account-title').textContent = `Editar Permisos: @${a.user}`;
+    $('acc-user').value = a.user;
+    $('acc-user').disabled = (a.user === 'admin');
+    $('acc-pass').value = a.pass || '';
+    $('acc-name').value = a.name || '';
+    $('acc-role').value = a.role || '';
+
+    const mods = a.modules || [];
+    $('perm-inventario').checked = mods.includes('inventario');
+    $('perm-cotizaciones').checked = mods.includes('cotizaciones');
+    $('perm-presupuestos').checked = mods.includes('presupuestos');
+    $('perm-postventa').checked = mods.includes('postventa');
+    $('perm-resenas').checked = mods.includes('resenas');
+    $('perm-reportes').checked = mods.includes('reportes');
+
+    Modal.open('modal-account');
+  },
+
+  save() {
+    const user = $('acc-user').value.trim();
+    const pass = $('acc-pass').value.trim();
+    const name = $('acc-name').value.trim();
+    const role = $('acc-role').value.trim();
+
+    if (!user || !pass || !name || !role) {
+      toast('Completá todos los campos requeridos', 'error');
+      return;
+    }
+
+    const modules = [];
+    if ($('perm-inventario').checked) modules.push('inventario');
+    if ($('perm-cotizaciones').checked) modules.push('cotizaciones');
+    if ($('perm-presupuestos').checked) modules.push('presupuestos');
+    if ($('perm-postventa').checked) modules.push('postventa');
+    if ($('perm-resenas').checked) modules.push('resenas');
+    if ($('perm-reportes').checked) modules.push('reportes');
+
+    if (state.editingId) {
+      const idx = DB.accounts.findIndex(a => a.id === state.editingId);
+      if (idx !== -1) {
+        const isSuper = DB.accounts[idx].isSuperAdmin || DB.accounts[idx].user === 'admin';
+        if (isSuper) modules.push('cuentas');
+        DB.accounts[idx] = {
+          ...DB.accounts[idx],
+          user,
+          pass,
+          name,
+          role,
+          modules
+        };
+        toast(`Permisos de @${user} actualizados ✓`);
+      }
+    } else {
+      if (DB.accounts.some(a => a.user.toLowerCase() === user.toLowerCase())) {
+        toast('Ese nombre de usuario ya existe', 'error');
+        return;
+      }
+      const newAcc = {
+        id: `acc-${Date.now()}`,
+        user,
+        pass,
+        name,
+        role,
+        isSuperAdmin: false,
+        modules
+      };
+      DB.accounts.push(newAcc);
+      toast(`Cuenta @${user} creada con éxito ✓`);
+    }
+
+    saveDatabase();
+    Modal.close('modal-account');
+    App.applyPermissions();
+    this.render($('acc-search').value);
+  },
+
+  confirmDelete(id, username) {
+    if (username === 'admin') {
+      toast('No se puede eliminar la cuenta principal de Administrador', 'error');
+      return;
+    }
+    if (!confirm(`¿Eliminar la cuenta @${username}?`)) return;
+    DB.accounts = DB.accounts.filter(a => a.id !== id);
+    saveDatabase();
+    App.applyPermissions();
+    this.render($('acc-search').value);
+    toast(`Cuenta @${username} eliminada`, 'info');
+  },
+
+  init() {
+    const addBtn = $('btn-add-account');
+    if (addBtn) addBtn.addEventListener('click', () => this.openNew());
+    const searchInput = $('acc-search');
+    if (searchInput) searchInput.addEventListener('input', e => this.render(e.target.value));
+    const form = $('form-account');
+    if (form) form.addEventListener('submit', e => { e.preventDefault(); this.save(); });
+  }
+};
+
+// ─── QUOTES (PRESUPUESTOS) MODULE ──────────────────────────────────────────────────
+const Quotes = {
+  statusLabel: { borrador: 'Borrador', enviado: 'Enviado', aceptado: 'Aceptado', rechazado: 'Rechazado' },
+  statusClass: { borrador: 'badge--vis-off', enviado: 'badge--vis-on', aceptado: 'badge--active', rechazado: 'badge--paused' },
+
+  getTotal(items) {
+    return items.reduce((s, i) => s + (i.qty * i.price), 0);
+  },
+
+  filtered(q = '') {
+    let list = DB.quotes || [];
+    if (q) {
+      const lq = q.toLowerCase();
+      list = list.filter(q => q.client.toLowerCase().includes(lq) || q.number.toLowerCase().includes(lq) || q.company.toLowerCase().includes(lq));
+    }
+    return list;
+  },
+
+  render(q = '') {
+    const list = this.filtered(q);
+    const thead = $('qt-thead');
+    const tbody = $('qt-tbody');
+    const empty = $('qt-empty');
+    if (!thead) return;
+
+    thead.innerHTML = `<tr>
+      <th>N° Presupuesto</th><th>Cliente / Empresa</th><th>Fecha</th><th>Válido hasta</th><th>Total USD</th><th>Estado</th><th>Acciones</th>
+    </tr>`;
+
+    if (!list.length) { tbody.innerHTML = ''; empty.style.display = 'flex'; return; }
+    empty.style.display = 'none';
+
+    tbody.innerHTML = list.map(q => {
+      const total = this.getTotal(q.items);
+      return `<tr>
+        <td><span class="badge badge--oem">${q.number}</span></td>
+        <td>
+          <div style="font-weight:700;color:var(--t1)">${q.client}</div>
+          <div style="font-size:.75rem;color:var(--t3)">${q.company !== q.client ? q.company : ''}</div>
+        </td>
+        <td style="color:var(--t2);font-size:.85rem">${formatDate(q.date)}</td>
+        <td style="color:var(--t2);font-size:.85rem">${formatDate(q.validUntil)}</td>
+        <td><span class="td-price-tag">USD ${total.toLocaleString('es-AR')}</span></td>
+        <td><span class="badge ${this.statusClass[q.status]}">${this.statusLabel[q.status]}</span></td>
+        <td>
+          <div class="td-actions">
+            <button class="action-btn action-btn--edit" title="Ver / Imprimir PDF" onclick="Quotes.printPDF('${q.id}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            </button>
+            <button class="action-btn action-btn--edit" title="Editar" onclick="Quotes.edit('${q.id}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="action-btn action-btn--del" title="Eliminar" onclick="Quotes.confirmDelete('${q.id}','${q.number}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+            </button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+
+    const badge = $('badge-presupuestos');
+    if (badge) badge.textContent = list.length;
+  },
+
+  openNew() {
+    state.editingId = null;
+    $('modal-quote-title').textContent = 'Nuevo Presupuesto';
+    $('form-quote').reset();
+    // default dates
+    const today = new Date().toISOString().split('T')[0];
+    const inMonth = new Date(Date.now() + 30*86400000).toISOString().split('T')[0];
+    $('qt-date').value = today;
+    $('qt-valid').value = inMonth;
+    $('qt-status').value = 'borrador';
+    this.clearItems();
+    this.addItemRow();
+    Modal.open('modal-quote');
+  },
+
+  edit(id) {
+    const q = (DB.quotes||[]).find(x => x.id === id);
+    if (!q) return;
+    state.editingId = id;
+    $('modal-quote-title').textContent = `Editar: ${q.number}`;
+    $('qt-client').value = q.client;
+    $('qt-company').value = q.company;
+    $('qt-phone').value = q.phone;
+    $('qt-email').value = q.email;
+    $('qt-cuit').value = q.cuit;
+    $('qt-date').value = q.date;
+    $('qt-valid').value = q.validUntil;
+    $('qt-status').value = q.status;
+    $('qt-conditions').value = q.conditions;
+    $('qt-notes').value = q.notes;
+    this.clearItems();
+    q.items.forEach(item => this.addItemRow(item));
+    Modal.open('modal-quote');
+  },
+
+  clearItems() {
+    const tbody = $('qt-items-body');
+    if (tbody) tbody.innerHTML = '';
+  },
+
+  addItemRow(item = {}) {
+    const tbody = $('qt-items-body');
+    if (!tbody) return;
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><input class="mf-input qt-item-desc" type="text" placeholder="Descripción del producto o servicio" value="${item.desc||''}" style="width:100%"></td>
+      <td><input class="mf-input qt-item-qty" type="number" min="1" value="${item.qty||1}" style="width:70px"></td>
+      <td>
+        <select class="mf-input qt-item-unit" style="width:100px">
+          ${['unidad','kit','par','bidón','metro','hora','servicio'].map(u => `<option${item.unit===u?' selected':''}>${u}</option>`).join('')}
+        </select>
+      </td>
+      <td><input class="mf-input qt-item-price" type="number" min="0" step="0.01" placeholder="0.00" value="${item.price||''}" style="width:100px"></td>
+      <td class="qt-item-subtotal" style="font-weight:700;color:var(--y);text-align:right">USD ${((item.qty||1)*(item.price||0)).toLocaleString('es-AR')}</td>
+      <td><button type="button" class="action-btn action-btn--del" onclick="this.closest('tr').remove();Quotes.recalcTotal()" title="Quitar" style="width:28px;height:28px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button></td>`;
+    row.querySelectorAll('input, select').forEach(el => el.addEventListener('input', () => this.recalcTotal()));
+    tbody.appendChild(row);
+    this.recalcTotal();
+  },
+
+  recalcTotal() {
+    const rows = document.querySelectorAll('#qt-items-body tr');
+    let total = 0;
+    rows.forEach(row => {
+      const qty = parseFloat(row.querySelector('.qt-item-qty')?.value) || 0;
+      const price = parseFloat(row.querySelector('.qt-item-price')?.value) || 0;
+      const sub = qty * price;
+      const subCell = row.querySelector('.qt-item-subtotal');
+      if (subCell) subCell.textContent = `USD ${sub.toLocaleString('es-AR')}`;
+      total += sub;
+    });
+    const el = $('qt-total-display');
+    if (el) el.textContent = `USD ${total.toLocaleString('es-AR')}`;
+  },
+
+  collectItems() {
+    const rows = document.querySelectorAll('#qt-items-body tr');
+    return Array.from(rows).map(row => ({
+      desc: row.querySelector('.qt-item-desc')?.value.trim() || '',
+      qty: parseFloat(row.querySelector('.qt-item-qty')?.value) || 1,
+      unit: row.querySelector('.qt-item-unit')?.value || 'unidad',
+      price: parseFloat(row.querySelector('.qt-item-price')?.value) || 0,
+    })).filter(i => i.desc);
+  },
+
+  save() {
+    const client = $('qt-client').value.trim();
+    const company = $('qt-company').value.trim() || client;
+    if (!client) { toast('El nombre del cliente es obligatorio', 'error'); return; }
+    const items = this.collectItems();
+    if (!items.length) { toast('Agrego al menos un producto o servicio', 'error'); return; }
+
+    const data = {
+      client, company,
+      phone: $('qt-phone').value.trim(),
+      email: $('qt-email').value.trim(),
+      cuit: $('qt-cuit').value.trim(),
+      date: $('qt-date').value,
+      validUntil: $('qt-valid').value,
+      status: $('qt-status').value,
+      conditions: $('qt-conditions').value.trim(),
+      notes: $('qt-notes').value.trim(),
+      items,
+    };
+
+    if (state.editingId) {
+      const idx = DB.quotes.findIndex(q => q.id === state.editingId);
+      if (idx !== -1) { DB.quotes[idx] = { ...DB.quotes[idx], ...data }; toast('Presupuesto actualizado ✓'); }
+    } else {
+      const num = `PRE-${new Date().getFullYear()}-${String(nextId.quote++).padStart(3,'0')}`;
+      DB.quotes.push({ id: `Q${Date.now()}`, number: num, ...data });
+      toast('Presupuesto creado ✓');
+    }
+    saveDatabase();
+    Modal.close('modal-quote');
+    this.render($('qt-search')?.value || '');
+  },
+
+  confirmDelete(id, number) {
+    if (!confirm(`¿Eliminar el presupuesto ${number}?`)) return;
+    DB.quotes = DB.quotes.filter(q => q.id !== id);
+    saveDatabase();
+    this.render();
+    toast('Presupuesto eliminado', 'info');
+  },
+
+  printPDF(id) {
+    const q = (DB.quotes||[]).find(x => x.id === id);
+    if (!q) return;
+    const total = this.getTotal(q.items);
+    const itemsHTML = q.items.map(i => `
+      <tr>
+        <td style="padding:8px 10px;border-bottom:1px solid #2a2a3a">${i.desc}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #2a2a3a;text-align:center">${i.qty}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #2a2a3a;text-align:center">${i.unit}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #2a2a3a;text-align:right">USD ${i.price.toLocaleString('es-AR')}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #2a2a3a;text-align:right;font-weight:700">USD ${(i.qty*i.price).toLocaleString('es-AR')}</td>
+      </tr>`).join('');
+
+    const win = window.open('', '_blank');
+    win.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+    <title>${q.number} — Maquinarias 9 de Abril</title>
+    <style>
+      * { margin:0; padding:0; box-sizing:border-box; }
+      body { font-family: 'Segoe UI', Arial, sans-serif; background:#fff; color:#111; padding:40px; max-width:900px; margin:0 auto; }
+      .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px; border-bottom:3px solid #FFB800; padding-bottom:20px; }
+      .brand h1 { font-size:1.5rem; font-weight:900; color:#111; }
+      .brand p { font-size:.85rem; color:#555; margin-top:4px; }
+      .quote-meta { text-align:right; }
+      .quote-meta .number { font-size:1.2rem; font-weight:800; color:#FFB800; }
+      .quote-meta p { font-size:.82rem; color:#555; margin-top:2px; }
+      .section { margin-bottom:24px; }
+      .section h3 { font-size:.78rem; font-weight:700; color:#888; text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px; }
+      .client-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px 24px; }
+      .client-field label { font-size:.72rem; color:#888; display:block; }
+      .client-field span { font-size:.9rem; font-weight:600; color:#111; }
+      table { width:100%; border-collapse:collapse; margin-top:8px; }
+      thead th { background:#111; color:#FFB800; padding:10px; font-size:.8rem; text-align:left; }
+      thead th:last-child, thead th:nth-child(4) { text-align:right; }
+      thead th:nth-child(2), thead th:nth-child(3) { text-align:center; }
+      .total-row td { background:#f9f9f9; font-weight:800; font-size:1rem; padding:12px 10px; border-top:2px solid #FFB800; }
+      .footer { margin-top:32px; padding-top:16px; border-top:1px solid #eee; display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+      .footer p { font-size:.8rem; color:#555; line-height:1.6; }
+      .footer strong { color:#111; display:block; margin-bottom:4px; }
+      .sign-block { margin-top:48px; text-align:center; }
+      .sign-block .line { border-top:1px solid #bbb; width:220px; margin:0 auto 6px; }
+      .sign-block p { font-size:.78rem; color:#888; }
+      .badge { display:inline-block; padding:3px 10px; border-radius:99px; font-size:.75rem; font-weight:700; }
+      .badge-yellow { background:#fff3cc; color:#a67c00; }
+      @media print { body { padding:20px; } button { display:none; } }
+    </style></head><body>
+    <div class="header">
+      <div class="brand">
+        <h1>Maquinarias 9 de Abril</h1>
+        <p>Autoelevadores • Repuestos OEM • Camiones</p>
+        <p style="margin-top:8px;font-size:.8rem">Buenos Aires, Argentina &nbsp;|&nbsp; +54 9 11 2673-8983</p>
+      </div>
+      <div class="quote-meta">
+        <div class="number">${q.number}</div>
+        <p>Fecha: <strong>${formatDate(q.date)}</strong></p>
+        <p>Válido hasta: <strong>${formatDate(q.validUntil)}</strong></p>
+        <p style="margin-top:6px"><span class="badge badge-yellow">${this.statusLabel[q.status]}</span></p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Datos del Cliente</h3>
+      <div class="client-grid">
+        <div class="client-field"><label>Nombre / Razón Social</label><span>${q.client}</span></div>
+        <div class="client-field"><label>Empresa</label><span>${q.company}</span></div>
+        <div class="client-field"><label>Teléfono / WhatsApp</label><span>${q.phone||'—'}</span></div>
+        <div class="client-field"><label>Email</label><span>${q.email||'—'}</span></div>
+        ${q.cuit ? `<div class="client-field"><label>CUIT</label><span>${q.cuit}</span></div>` : ''}
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Detalle del Presupuesto</h3>
+      <table>
+        <thead><tr>
+          <th>Producto / Servicio</th><th style="text-align:center">Cant.</th><th style="text-align:center">Unidad</th><th style="text-align:right">P. Unit.</th><th style="text-align:right">Subtotal</th>
+        </tr></thead>
+        <tbody>${itemsHTML}</tbody>
+        <tfoot><tr class="total-row">
+          <td colspan="4" style="padding:12px 10px">TOTAL GENERAL</td>
+          <td style="padding:12px 10px;text-align:right;color:#a67c00">USD ${total.toLocaleString('es-AR')}</td>
+        </tr></tfoot>
+      </table>
+    </div>
+
+    <div class="footer">
+      <div><strong>Condiciones</strong><p>${q.conditions||'Consultar condiciones con el vendedor.'}</p></div>
+      ${q.notes ? `<div><strong>Observaciones</strong><p>${q.notes}</p></div>` : '<div></div>'}
+    </div>
+
+    <div class="sign-block" style="margin-top:60px;display:flex;justify-content:space-around">
+      <div><div class="line"></div><p>Firma y Sello del Vendedor</p></div>
+      <div><div class="line"></div><p>Conformidad del Cliente</p></div>
+    </div>
+
+    <div style="text-align:center;margin-top:32px">
+      <button onclick="window.print()" style="background:#FFB800;color:#000;border:none;padding:10px 28px;border-radius:8px;font-weight:800;font-size:1rem;cursor:pointer">Imprimir / Guardar PDF</button>
+    </div>
+    </body></html>`);
+    win.document.close();
+  },
+
+  init() {
+    const addBtn = $('btn-add-quote');
+    if (addBtn) addBtn.addEventListener('click', () => this.openNew());
+    const search = $('qt-search');
+    if (search) search.addEventListener('input', e => this.render(e.target.value));
+    const form = $('form-quote');
+    if (form) form.addEventListener('submit', e => { e.preventDefault(); this.save(); });
+    const addItemBtn = $('qt-add-item');
+    if (addItemBtn) addItemBtn.addEventListener('click', () => this.addItemRow());
+  }
+};
+
+// ─── REPORTS MODULE ──────────────────────────────────────────────────────────────
+const Reports = {
+  render() {
+    this.renderMetrics();
+    this.renderAlerts();
+    this.renderLeadDistribution();
+    this.renderRecentQuotes();
+    this.bindMobileToggle();
+  },
+
+  bindMobileToggle() {
+    const btn = $('rpt-toggle-btn');
+    const grid = $('rpt-metrics-grid');
+    const chev = $('rpt-toggle-chevron');
+    const label = $('rpt-toggle-label');
+    if (!btn || !grid) return;
+    if (btn._bound) return;
+    btn._bound = true;
+    btn.addEventListener('click', () => {
+      const exp = btn.classList.toggle('expanded');
+      grid.classList.toggle('expanded');
+      if (chev) chev.style.transform = exp ? 'rotate(180deg)' : '';
+      if (label) label.textContent = exp ? 'Ocultar Métricas Principales' : 'Ver Métricas Principales (5 KPIs)';
+    });
+  },
+
+  renderMetrics() {
+    // Stock value
+    const stockVal = [
+      ...DB.autoelevadores.filter(x => x.status === 'active'),
+      ...DB.camiones.filter(x => x.status === 'active'),
+    ].reduce((s, x) => s + x.price, 0);
+    const partsVal = DB.repuestos.reduce((s, x) => s + (x.price * x.stock), 0);
+    const totalVal = stockVal + partsVal;
+
+    // Active equipment
+    const activeEquip = DB.autoelevadores.filter(x => x.status === 'active').length +
+                        DB.camiones.filter(x => x.status === 'active').length;
+
+    // Active leads (all non-ganado/perdido columns)
+    const allLeads = Object.values(DB.leads).flat();
+    const activeLeads = allLeads.filter(l => l).length;
+    const wonLeads = (DB.leads.ganado || []).length;
+
+    // Quotes
+    const totalQuotes = (DB.quotes || []).length;
+    const sentQuotes = (DB.quotes || []).filter(q => q.status === 'enviado').length;
+
+    const set = (id, val) => { const el = $(id); if (el) el.textContent = val; };
+    set('rpt-stock-val', `USD ${totalVal.toLocaleString('es-AR')}`);
+    set('rpt-active-equip', activeEquip);
+    set('rpt-active-leads', activeLeads);
+    set('rpt-won-leads', wonLeads);
+    set('rpt-total-quotes', totalQuotes);
+    set('rpt-sent-quotes', sentQuotes);
+  },
+
+  renderAlerts() {
+    const el = $('rpt-alerts');
+    if (!el) return;
+    const alerts = [];
+
+    // Low stock parts
+    DB.repuestos.filter(r => r.stock <= 3).forEach(r => {
+      const cls = r.stock === 0 ? 'rpt-alert--danger' : 'rpt-alert--warning';
+      alerts.push(`<div class="rpt-alert ${cls}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div><strong>${r.name}</strong> <span class="badge badge--oem">${r.oem}</span><br>
+        <span>${r.stock === 0 ? '❌ Sin stock' : `⚠️ Stock crítico: ${r.stock} unidades`}</span></div>
+      </div>`);
+    });
+
+    // Warranties expiring soon (next 60 days)
+    const now = Date.now();
+    const in60 = now + 60 * 86400000;
+    DB.units.forEach(u => {
+      const exp = new Date(u.warrantyExpiry + 'T12:00:00').getTime();
+      if (exp > now && exp <= in60) {
+        const days = Math.ceil((exp - now) / 86400000);
+        alerts.push(`<div class="rpt-alert rpt-alert--info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div><strong>Garantía por vencer: ${u.model}</strong><br>
+          <span>Cliente: ${u.client} — Vence en ${days} días (${formatDate(u.warrantyExpiry)})</span></div>
+        </div>`);
+      } else if (exp <= now) {
+        alerts.push(`<div class="rpt-alert rpt-alert--danger">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div><strong>Garantía vencida: ${u.model}</strong><br>
+          <span>Cliente: ${u.client} — Venció el ${formatDate(u.warrantyExpiry)}</span></div>
+        </div>`);
+      }
+    });
+
+    el.innerHTML = alerts.length
+      ? alerts.join('')
+      : `<div class="rpt-alert rpt-alert--ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg><div><strong>Sin alertas activas</strong><span>Stock y garantías en orden.</span></div></div>`;
+  },
+
+  renderLeadDistribution() {
+    const el = $('rpt-leads-chart');
+    if (!el) return;
+    const stages = [
+      { key: 'nuevas',      label: 'Nuevas',     color: '#3b82f6' },
+      { key: 'cotizacion',  label: 'Cotización', color: '#f59e0b' },
+      { key: 'enviado',     label: 'Enviado',    color: '#8b5cf6' },
+      { key: 'ganado',      label: 'Ganados',    color: '#22c55e' },
+    ];
+    const total = Object.values(DB.leads).flat().length || 1;
+    el.innerHTML = stages.map(s => {
+      const count = (DB.leads[s.key] || []).length;
+      const pct = Math.round(count / total * 100);
+      return `<div class="rpt-bar-row">
+        <div class="rpt-bar-label">${s.label}</div>
+        <div class="rpt-bar-track">
+          <div class="rpt-bar-fill" style="width:${pct}%;background:${s.color}"></div>
+        </div>
+        <div class="rpt-bar-count">${count} <span>(${pct}%)</span></div>
+      </div>`;
+    }).join('');
+  },
+
+  renderRecentQuotes() {
+    const el = $('rpt-recent-quotes');
+    if (!el) return;
+    const recents = [...(DB.quotes||[])].reverse().slice(0, 5);
+    if (!recents.length) { el.innerHTML = '<p style="color:var(--t3);font-size:.85rem">Sin presupuestos aun.</p>'; return; }
+    const sc = Quotes.statusClass;
+    const sl = Quotes.statusLabel;
+    el.innerHTML = recents.map(q => {
+      const total = Quotes.getTotal(q.items);
+      return `<div class="rpt-quote-row">
+        <div><span class="badge badge--oem" style="margin-right:.5rem">${q.number}</span><strong>${q.client}</strong></div>
+        <div style="display:flex;align-items:center;gap:.75rem;flex-shrink:0">
+          <span style="font-weight:700;color:var(--y)">USD ${total.toLocaleString('es-AR')}</span>
+          <span class="badge ${sc[q.status]}">${sl[q.status]}</span>
+        </div>
+      </div>`;
+    }).join('');
+  },
+
+  init() {}
+};
+
 // ─── APP INIT ─────────────────────────────────────────────────────────────────
 const App = {
+  applyPermissions() {
+    const user = Auth.getCurrentUser();
+    state.currentUser = user;
+
+    // Update Top Header User Pill
+    const userAvatarEl = document.querySelector('.th-avatar');
+    const userNameEl = document.querySelector('.th-user-name');
+    const userRoleEl = document.querySelector('.th-user-role');
+    const heroTitleEl = document.querySelector('.crm-hh-title');
+    const heroAvatarEl = document.querySelector('.crm-hh-avatar');
+
+    const initial = user.name ? user.name.charAt(0).toUpperCase() : 'A';
+    if (userAvatarEl) userAvatarEl.textContent = initial;
+    if (userNameEl) userNameEl.textContent = user.name || user.user;
+    if (userRoleEl) userRoleEl.textContent = user.role || 'Usuario CRM';
+    if (heroTitleEl) heroTitleEl.textContent = `Bienvenido, ${user.name ? user.name.split(' ')[0] : user.user}`;
+    if (heroAvatarEl) heroAvatarEl.textContent = initial;
+
+    // Module list allowed
+    const allowed = user.modules || ['inventario', 'cotizaciones', 'postventa', 'resenas'];
+    if (user.isSuperAdmin || user.user === 'admin') {
+      if (!allowed.includes('cuentas')) allowed.push('cuentas');
+      if (!allowed.includes('presupuestos')) allowed.push('presupuestos');
+      if (!allowed.includes('reportes')) allowed.push('reportes');
+    }
+
+    // Toggle Sidebar Items & Bottom Nav Items & Home Cards
+    ['inventario', 'cotizaciones', 'presupuestos', 'postventa', 'resenas', 'reportes', 'cuentas'].forEach(mod => {
+      const sbItem = $(`nav-${mod}`);
+      const bnavItem = $(`bnav-${mod}`);
+      const hmodItem = $(`hmod-${mod}`) || document.querySelector(`.crm-hmod-card[data-view="${mod}"]`);
+      const hasPerm = allowed.includes(mod);
+
+      if (sbItem) sbItem.style.display = hasPerm ? 'flex' : 'none';
+      if (bnavItem) bnavItem.style.display = hasPerm ? 'flex' : 'none';
+      if (hmodItem) hmodItem.style.display = hasPerm ? 'flex' : 'none';
+    });
+
+    // Update Accounts Badge
+    const accBadge = $('badge-cuentas');
+    if (accBadge && DB.accounts) accBadge.textContent = DB.accounts.length;
+  },
+
   init() {
     loadDatabase();
     Modal.init();
@@ -1225,7 +2114,12 @@ const App = {
     K.init();
     PV.init();
     Rev.init();
-    
+    Cuentas.init();
+    Quotes.init();
+    Reports.init();
+
+    this.applyPermissions();
+
     const toggleBtn = $('sb-toggle-mobile');
     const sidebar = $('sidebar');
     const backdrop = $('sidebar-backdrop');
@@ -1242,11 +2136,29 @@ const App = {
 
     if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
     if (backdrop) backdrop.addEventListener('click', closeSidebar);
-    $$('.sb-item').forEach(btn => btn.addEventListener('click', closeSidebar));
 
-    Router.go('home');
+    const user = Auth.getCurrentUser();
+    const allowed = user.modules || ['inventario','cotizaciones'];
+    const initialView = window.innerWidth < 769 ? 'home' : (allowed[0] || 'inventario');
+    Router.go(initialView);
   }
 };
+
+// ─── GLOBAL DRAG & SELECTION FAILSAFE ─────────────────────────────────────────
+function resetDragFailsafe() {
+  document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+  document.querySelectorAll('.drag-active').forEach(el => el.classList.remove('drag-active'));
+  document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+  if (typeof K !== 'undefined') {
+    K.draggingId = null;
+    K.draggingFrom = null;
+  }
+}
+
+window.addEventListener('mouseup', resetDragFailsafe);
+window.addEventListener('dragend', resetDragFailsafe);
+window.addEventListener('mouseleave', resetDragFailsafe);
+window.addEventListener('blur', resetDragFailsafe);
 
 // ─── BOOTSTRAP ────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {

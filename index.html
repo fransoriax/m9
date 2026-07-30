@@ -25,7 +25,7 @@
         <li><a href="index.html" class="nav-link">Inicio</a></li>
         <li><a href="catalog.html" class="nav-link">Catálogo</a></li>
         <li><a href="repuestos.html" class="nav-link">Repuestos</a></li>
-        <li><a href="index.html#transporte" class="nav-link">Camiones</a></li>
+        <li><a href="camiones.html" class="nav-link">Camiones</a></li>
         <li><a href="#" class="nav-link open-quote-modal" data-product="Contacto General">Contacto</a></li>
       </ul>
       <div class="nav-cta">
@@ -579,13 +579,16 @@
         <h2 class="section-title">Soluciones Complementarias de Carga</h2>
       </div>
 
-      <div class="trucks-banner">
-        <div class="trucks-banner-bg" style="background-image: url('assets/truck.png');"></div>
+      <div class="trucks-banner" onclick="window.location.href='camiones.html'">
+        <div class="trucks-banner-bg" style="background-image: url('assets/truck_hero.jpg');"></div>
         <div class="trucks-banner-content">
-          <span class="badge badge-yellow" style="margin-bottom: 1rem;">Distribución Camiones</span>
+          <span class="badge badge-yellow" style="margin-bottom: 0.8rem;">Distribución Camiones</span>
           <h3>Flotas de Camiones de Servicio Pesado</h3>
-          <p>Disponemos de una gama premium de camiones de carga de gran tonelaje ideales para el transporte de maquinaria y distribución logística de media y larga distancia.</p>
-          <a href="#" class="btn btn-outline-yellow open-quote-modal" data-product="Cotización Camión Comercial Heavy Duty">Solicitar Información</a>
+          <p class="trucks-banner-desc">Disponemos de una gama premium de camiones de carga de gran tonelaje ideales para el transporte de maquinaria y distribución logística de media y larga distancia.</p>
+          <a href="camiones.html" class="btn btn-trucks-cta">
+            <span>Ver Catálogo de Camiones</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
         </div>
       </div>
     </section>
@@ -641,11 +644,27 @@
   <div class="modal" id="quote-modal">
     <div class="modal-overlay"></div>
     <div class="modal-content">
-      <div class="modal-icon">📨</div>
+      <button type="button" class="modal-close-x" aria-label="Cerrar">&times;</button>
+      <div class="modal-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
       <h3>Solicitud de Cotización</h3>
-      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">
-        Por favor complete el formulario técnico. Cotizaremos el producto <span id="modal-product-title" style="color: var(--primary-yellow); font-weight: 700;"></span> en menos de 2 horas hábiles.
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.2rem;">
+        Cotizaremos el producto <span id="modal-product-title" style="color: var(--primary-yellow); font-weight: 700;"></span> en menos de 2 horas hábiles.
       </p>
+
+      <div style="margin-bottom: 1.5rem; text-align: center; background: rgba(37, 211, 102, 0.08); border: 1px solid rgba(37, 211, 102, 0.3); padding: 0.9rem; border-radius: 8px;">
+        <p style="font-size: 0.85rem; color: #25D366; font-weight: 600; margin-bottom: 0.6rem;">¿Buscás atención rápida e inmediata?</p>
+        <a id="modal-whatsapp-direct" href="https://wa.me/5491121699968?text=Hola%2C%20quisiera%20consultar%20sobre%3A%20Contacto%20General" target="_blank" rel="noopener noreferrer" style="background-color: #25D366; color: #ffffff; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 700; font-size: 0.9rem; border-radius: 6px; padding: 0.65rem 1rem; text-decoration: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Contactar por WhatsApp ahora
+        </a>
+      </div>
+
+      <div style="position: relative; text-align: center; margin: 1.2rem 0 1rem 0;">
+        <span style="background: var(--bg-card, #141414); padding: 0 0.8rem; font-size: 0.78rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; position: relative; z-index: 1;">o complete el formulario web</span>
+        <div style="position: absolute; top: 50%; left: 0; right: 0; border-top: 1px solid var(--border-color); z-index: 0;"></div>
+      </div>
       <form id="modal-quote-form">
         <div class="form-group">
           <label for="modal-client-name">Nombre Completo</label>

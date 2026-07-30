@@ -197,9 +197,12 @@ function ensureDatabaseSeeded() {
           { id: 6, oem: 'OEM-MAS-T3M',  name: 'Mástil Telescópico 3m',category: 'Estructura', stock: 0,  price: 4500, status: 'paused', compat: 'Hangcha XS-20',                 img: 'assets/forklift_parts.png' },
         ],
         camiones: [
-          { id: 1, name: 'Mercedes Benz Actros 2651', brand: 'Mercedes Benz', capacity: '26 Tn', motor: 'Diesel', hours: 380000, price: 95000, status: 'active', visible: true, img: 'assets/truck.png' },
-          { id: 2, name: 'Volvo FH 460',              brand: 'Volvo',         capacity: '24 Tn', motor: 'Diesel', hours: 210000, price: 110000, status: 'active', visible: true, img: 'assets/truck.png' },
-          { id: 3, name: 'Scania R450 6×2',           brand: 'Scania',        capacity: '22 Tn', motor: 'Diesel', hours: 290000, price: 88000, status: 'paused', visible: false, img: 'assets/truck.png' },
+          { id: 1, name: 'Mercedes Benz Actros 2651 LS 6x4', brand: 'Mercedes Benz', type: 'Tractor Carretera', capacity: '26 Tn', motor: 'Diesel 510 CV', hours: 0, price: 115000, status: 'active', visible: true, img: 'assets/truck.png' },
+          { id: 2, name: 'Volvo FH 460 Globetrotter 6x2T', brand: 'Volvo', type: 'Tractor Carretera', capacity: '24 Tn', motor: 'Diesel 460 CV', hours: 185000, price: 98000, status: 'active', visible: true, img: 'assets/truck.png' },
+          { id: 3, name: 'Scania R450 Streamline Highline 6x2', brand: 'Scania', type: 'Tractor Carretera', capacity: '22 Tn', motor: 'Diesel 450 CV', hours: 210000, price: 92000, status: 'active', visible: true, img: 'assets/truck.png' },
+          { id: 4, name: 'IVECO Stralis Hi-Way 440 4x2', brand: 'IVECO', type: 'Tractor Carretera', capacity: '20 Tn', motor: 'Diesel 440 CV', hours: 0, price: 86000, status: 'active', visible: true, img: 'assets/truck.png' },
+          { id: 5, name: 'Ford Cargo 2042 4x2T', brand: 'Ford', type: 'Tractor Carretera', capacity: '20 Tn', motor: 'Diesel 420 CV', hours: 290000, price: 74000, status: 'active', visible: true, img: 'assets/truck.png' },
+          { id: 6, name: 'Volkswagen Constellation 31.330 6x4', brand: 'Volkswagen', type: 'Chasis Volcador', capacity: '31 Tn', motor: 'Diesel 330 CV', hours: 0, price: 108000, status: 'active', visible: true, img: 'assets/truck.png' }
         ],
         leads: {
           nuevas: [
@@ -247,6 +250,8 @@ document.addEventListener("DOMContentLoaded", () => {
     initPartsPage();
   } else if (cleanPage === "detalle") {
     initDetailPage();
+  } else if (cleanPage === "camiones") {
+    initCamionesPage();
   }
   
   setupGlobalModals();
@@ -403,6 +408,72 @@ function initHomePage() {
 }
 
 
+// --- DYNAMIC EXPANDABLE BRAND LIST HELPER ---
+function renderExpandableBrandList(container, brands, filterDataAttr) {
+  if (!container || !brands.length) return;
+
+  const MAX_VISIBLE = 3;
+  if (brands.length <= MAX_VISIBLE) {
+    container.innerHTML = brands.map(b => `
+      <label class="checkbox-label">
+        <input type="checkbox" value="${b}" data-filter="${filterDataAttr}" class="filter-checkbox">
+        ${b}
+      </label>
+    `).join('');
+    return;
+  }
+
+  const visibleBrands = brands.slice(0, MAX_VISIBLE);
+  const hiddenBrands = brands.slice(MAX_VISIBLE);
+
+  let html = visibleBrands.map(b => `
+    <label class="checkbox-label">
+      <input type="checkbox" value="${b}" data-filter="${filterDataAttr}" class="filter-checkbox">
+      ${b}
+    </label>
+  `).join('');
+
+  html += `
+    <div class="more-brands-wrapper" style="display: none; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+      ${hiddenBrands.map(b => `
+        <label class="checkbox-label">
+          <input type="checkbox" value="${b}" data-filter="${filterDataAttr}" class="filter-checkbox">
+          ${b}
+        </label>
+      `).join('')}
+    </div>
+    <button type="button" class="btn-toggle-more-brands" style="background: none; border: none; color: var(--primary-yellow); font-size: 0.82rem; font-weight: 600; cursor: pointer; text-align: left; padding: 0.45rem 0 0 0; display: flex; align-items: center; gap: 0.35rem; transition: color 0.2s;">
+      <span>+ Ver más marcas (${hiddenBrands.length})</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </button>
+  `;
+
+  container.innerHTML = html;
+
+  const toggleBtn = container.querySelector(".btn-toggle-more-brands");
+  const moreWrapper = container.querySelector(".more-brands-wrapper");
+
+  if (toggleBtn && moreWrapper) {
+    toggleBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const isHidden = moreWrapper.style.display === "none";
+      if (isHidden) {
+        moreWrapper.style.display = "flex";
+        toggleBtn.innerHTML = `
+          <span>- Mostrar menos</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
+        `;
+      } else {
+        moreWrapper.style.display = "none";
+        toggleBtn.innerHTML = `
+          <span>+ Ver más marcas (${hiddenBrands.length})</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        `;
+      }
+    });
+  }
+}
+
 // 4. CATALOG PAGE ENGINE
 function initCatalogPage() {
   const grid = document.getElementById("catalog-grid");
@@ -448,21 +519,20 @@ function initCatalogPage() {
     }
   } catch(e) { /* fallback to static forklifts */ }
 
-  // 2. Populate Brand Filter Checkboxes Dynamically
+  let catalogCurrentPage = 1;
+  const CATALOG_PER_PAGE = 6;
+
+  // 2. Populate Brand Filter Checkboxes Dynamically with "Ver más marcas" toggle
   const brandContainer = document.getElementById("brand-filter-options");
   if (brandContainer) {
     const allBrands = [...new Set(allEquipments.map(item => item.brand).filter(Boolean))].sort();
-    brandContainer.innerHTML = allBrands.map(b => `
-      <label class="checkbox-label">
-        <input type="checkbox" value="${b}" data-filter="brand" class="filter-checkbox">
-        ${b}
-      </label>
-    `).join('');
+    renderExpandableBrandList(brandContainer, allBrands, "brand");
   }
 
   // Render Function
   function renderForklifts(filteredData) {
     grid.innerHTML = "";
+    const paginationContainer = document.getElementById("catalog-pagination");
     if (filteredData.length === 0) {
       grid.innerHTML = `
         <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; border: 1px dashed var(--border-color); border-radius: 8px;">
@@ -470,12 +540,19 @@ function initCatalogPage() {
           <p>Intente flexibilizar los filtros técnicos aplicados.</p>
         </div>
       `;
+      if (paginationContainer) paginationContainer.innerHTML = "";
       return;
     }
 
-    filteredData.forEach(fork => {
+    const totalPages = Math.ceil(filteredData.length / CATALOG_PER_PAGE);
+    if (catalogCurrentPage > totalPages) catalogCurrentPage = 1;
+
+    const pageSlice = filteredData.slice((catalogCurrentPage - 1) * CATALOG_PER_PAGE, catalogCurrentPage * CATALOG_PER_PAGE);
+
+    pageSlice.forEach(fork => {
       const card = document.createElement("div");
       card.className = "product-card";
+      card.setAttribute("data-url", `detalle.html?id=${fork.id}`);
       card.innerHTML = `
         <div class="product-card-img-wrapper">
           <img class="product-card-img" src="${fork.image}" alt="${fork.name}" loading="lazy">
@@ -512,6 +589,13 @@ function initCatalogPage() {
         </div>
       `;
       grid.appendChild(card);
+    });
+
+    renderPagination(paginationContainer, catalogCurrentPage, totalPages, (newPage) => {
+      catalogCurrentPage = newPage;
+      renderForklifts(filteredData);
+      const gridEl = document.getElementById("catalog-grid");
+      if (gridEl) gridEl.scrollIntoView({ behavior: 'smooth' });
     });
 
     attachQuoteEvents();
@@ -560,13 +644,14 @@ function initCatalogPage() {
   }
 
   function applyFilters() {
+    catalogCurrentPage = 1;
     const selectedTypes = Array.from(document.querySelectorAll("input[data-filter='type']:checked")).map(el => el.value);
     const selectedBrands = Array.from(document.querySelectorAll("input[data-filter='brand']:checked")).map(el => el.value);
     const selectedConds = Array.from(document.querySelectorAll("input[data-filter='condition']:checked")).map(el => el.value);
     const maxCapacity = parseInt(capacityRange ? capacityRange.value : 7000);
 
     const filtered = allEquipments.filter(fork => {
-      if (fork.type === "Camión" || fork.type === "Camiones") return false;
+      if (fork.type === "Camión" || fork.type === "Camiones" || fork.type === "Tractor Carretera" || fork.type === "Chasis Volcador") return false;
       const matchType = selectedTypes.length === 0 || selectedTypes.includes(fork.type);
       const matchBrand = selectedBrands.length === 0 || selectedBrands.includes(fork.brand);
       const matchCond = selectedConds.length === 0 || selectedConds.includes(fork.condition);
@@ -649,71 +734,76 @@ function initPartsPage() {
   const machineSelect = document.getElementById("select-machine");
   const systemSelect = document.getElementById("select-system");
   const categorySelect = document.getElementById("select-category");
-  const partsTableBody = document.getElementById("parts-table-body");
+  const partsContainer = document.getElementById("parts-ml-container");
   const partsSearchInput = document.getElementById("parts-search-input");
   const partsCountLabel = document.getElementById("parts-count-val");
   const clearFiltersBtn = document.getElementById("clear-parts-filters");
 
-  if (!partsTableBody) return;
+  if (!partsContainer && !document.getElementById("parts-table-body")) return;
 
   const currentSpareParts = getMergedSpareParts();
 
   // Initialize unique selector values
   const machines = [...new Set(currentSpareParts.map(p => p.machine))];
   
-  machines.forEach(m => {
-    const option = document.createElement("option");
-    option.value = m;
-    option.textContent = m;
-    machineSelect.appendChild(option);
-  });
+  if (machineSelect) {
+    machines.forEach(m => {
+      const option = document.createElement("option");
+      option.value = m;
+      option.textContent = m;
+      machineSelect.appendChild(option);
+    });
 
-  // Cascading logic events
-  machineSelect.addEventListener("change", () => {
-    // Enable and update systems
-    if (machineSelect.value) {
-      systemSelect.removeAttribute("disabled");
-      const matchedSystems = [...new Set(currentSpareParts.filter(p => p.machine === machineSelect.value).map(p => p.system))];
-      
-      systemSelect.innerHTML = `<option value="">-- Seleccionar Sistema --</option>`;
-      matchedSystems.forEach(s => {
-        const option = document.createElement("option");
-        option.value = s;
-        option.textContent = formatSystemName(s);
-        systemSelect.appendChild(option);
-      });
-    } else {
-      systemSelect.setAttribute("disabled", "true");
-      systemSelect.innerHTML = `<option value="">-- Primero seleccione equipo --</option>`;
-      categorySelect.setAttribute("disabled", "true");
-      categorySelect.innerHTML = `<option value="">-- Primero seleccione sistema --</option>`;
-    }
-    applyPartsFilter();
-  });
+    // Cascading logic events
+    machineSelect.addEventListener("change", () => {
+      if (machineSelect.value) {
+        systemSelect.removeAttribute("disabled");
+        const matchedSystems = [...new Set(currentSpareParts.filter(p => p.machine === machineSelect.value).map(p => p.system))];
+        
+        systemSelect.innerHTML = `<option value="">-- Seleccionar Sistema --</option>`;
+        matchedSystems.forEach(s => {
+          const option = document.createElement("option");
+          option.value = s;
+          option.textContent = formatSystemName(s);
+          systemSelect.appendChild(option);
+        });
+      } else {
+        systemSelect.setAttribute("disabled", "true");
+        systemSelect.innerHTML = `<option value="">-- Primero seleccione equipo --</option>`;
+        categorySelect.setAttribute("disabled", "true");
+        categorySelect.innerHTML = `<option value="">-- Primero seleccione sistema --</option>`;
+      }
+      applyPartsFilter();
+    });
+  }
 
-  systemSelect.addEventListener("change", () => {
-    if (systemSelect.value) {
-      categorySelect.removeAttribute("disabled");
-      const matchedCats = [...new Set(currentSpareParts.filter(p => 
-        p.machine === machineSelect.value && 
-        p.system === systemSelect.value
-      ).map(p => p.category))];
-      
-      categorySelect.innerHTML = `<option value="">-- Seleccionar Categoría --</option>`;
-      matchedCats.forEach(c => {
-        const option = document.createElement("option");
-        option.value = c;
-        option.textContent = formatCategoryName(c);
-        categorySelect.appendChild(option);
-      });
-    } else {
-      categorySelect.setAttribute("disabled", "true");
-      categorySelect.innerHTML = `<option value="">-- Primero seleccione sistema --</option>`;
-    }
-    applyPartsFilter();
-  });
+  if (systemSelect) {
+    systemSelect.addEventListener("change", () => {
+      if (systemSelect.value) {
+        categorySelect.removeAttribute("disabled");
+        const matchedCats = [...new Set(currentSpareParts.filter(p => 
+          p.machine === machineSelect.value && 
+          p.system === systemSelect.value
+        ).map(p => p.category))];
+        
+        categorySelect.innerHTML = `<option value="">-- Seleccionar Categoría --</option>`;
+        matchedCats.forEach(c => {
+          const option = document.createElement("option");
+          option.value = c;
+          option.textContent = formatCategoryName(c);
+          categorySelect.appendChild(option);
+        });
+      } else {
+        categorySelect.setAttribute("disabled", "true");
+        categorySelect.innerHTML = `<option value="">-- Primero seleccione sistema --</option>`;
+      }
+      applyPartsFilter();
+    });
+  }
 
-  categorySelect.addEventListener("change", applyPartsFilter);
+  if (categorySelect) {
+    categorySelect.addEventListener("change", applyPartsFilter);
+  }
   
   if (partsSearchInput) {
     partsSearchInput.addEventListener("input", applyPartsFilter);
@@ -743,9 +833,9 @@ function initPartsPage() {
         matched = currentSpareParts;
       }
 
-      renderPartsTable(matched);
+      renderPartsList(matched);
 
-      // Scroll to table smoothly
+      // Scroll to list smoothly
       const resultsSection = document.querySelector(".parts-results-section");
       if (resultsSection) {
         resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -755,11 +845,15 @@ function initPartsPage() {
 
   if (clearFiltersBtn) {
     clearFiltersBtn.addEventListener("click", () => {
-      machineSelect.value = "";
-      systemSelect.innerHTML = `<option value="">-- Primero seleccione equipo --</option>`;
-      systemSelect.setAttribute("disabled", "true");
-      categorySelect.innerHTML = `<option value="">-- Primero seleccione sistema --</option>`;
-      categorySelect.setAttribute("disabled", "true");
+      if (machineSelect) machineSelect.value = "";
+      if (systemSelect) {
+        systemSelect.innerHTML = `<option value="">-- Primero seleccione equipo --</option>`;
+        systemSelect.setAttribute("disabled", "true");
+      }
+      if (categorySelect) {
+        categorySelect.innerHTML = `<option value="">-- Primero seleccione sistema --</option>`;
+        categorySelect.setAttribute("disabled", "true");
+      }
       catCards.forEach(c => c.classList.remove("active"));
       if (partsSearchInput) partsSearchInput.value = "";
       applyPartsFilter();
@@ -793,11 +887,15 @@ function initPartsPage() {
     return names[cat] || cat;
   }
 
+  let partsCurrentPage = 1;
+  const PARTS_PER_PAGE = 8;
+
   function applyPartsFilter() {
+    partsCurrentPage = 1;
     catCards.forEach(c => c.classList.remove("active"));
-    const selectedMachine = machineSelect.value;
-    const selectedSystem = systemSelect.value;
-    const selectedCategory = categorySelect.value;
+    const selectedMachine = machineSelect ? machineSelect.value : "";
+    const selectedSystem = systemSelect ? systemSelect.value : "";
+    const selectedCategory = categorySelect ? categorySelect.value : "";
     const searchQuery = partsSearchInput ? partsSearchInput.value.toLowerCase().trim() : "";
 
     const matchedParts = currentSpareParts.filter(part => {
@@ -813,63 +911,137 @@ function initPartsPage() {
       return matchMachine && matchSystem && matchCategory && matchSearch;
     });
 
-    renderPartsTable(matchedParts);
+    renderPartsList(matchedParts);
   }
 
-  function renderPartsTable(items) {
-    partsTableBody.innerHTML = "";
-    partsCountLabel.textContent = items.length;
+  function renderPartsList(items) {
+    const container = document.getElementById("parts-ml-container");
+    if (!container) return;
+
+    container.innerHTML = "";
+    if (partsCountLabel) partsCountLabel.textContent = items.length;
+    const paginationContainer = document.getElementById("parts-pagination");
 
     if (items.length === 0) {
-      partsTableBody.innerHTML = `
-        <tr>
-          <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
-            No se encontraron repuestos con los criterios aplicados. Intente otra búsqueda o limpie los filtros.
-          </td>
-        </tr>
+      container.innerHTML = `
+        <div style="text-align: center; padding: 4rem 2rem; border: 1px dashed var(--border-color); border-radius: 8px;">
+          <h3 style="font-family: var(--font-headings); font-size: 1.4rem; margin-bottom: 0.5rem;">No se encontraron repuestos</h3>
+          <p style="color: var(--text-secondary);">Intente modificar los filtros o realice una búsqueda diferente.</p>
+        </div>
       `;
+      if (paginationContainer) paginationContainer.innerHTML = "";
       return;
     }
 
-    items.forEach(item => {
-      const row = document.createElement("tr");
-      const stockText = item.stock === "in" ? "En Stock" : "Stock Crítico";
-      const stockClass = item.stock === "in" ? "stock-in" : "stock-low";
+    const totalPages = Math.ceil(items.length / PARTS_PER_PAGE);
+    if (partsCurrentPage > totalPages) partsCurrentPage = 1;
+
+    const pageSlice = items.slice((partsCurrentPage - 1) * PARTS_PER_PAGE, partsCurrentPage * PARTS_PER_PAGE);
+
+    pageSlice.forEach(item => {
       const fallbackImg = "assets/forklift_parts.png";
-      
-      row.innerHTML = `
-        <td style="width: 70px;">
-          <img src="${item.image || fallbackImg}" alt="${item.name}" class="part-thumb-img" loading="lazy">
-        </td>
-        <td class="part-oem">${item.oem}</td>
-        <td>
-          <div class="part-name" style="font-weight: 700;">${item.name}</div>
-          <div class="part-compatibility" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">Comp. ${item.machine} — ${item.desc}</div>
-        </td>
-        <td style="font-family: var(--font-headings); font-weight: 700; color: var(--primary-yellow); font-size: 1.05rem; white-space: nowrap;">
-          USD $${(item.price || 100).toLocaleString('es-AR')}
-        </td>
-        <td><span class="stock-status ${stockClass}">${stockText}</span></td>
-        <td style="text-align: right; white-space: nowrap;">
-          <button class="btn btn-primary btn-sm add-to-cart-btn" data-oem="${item.oem}" style="padding: 0.4rem 0.85rem; font-size: 0.8rem; margin-right: 0.3rem;">
-            🛒 Agregar
-          </button>
-          <button class="btn btn-outline-yellow btn-sm open-quote-modal" data-product="Repuesto OEM ${item.oem} - ${item.name}" style="padding: 0.4rem 0.85rem; font-size: 0.8rem;">
-            Cotizar
-          </button>
-        </td>
+      const isStockIn = item.stock === "in";
+      const stockBadge = isStockIn 
+        ? `<span class="parts-ml-stock-tag">✓ Stock Inmediato</span>`
+        : `<span class="parts-ml-stock-tag" style="color: #ffaa00;">⚡ Stock Bajo - Consultar</span>`;
+
+      const card = document.createElement("div");
+      card.className = "parts-ml-card";
+      card.innerHTML = `
+        <div class="parts-ml-img-wrapper">
+          <img src="${item.image || fallbackImg}" alt="${item.name}" class="parts-ml-img" loading="lazy">
+        </div>
+        <div class="parts-ml-content">
+          <div class="parts-ml-header">
+            <h3 class="parts-ml-title">${item.name}</h3>
+            <span class="parts-ml-oem-badge">OEM: ${item.oem}</span>
+          </div>
+          <div class="parts-ml-compat">
+            <strong>Compatibilidad:</strong> ${item.machine} — ${item.desc}
+          </div>
+          <div class="parts-ml-details-row">
+            <div class="parts-ml-price-box">
+              <span class="parts-ml-price">USD $${(item.price || 100).toLocaleString('es-AR')}</span>
+              ${stockBadge}
+            </div>
+            <div class="parts-ml-actions">
+              <button class="btn btn-primary btn-sm add-to-cart-btn" data-oem="${item.oem}" style="padding: 0.5rem 0.9rem; font-size: 0.82rem;">
+                🛒 Agregar al Carrito
+              </button>
+              <button class="btn btn-outline-yellow btn-sm open-quote-modal" data-product="Repuesto OEM ${item.oem} - ${item.name}" style="padding: 0.5rem 0.9rem; font-size: 0.82rem;">
+                Cotizar
+              </button>
+            </div>
+          </div>
+        </div>
       `;
-      partsTableBody.appendChild(row);
+      const addBtn = card.querySelector(".add-to-cart-btn");
+      if (addBtn) {
+        addBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          PartsCart.addItem(item.oem);
+        });
+      }
+
+      card.addEventListener("click", (e) => {
+        if (e.target.closest("button") || e.target.closest("a")) return;
+        openPartDetailModal(item);
+      });
+
+      container.appendChild(card);
     });
 
-    document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const oem = btn.dataset.oem;
-        PartsCart.addItem(oem);
-      });
+    renderPagination(paginationContainer, partsCurrentPage, totalPages, (newPage) => {
+      partsCurrentPage = newPage;
+      renderPartsList(items);
+      const containerEl = document.getElementById("parts-ml-container");
+      if (containerEl) containerEl.scrollIntoView({ behavior: 'smooth' });
     });
 
     attachQuoteEvents();
+  }
+
+  function openPartDetailModal(item) {
+    const modal = document.getElementById("part-detail-modal");
+    if (!modal) return;
+
+    const imgEl = document.getElementById("part-modal-img");
+    const titleEl = document.getElementById("part-modal-title");
+    const oemEl = document.getElementById("part-modal-oem");
+    const compatEl = document.getElementById("part-modal-compat");
+    const priceEl = document.getElementById("part-modal-price");
+    const stockEl = document.getElementById("part-modal-stock");
+    const addCartBtn = document.getElementById("part-modal-add-cart");
+    const quoteBtn = document.getElementById("part-modal-quote-btn");
+
+    const fallbackImg = "assets/forklift_parts.png";
+    if (imgEl) imgEl.src = item.image || fallbackImg;
+    if (titleEl) titleEl.textContent = item.name;
+    if (oemEl) oemEl.textContent = `OEM: ${item.oem}`;
+    if (compatEl) compatEl.innerHTML = `<strong>Compatibilidad:</strong> ${item.machine}<br><span style="margin-top: 0.3rem; display: inline-block;">${item.desc}</span>`;
+    if (priceEl) priceEl.textContent = `USD $${(item.price || 100).toLocaleString('es-AR')}`;
+    
+    if (stockEl) {
+      const isStockIn = item.stock === "in";
+      stockEl.innerHTML = isStockIn 
+        ? `✓ Stock Inmediato` 
+        : `<span style="color: #ffaa00;">⚡ Stock Bajo - Consultar</span>`;
+    }
+
+    if (addCartBtn) {
+      addCartBtn.onclick = (e) => {
+        e.stopPropagation();
+        PartsCart.addItem(item.oem);
+        modal.classList.remove("active");
+      };
+    }
+
+    if (quoteBtn) {
+      quoteBtn.setAttribute("data-product", `Repuesto OEM ${item.oem} - ${item.name}`);
+    }
+
+    modal.classList.add("active");
   }
 
   // Initialize Parts Cart Engine
@@ -882,21 +1054,53 @@ function initPartsPage() {
     partsSearchInput.value = searchParam;
     applyPartsFilter();
   } else {
-    renderPartsTable(currentSpareParts);
+    renderPartsList(currentSpareParts);
   }
 }
 
 // 6. PRODUCT DETAIL LOADER
 function initDetailPage() {
   const urlParams = new URLSearchParams(window.location.search);
-  const id = urlParams.get("id") || "neo-25e";
-  const item = forklifts.find(f => f.id === id);
+  const id = urlParams.get("id") || "toyota-8fg25";
+
+  let item = forklifts.find(f => f.id.toString() === id.toString());
+  if (!item && typeof staticTrucks !== "undefined") {
+    item = staticTrucks.find(t => t.id.toString() === id.toString());
+  }
+  if (!item) {
+    try {
+      const rawDB = localStorage.getItem('m9-inventory-db');
+      if (rawDB) {
+        const parsedDB = JSON.parse(rawDB);
+        const allEquip = [...(parsedDB.autoelevadores || []), ...(parsedDB.camiones || [])];
+        const found = allEquip.find(e => e.id.toString() === id.toString() || `crm-auto-${e.id}` === id || `crm-truck-${e.id}` === id);
+        if (found) {
+          item = {
+            id: found.id,
+            name: found.name,
+            brand: found.brand,
+            type: found.type || (found.motor ? 'Camión Heavy Duty' : 'Autoelevador'),
+            capacity: found.capacity || 'N/A',
+            height: found.height || 4.5,
+            year: found.year || 2025,
+            condition: found.hours > 0 ? 'Usado' : 'Nuevo',
+            image: found.img ? found.img.replace('../', '') : (found.motor ? 'assets/truck.png' : 'assets/diesel_forklift.png'),
+            description: `Unidad industrial ${found.brand} ${found.name}.`,
+            specs: {
+              engine: found.motor || 'Convencional',
+              hours: found.hours ? `${found.hours}` : '0'
+            }
+          };
+        }
+      }
+    } catch(e) {}
+  }
 
   if (!item) {
     document.querySelector(".detail-layout").innerHTML = `
       <div style="grid-column: 1/-1; text-align: center; padding: 8rem 0;">
-        <h2>Equipo no encontrado</h2>
-        <p style="margin-bottom: 2rem;">El autoelevador especificado no se encuentra en nuestro catálogo.</p>
+        <h2>Unidad no encontrada</h2>
+        <p style="margin-bottom: 2rem;">El equipo especificado no se encuentra en nuestro catálogo activo.</p>
         <a href="catalog.html" class="btn btn-primary">Volver al Catálogo</a>
       </div>
     `;
@@ -919,39 +1123,55 @@ function initDetailPage() {
   // Populate Specs
   const specList = document.getElementById("detail-specs-list");
   if (specList) {
-    specList.innerHTML = `
-      <div class="detail-spec-row">
-        <span>Capacidad de carga</span>
-        <span>${item.capacity} kg (${(item.capacity / 1000).toFixed(1)} TN)</span>
-      </div>
-      <div class="detail-spec-row">
-        <span>Altura máxima de elevación</span>
-        <span>${item.height.toFixed(1)} metros</span>
-      </div>
-      <div class="detail-spec-row">
-        <span>Año de fabricación</span>
-        <span>${item.year}</span>
-      </div>
-    `;
-
-    // Add unique specs
-    for (const [key, value] of Object.entries(item.specs)) {
-      let label = key;
-      if (key === "voltage") label = "Batería / Tensión";
-      else if (key === "engine") label = "Motor Combustión";
-      else if (key === "transmission") label = "Transmisión";
-      else if (key === "turningRadius") label = "Radio de Giro";
-      else if (key === "controller") label = "Controlador Electrónico";
-      else if (key === "mastType") label = "Tipo de Mástil";
-
-      const row = document.createElement("div");
-      row.className = "detail-spec-row";
-      row.innerHTML = `
-        <span>${label}</span>
-        <span>${value}</span>
+    let specHTML = "";
+    if (item.capacity) {
+      const capVal = typeof item.capacity === "number" ? `${item.capacity} kg (${(item.capacity / 1000).toFixed(1)} TN)` : item.capacity;
+      specHTML += `
+        <div class="detail-spec-row">
+          <span>Capacidad de carga</span>
+          <span>${capVal}</span>
+        </div>
       `;
-      specList.appendChild(row);
     }
+    if (item.height) {
+      specHTML += `
+        <div class="detail-spec-row">
+          <span>Altura máxima de elevación</span>
+          <span>${typeof item.height === "number" ? item.height.toFixed(1) + " metros" : item.height}</span>
+        </div>
+      `;
+    }
+    if (item.year) {
+      specHTML += `
+        <div class="detail-spec-row">
+          <span>Año de fabricación</span>
+          <span>${item.year}</span>
+        </div>
+      `;
+    }
+
+    if (item.specs) {
+      for (const [key, value] of Object.entries(item.specs)) {
+        let label = key;
+        if (key === "voltage") label = "Batería / Tensión";
+        else if (key === "engine") label = "Motorización";
+        else if (key === "transmission") label = "Transmisión";
+        else if (key === "turningRadius") label = "Radio de Giro";
+        else if (key === "controller") label = "Controlador Electrónico";
+        else if (key === "mastType") label = "Tipo de Mástil";
+        else if (key === "suspension") label = "Suspensión";
+        else if (key === "brakes") label = "Sistema de Frenos";
+        else if (key === "hours") label = "Kilometraje / Uso";
+
+        specHTML += `
+          <div class="detail-spec-row">
+            <span>${label}</span>
+            <span>${value}</span>
+          </div>
+        `;
+      }
+    }
+    specList.innerHTML = specHTML;
   }
 
   // Main gallery image
@@ -1028,14 +1248,15 @@ function initDetailPage() {
 function setupGlobalModals() {
   const modal = document.getElementById("quote-modal");
   const overlay = modal ? modal.querySelector(".modal-overlay") : null;
-  const modalClose = modal ? modal.querySelector(".btn-secondary") : null;
   const form = document.getElementById("modal-quote-form");
 
   if (modal && overlay) {
     overlay.addEventListener("click", () => closeModal(modal));
   }
-  if (modalClose) {
-    modalClose.addEventListener("click", () => closeModal(modal));
+  if (modal) {
+    modal.querySelectorAll(".btn-secondary, .modal-close-btn").forEach(closeBtn => {
+      closeBtn.addEventListener("click", () => closeModal(modal));
+    });
   }
 
   // Quote Form Submission logic
@@ -1054,32 +1275,80 @@ function setupGlobalModals() {
   if (form) {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      const product = document.getElementById("modal-product-title").textContent;
-      const clientName = document.getElementById("modal-client-name").value;
+      const productTitleEl = document.getElementById("modal-product-title");
+      const product = productTitleEl ? productTitleEl.textContent : "Equipo";
+      const clientNameEl = document.getElementById("modal-client-name") || document.getElementById("quote-name");
+      const clientName = clientNameEl ? clientNameEl.value : "Cliente";
       
       closeModal(modal);
-      openNotificationModal("Cotización Solicitada", `Estimado ${clientName}, su cotización por el producto "${product}" ha sido registrada con éxito. Recibirá detalles en su casilla de correo.`);
+      openNotificationModal("Cotización Solicitada", `Estimado ${clientName}, su cotización por "${product}" ha sido registrada con éxito. Recibirá detalles a la brevedad.`);
       form.reset();
     });
   }
 }
 
-function attachQuoteEvents() {
-  const buttons = document.querySelectorAll(".open-quote-modal");
-  const modal = document.getElementById("quote-modal");
-  
-  if (!modal) return;
-
-  buttons.forEach(btn => {
-    btn.onclick = (e) => {
+// Global click delegation for all quote & contact modal triggers & close actions across all pages
+document.addEventListener("click", (e) => {
+  // 1. Handle Modal Close Actions (Overlay click, X button, Cancel button, Close button)
+  const closeTrigger = e.target.closest(".modal-overlay, .modal-close-btn, .modal-close-x, .close-modal, .close-notif");
+  if (closeTrigger) {
+    const modal = closeTrigger.closest(".modal");
+    if (modal) {
       e.preventDefault();
-      const productName = btn.getAttribute("data-product") || "Contacto General";
-      const titleEl = document.getElementById("modal-product-title");
-      if (titleEl) titleEl.textContent = productName;
-      
-      openModal(modal);
-    };
-  });
+      closeModal(modal);
+      return;
+    }
+  }
+
+  const cancelBtn = e.target.closest(".modal .btn-secondary");
+  if (cancelBtn && cancelBtn.getAttribute("type") !== "submit") {
+    e.preventDefault();
+    const modal = cancelBtn.closest(".modal");
+    if (modal) {
+      closeModal(modal);
+      return;
+    }
+  }
+
+  // 2. Handle Opening Quote/Contact Modal (.open-quote-modal)
+  const btn = e.target.closest(".open-quote-modal");
+  if (btn) {
+    e.preventDefault();
+    const modal = document.getElementById("quote-modal");
+    if (!modal) return;
+
+    const productName = btn.getAttribute("data-product") || "Contacto General";
+    const titleEl = document.getElementById("modal-product-title");
+    if (titleEl) titleEl.textContent = productName;
+
+    // Update direct WhatsApp link in modal with pre-filled message
+    const waBtn = document.getElementById("modal-whatsapp-direct");
+    if (waBtn) {
+      const msg = encodeURIComponent(`Hola, quisiera realizar una consulta sobre: ${productName}`);
+      waBtn.href = `https://wa.me/5491121699968?text=${msg}`;
+    }
+
+    // Close mobile navbar menu if open
+    const navMenu = document.querySelector(".nav-menu");
+    const navToggle = document.querySelector(".nav-toggle");
+    if (navMenu && navMenu.classList.contains("active")) {
+      navMenu.classList.remove("active");
+      if (navToggle) {
+        navToggle.classList.remove("active");
+        navToggle.querySelectorAll("span").forEach(bar => {
+          bar.style.transform = "none";
+          bar.style.opacity = "1";
+        });
+      }
+    }
+
+    openModal(modal);
+    return;
+  }
+});
+
+function attachQuoteEvents() {
+  // Handled globally by document click listener
 }
 
 function openModal(modalEl) {
@@ -1678,5 +1947,480 @@ const PartsCart = {
     window.open(`https://wa.me/${number}?text=${encoded}`, '_blank');
   }
 };
+
+// --- TRUCKS DIVISION ENGINE ---
+const staticTrucks = [
+  {
+    id: "mb-actros-2651",
+    name: "Mercedes-Benz Actros 2651 LS 6x4",
+    brand: "Mercedes Benz",
+    type: "Tractor Carretera",
+    capacityKg: 26000,
+    capacity: "26 Tn",
+    power: "510 CV",
+    axles: "6x4",
+    year: 2024,
+    condition: "Nuevo",
+    price: 115000,
+    priceLabel: "U$S 115.000 + IVA",
+    image: "assets/truck.png",
+    description: "Tractor de alta potencia para transporte pesado de larga distancia. Motor OM 471 LA, transmisión automatizada Powershift 3, retarder y cabina StreamSpace con suspensión neumática.",
+    specs: {
+      engine: "OM 471 LA 510 CV Euro 5",
+      transmission: "Powershift 3 (12 marchas)",
+      suspension: "Neumática integral",
+      brakes: "Disco + EBS / ABS / Retarder",
+      hours: "0 km (0km)"
+    }
+  },
+  {
+    id: "volvo-fh-460",
+    name: "Volvo FH 460 Globetrotter 6x2T",
+    brand: "Volvo",
+    type: "Tractor Carretera",
+    capacityKg: 24000,
+    capacity: "24 Tn",
+    power: "460 CV",
+    axles: "6x2",
+    year: 2023,
+    condition: "Usado",
+    price: 98000,
+    priceLabel: "U$S 98.000",
+    image: "assets/truck.png",
+    description: "Excelente unidad para transporte de larga distancia con caja I-Shift, freno de motor VEB+ de 510 CV y cabina Globetrotter de máximo confort.",
+    specs: {
+      engine: "D13K 460 CV Euro 5",
+      transmission: "I-Shift AT2612F 12 vel",
+      suspension: "Neumática de elevación",
+      brakes: "Disco EBS + VEB+",
+      hours: "185.000 km"
+    }
+  },
+  {
+    id: "scania-r450",
+    name: "Scania R450 Streamline Highline 6x2",
+    brand: "Scania",
+    type: "Tractor Carretera",
+    capacityKg: 22000,
+    capacity: "22 Tn",
+    power: "450 CV",
+    axles: "6x2",
+    year: 2023,
+    condition: "Usado",
+    price: 92000,
+    priceLabel: "U$S 92.000",
+    image: "assets/truck.png",
+    description: "Tractor liviano y eficiente en consumo. Sistema Opticruise sin pedal de embrague, Retarder Scania 4100 Nm y telemetría integrada.",
+    specs: {
+      engine: "DC13 148 450 CV XPI",
+      transmission: "Opticruise 14 velocidades",
+      suspension: "Neumática integral",
+      brakes: "Retarder Scania + ABS",
+      hours: "210.000 km"
+    }
+  },
+  {
+    id: "iveco-stralis-440",
+    name: "IVECO Stralis Hi-Way 440 4x2",
+    brand: "IVECO",
+    type: "Tractor Carretera",
+    capacityKg: 20000,
+    capacity: "20 Tn",
+    power: "440 CV",
+    axles: "4x2",
+    year: 2024,
+    condition: "Nuevo",
+    price: 86000,
+    priceLabel: "U$S 86.000 + IVA",
+    image: "assets/truck.png",
+    description: "Tractor 4x2 óptimo para distribución regional y media distancia. Motor Cursor 13, transmisión ZF Eurotronic y suspensión neumática ECAS.",
+    specs: {
+      engine: "Cursor 13 440 CV Euro 5",
+      transmission: "ZF Eurotronic 16 vel",
+      suspension: "Neumática ECAS",
+      brakes: "Disco delantero / Tambor trasero",
+      hours: "0 km (0km)"
+    }
+  },
+  {
+    id: "ford-cargo-2042",
+    name: "Ford Cargo 2042 4x2T Extra Pesado",
+    brand: "Ford",
+    type: "Tractor Carretera",
+    capacityKg: 20000,
+    capacity: "20 Tn",
+    power: "420 CV",
+    axles: "4x2",
+    year: 2022,
+    condition: "Usado",
+    price: 74000,
+    priceLabel: "U$S 74.000",
+    image: "assets/truck.png",
+    description: "Camión robusto y confiable para logística de larga distancia. Motor FPT 10.3L, transmisión ZF AS-Tronic y cabina dormitorio espaciosa.",
+    specs: {
+      engine: "FPT 10.3L 420 CV Euro 5",
+      transmission: "ZF AS-Tronic 12 vel",
+      suspension: "Ballestas parabólicas",
+      brakes: "Tambor con ABS y EBD",
+      hours: "290.000 km"
+    }
+  },
+  {
+    id: "vw-constellation-31330",
+    name: "Volkswagen Constellation 31.330 6x4",
+    brand: "Volkswagen",
+    type: "Chasis Volcador",
+    capacityKg: 31000,
+    capacity: "31 Tn",
+    power: "330 CV",
+    axles: "6x4",
+    year: 2024,
+    condition: "Nuevo",
+    price: 108000,
+    priceLabel: "U$S 108.000 + IVA",
+    image: "assets/truck.png",
+    description: "Chasis volcador reforzado para trabajos pesados en canteras y minería. Motor Cummins ISL 8.9L, tracción 6x4 con reductor de cubo de rueda.",
+    specs: {
+      engine: "Cummins ISL 330 CV Euro 5",
+      transmission: "ZF manual 16 vel",
+      suspension: "Bogie reforzada",
+      brakes: "C-Brake + ABS",
+      hours: "0 km (0km)"
+    }
+  }
+];
+
+function initCamionesPage() {
+  const grid = document.getElementById("trucks-grid");
+  const searchInput = document.getElementById("search-trucks");
+  const brandContainer = document.getElementById("truck-brand-filters");
+  const sortSelect = document.getElementById("sort-trucks");
+  const countSpan = document.getElementById("trucks-count");
+
+  if (!grid) return;
+
+  let truckCurrentPage = 1;
+  const TRUCKS_PER_PAGE = 6;
+
+  // 1. Gather static trucks + CRM trucks from localStorage
+  let allTrucks = [...staticTrucks];
+  try {
+    const rawDB = localStorage.getItem('m9-inventory-db');
+    if (rawDB) {
+      const parsedDB = JSON.parse(rawDB);
+      if (parsedDB.camiones && Array.isArray(parsedDB.camiones)) {
+        parsedDB.camiones.forEach(crmItem => {
+          if (crmItem.visible !== false && !allTrucks.some(t => t.name.toLowerCase() === crmItem.name.toLowerCase())) {
+            let capKg = 20000;
+            if (crmItem.capacity) {
+              const match = crmItem.capacity.replace('.', '').match(/\d+/);
+              if (match) capKg = parseInt(match[0]) * 1000;
+            }
+            allTrucks.push({
+              id: `crm-truck-${crmItem.id}`,
+              name: crmItem.name,
+              brand: crmItem.brand || "Generico",
+              type: crmItem.type || "Tractor Carretera",
+              capacityKg: capKg,
+              capacity: crmItem.capacity || "20 Tn",
+              power: crmItem.motor || "Diesel",
+              axles: "6x2",
+              year: 2024,
+              condition: crmItem.hours > 0 ? "Usado" : "Nuevo",
+              price: crmItem.price || 85000,
+              priceLabel: `U$S ${crmItem.price ? crmItem.price.toLocaleString('es-AR') : 'Consultar'}`,
+              image: crmItem.img ? crmItem.img.replace('../', '') : "assets/truck.png",
+              description: `Unidad de carga pesada ${crmItem.brand} ${crmItem.name}.`,
+              specs: {
+                engine: crmItem.motor || "Diesel HD",
+                transmission: "Automatizada HD",
+                suspension: "Neumática",
+                brakes: "ABS / EBS",
+                hours: crmItem.hours ? `${crmItem.hours} km` : "0 km"
+              }
+            });
+          }
+        });
+      }
+    }
+  } catch(e) {}
+
+  // 2. Render Brand Filter checkboxes dynamically with "Ver más marcas" toggle
+  if (brandContainer) {
+    const brands = [...new Set(allTrucks.map(t => t.brand).filter(Boolean))].sort();
+    renderExpandableBrandList(brandContainer, brands, "truck-brand");
+  }
+
+  // 3. Render Trucks Function
+  function renderTrucks() {
+    if (!grid) return;
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    const selectedBrands = Array.from(document.querySelectorAll('[data-filter="truck-brand"]:checked')).map(cb => cb.value);
+    const selectedTypes = Array.from(document.querySelectorAll('[data-filter="truck-type"]:checked')).map(cb => cb.value);
+    const selectedCond = Array.from(document.querySelectorAll('[data-filter="truck-condition"]:checked')).map(cb => cb.value);
+    const sortVal = sortSelect ? sortSelect.value : "featured";
+
+    let filtered = allTrucks.filter(item => {
+      // Search text
+      if (query && !item.name.toLowerCase().includes(query) && !item.brand.toLowerCase().includes(query) && !item.description.toLowerCase().includes(query)) {
+        return false;
+      }
+      // Brand
+      if (selectedBrands.length > 0 && !selectedBrands.includes(item.brand)) {
+        return false;
+      }
+      // Type
+      if (selectedTypes.length > 0 && !selectedTypes.includes(item.type)) {
+        return false;
+      }
+      // Condition
+      if (selectedCond.length > 0 && !selectedCond.includes(item.condition)) {
+        return false;
+      }
+      return true;
+    });
+
+    // Sorting
+    if (sortVal === "price-asc") {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (sortVal === "price-desc") {
+      filtered.sort((a, b) => b.price - a.price);
+    } else if (sortVal === "power-desc") {
+      filtered.sort((a, b) => parseInt(b.power) - parseInt(a.power));
+    }
+
+    if (countSpan) countSpan.textContent = `${filtered.length} unidades encontradas`;
+    updateActiveFilterCount();
+
+    grid.innerHTML = "";
+    const paginationContainer = document.getElementById("trucks-pagination");
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; border: 1px dashed var(--border-color); border-radius: 8px;">
+          <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">No se encontraron camiones</h3>
+          <p style="color: var(--text-secondary);">Intente modificar o limpiar los filtros seleccionados.</p>
+        </div>
+      `;
+      if (paginationContainer) paginationContainer.innerHTML = "";
+      return;
+    }
+
+    const totalPages = Math.ceil(filtered.length / TRUCKS_PER_PAGE);
+    if (truckCurrentPage > totalPages) truckCurrentPage = 1;
+
+    const pageSlice = filtered.slice((truckCurrentPage - 1) * TRUCKS_PER_PAGE, truckCurrentPage * TRUCKS_PER_PAGE);
+
+    pageSlice.forEach(truck => {
+      const card = document.createElement("div");
+      card.className = "product-card truck-card-v2";
+      card.setAttribute("data-url", `detalle.html?id=${truck.id}`);
+      card.innerHTML = `
+        <div class="product-card-img-wrapper">
+          <img src="${truck.image}" alt="${truck.name}" class="product-card-img" loading="lazy">
+          <span class="badge ${truck.condition === 'Nuevo' ? 'badge-yellow' : 'badge-dark'}">${truck.condition}</span>
+          <span class="truck-brand-badge">${truck.brand}</span>
+        </div>
+        <div class="product-card-body" style="padding: 1.2rem;">
+          <div class="product-category" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-secondary); margin-bottom:0.3rem;">${truck.type} • ${truck.axles}</div>
+          <h3 class="product-title" style="font-family:var(--font-headings); font-size:1.15rem; font-weight:700; color:var(--text-primary); margin-bottom: 0.8rem; line-height:1.3;">${truck.name}</h3>
+          
+          <div class="product-specs-grid" style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; margin: 0.8rem 0 1.2rem 0; padding: 0.6rem 0.8rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 6px;">
+            <div class="spec-item">
+              <span class="spec-label" style="display:block; font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Potencia</span>
+              <span class="spec-value" style="font-size:0.92rem; color:var(--primary-yellow); font-weight:700;">${truck.power}</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label" style="display:block; font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Capacidad</span>
+              <span class="spec-value" style="font-size:0.92rem; color:var(--text-primary); font-weight:600;">${truck.capacity}</span>
+            </div>
+          </div>
+          
+          <div class="product-card-footer truck-card-footer-mobile" style="display:flex; align-items:center; justify-content:space-between; gap:0.6rem; margin-top:0.8rem;">
+            <div>
+              <span style="font-size:0.7rem; color:var(--text-secondary); display:block; text-transform:uppercase;">Valor referencia</span>
+              <span class="product-price" style="font-size:1.05rem; font-weight:800; color:var(--text-primary);">${truck.priceLabel}</span>
+            </div>
+            <div style="display:flex; gap:0.4rem;">
+              <a href="detalle.html?id=${truck.id}" class="btn btn-secondary btn-sm" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">Ver Detalle</a>
+              <button class="btn btn-primary btn-sm open-quote-modal" data-product="Camión: ${truck.name} (${truck.power})" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">
+                Cotizar
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    renderPagination(paginationContainer, truckCurrentPage, totalPages, (newPage) => {
+      truckCurrentPage = newPage;
+      renderTrucks();
+      const gridEl = document.getElementById("trucks-grid");
+      if (gridEl) gridEl.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Re-attach quote modal listener
+    if (typeof attachQuoteEvents === "function") attachQuoteEvents();
+  }
+
+  function updateActiveFilterCount() {
+    const activeCountEl = document.getElementById("mobile-filter-count");
+    if (!activeCountEl) return;
+    const brandCount = document.querySelectorAll('[data-filter="truck-brand"]:checked').length;
+    const typeCount = document.querySelectorAll('[data-filter="truck-type"]:checked').length;
+    const condCount = document.querySelectorAll('[data-filter="truck-condition"]:checked').length;
+    const hasSearch = searchInput && searchInput.value.trim() !== "" ? 1 : 0;
+    const total = brandCount + typeCount + condCount + hasSearch;
+    activeCountEl.textContent = total;
+    activeCountEl.style.display = total > 0 ? "inline-flex" : "none";
+  }
+
+  // Mobile drawer toggle
+  const mobileToggleBtn = document.getElementById("toggle-mobile-truck-filters");
+  const sidebarEl = document.querySelector(".catalog-sidebar");
+  if (mobileToggleBtn && sidebarEl) {
+    mobileToggleBtn.addEventListener("click", () => {
+      sidebarEl.classList.toggle("mobile-open");
+      const isOpen = sidebarEl.classList.contains("mobile-open");
+      mobileToggleBtn.classList.toggle("active", isOpen);
+    });
+  }
+
+  // Quick Chips listener
+  document.querySelectorAll(".truck-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll(".truck-chip").forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      const val = chip.getAttribute("data-chip");
+
+      if (searchInput) searchInput.value = "";
+      document.querySelectorAll('[data-filter^="truck-"]').forEach(cb => cb.checked = false);
+
+      if (val.startsWith("brand:")) {
+        const brandVal = val.split(":")[1];
+        const targetCb = document.querySelector(`[data-filter="truck-brand"][value="${brandVal}"]`);
+        if (targetCb) targetCb.checked = true;
+      } else if (val.startsWith("type:")) {
+        const typeVal = val.split(":")[1];
+        const targetCb = document.querySelector(`[data-filter="truck-type"][value="${typeVal}"]`);
+        if (targetCb) targetCb.checked = true;
+      } else if (val.startsWith("cond:")) {
+        const condVal = val.split(":")[1];
+        const targetCb = document.querySelector(`[data-filter="truck-condition"][value="${condVal}"]`);
+        if (targetCb) targetCb.checked = true;
+      }
+      renderTrucks();
+    });
+  });
+
+  // Initial render
+  renderTrucks();
+
+  // Event Listeners
+  if (searchInput) searchInput.addEventListener("input", renderTrucks);
+  if (sortSelect) sortSelect.addEventListener("change", renderTrucks);
+  document.addEventListener("change", (e) => {
+    if (e.target && e.target.matches('[data-filter^="truck-"]')) {
+      renderTrucks();
+    }
+  });
+
+  const clearBtn = document.getElementById("clear-truck-filters");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      if (searchInput) searchInput.value = "";
+      document.querySelectorAll('[data-filter^="truck-"]').forEach(cb => cb.checked = false);
+      document.querySelectorAll(".truck-chip").forEach(c => c.classList.remove("active"));
+      const defaultChip = document.querySelector('.truck-chip[data-chip="all"]');
+      if (defaultChip) defaultChip.classList.add("active");
+      if (sortSelect) sortSelect.value = "featured";
+      renderTrucks();
+    });
+  }
+}
+
+// --- GLOBAL CARD CLICK DELEGATION FOR ALL PRODUCT CARDS ---
+document.addEventListener("click", (e) => {
+  const card = e.target.closest(".product-card, .truck-card-v2");
+  if (!card) return;
+
+  // Do not navigate if user clicked an interactive modal trigger or button
+  if (e.target.closest(".open-quote-modal") || e.target.closest("button.open-quote-modal") || e.target.closest("input") || e.target.closest("label")) {
+    return;
+  }
+
+  const dataUrl = card.getAttribute("data-url");
+  const detailLink = card.querySelector("a[href*='detalle.html']");
+  const targetUrl = dataUrl || (detailLink ? detailLink.getAttribute("href") : null);
+
+  if (targetUrl) {
+    window.location.href = targetUrl;
+  }
+});
+
+// --- REUSABLE NUMERICAL PAGINATION CONTROLS RENDERER ---
+function renderPagination(container, currentPage, totalPages, onPageChange) {
+  if (!container) return;
+  if (totalPages <= 1) {
+    container.innerHTML = "";
+    return;
+  }
+
+  let html = `<div class="pagination" style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; margin-top: 2rem;">`;
+
+  // Previous button
+  html += `
+    <button class="pagination-btn pagination-prev ${currentPage === 1 ? 'disabled' : ''}" 
+            ${currentPage === 1 ? 'disabled' : ''} 
+            style="padding: 0.5rem 0.9rem; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.88rem;">
+      &laquo; Ant
+    </button>
+  `;
+
+  // Page numbers
+  for (let i = 1; i <= totalPages; i++) {
+    const isActive = i === currentPage;
+    html += `
+      <button class="pagination-btn pagination-num ${isActive ? 'active' : ''}" 
+              data-page="${i}"
+              style="padding: 0.5rem 0.85rem; background: ${isActive ? 'var(--primary-yellow)' : 'var(--bg-card)'}; border: 1px solid ${isActive ? 'var(--primary-yellow)' : 'var(--border-color)'}; color: ${isActive ? '#000000' : 'var(--text-primary)'}; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.88rem;">
+        ${i}
+      </button>
+    `;
+  }
+
+  // Next button
+  html += `
+    <button class="pagination-btn pagination-next ${currentPage === totalPages ? 'disabled' : ''}" 
+            ${currentPage === totalPages ? 'disabled' : ''} 
+            style="padding: 0.5rem 0.9rem; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.88rem;">
+      Sig &raquo;
+    </button>
+  `;
+
+  html += `</div>`;
+  container.innerHTML = html;
+
+  // Attach click listeners to pagination buttons
+  const prevBtn = container.querySelector(".pagination-prev");
+  const nextBtn = container.querySelector(".pagination-next");
+  const numBtns = container.querySelectorAll(".pagination-num");
+
+  if (prevBtn && currentPage > 1) {
+    prevBtn.addEventListener("click", () => onPageChange(currentPage - 1));
+  }
+  if (nextBtn && currentPage < totalPages) {
+    nextBtn.addEventListener("click", () => onPageChange(currentPage + 1));
+  }
+  numBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const targetPage = parseInt(btn.dataset.page);
+      if (targetPage && targetPage !== currentPage) {
+        onPageChange(targetPage);
+      }
+    });
+  });
+}
+
 
 

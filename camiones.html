@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>División Camiones de Carga Pesada & Logística | Maquinarias 9 de Abril</title>
+  <meta name="description" content="Venta de camiones pesados, tractores de carretera 6x4, 6x2 y 4x2, volcadores y flotas de logística industrial. Mercedes-Benz, Volvo, Scania, IVECO y Ford.">
+  <link rel="icon" type="image/png" href="assets/logotipo_png.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- --- NAVIGATION BAR --- -->
+  <nav class="navbar" id="main-nav">
+    <div class="navbar-container">
+      <a href="index.html" class="nav-logo">
+        <img src="assets/logotipo_png.png" alt="Maquinarias 9 de Abril" class="nav-logo-img">
+      </a>
+      <button class="nav-toggle" aria-label="Abrir Menú">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link">Inicio</a></li>
+        <li><a href="catalog.html" class="nav-link">Catálogo</a></li>
+        <li><a href="repuestos.html" class="nav-link">Repuestos</a></li>
+        <li><a href="camiones.html" class="nav-link active">Camiones</a></li>
+        <li><a href="#" class="nav-link open-quote-modal" data-product="Contacto División Camiones">Contacto</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="#" class="btn btn-outline-yellow open-quote-modal" data-product="Cotización Flota Camiones" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">Cotizar Flota</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- --- HERO TRUCKS SECTION --- -->
+  <header class="hero hero-trucks-page">
+    <div class="hero-v2-bg hero-trucks-bg" style="background-image: url('assets/truck_hero.jpg');"></div>
+    <div class="hero-v2-overlay hero-trucks-overlay"></div>
+    <div class="hero-v2-dotgrid"></div>
+
+    <div class="container hero-trucks-content">
+      <div class="hero-brand-badge">
+        <span class="hero-brand-dot"></span>
+        DIVISIÓN TRANSPORTE &amp; LOGÍSTICA HEAVY DUTY
+      </div>
+      <h1 class="hero-title hero-trucks-title">
+        Flotas de Camiones Pesados <br><span style="color: var(--primary-yellow);">Tractores &amp; Chasis Industriales</span>
+      </h1>
+      <p class="hero-desc hero-trucks-desc">
+        Unidades de alto tonelaje para transporte de media y larga distancia, logística pesada y obras viales. Representación de primeras marcas con respaldo técnico oficial y financiación flexible.
+      </p>
+
+      <!-- Quick Filter Chips for Mobile / Touch -->
+      <div class="truck-quick-chips-wrapper" aria-label="Accesos Rápidos">
+        <button class="hero-cat-chip truck-chip active" data-chip="all">Todas las unidades</button>
+        <button class="hero-cat-chip truck-chip" data-chip="brand:Mercedes Benz">Mercedes-Benz</button>
+        <button class="hero-cat-chip truck-chip" data-chip="brand:Volvo">Volvo</button>
+        <button class="hero-cat-chip truck-chip" data-chip="brand:Scania">Scania</button>
+        <button class="hero-cat-chip truck-chip" data-chip="type:Tractor Carretera">Tractores</button>
+        <button class="hero-cat-chip truck-chip" data-chip="type:Chasis Volcador">Volcadores</button>
+        <button class="hero-cat-chip truck-chip" data-chip="cond:Nuevo">Nuevos 0km</button>
+      </div>
+
+      <div class="hero-truck-stats-grid">
+        <div class="truck-stat-card">
+          <span class="truck-stat-num">+500 CV</span>
+          <span class="truck-stat-label">Potencia Máxima</span>
+        </div>
+        <div class="truck-stat-card">
+          <span class="truck-stat-num">hasta 31 Tn</span>
+          <span class="truck-stat-label">Capacidad Carga</span>
+        </div>
+        <div class="truck-stat-card">
+          <span class="truck-stat-num">0 km &amp; Usados</span>
+          <span class="truck-stat-label">Garantía Certificada</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- --- MAIN CATALOG SECTION --- -->
+  <main class="section-padding container trucks-main-section">
+    
+    <div class="section-header" style="text-align: left; margin-bottom: 1.5rem;">
+      <span class="section-tag">Inventario Disponible</span>
+      <h2 class="section-title">Catálogo de Camiones y Tractores de Carga</h2>
+    </div>
+
+    <!-- Mobile Filter Accordion Toggle Button (Standardized) -->
+    <button class="truck-mobile-filter-btn mobile-filter-toggle" id="toggle-mobile-truck-filters" type="button" aria-expanded="false">
+      <div class="mft-left">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+        <span>Filtrar &amp; Buscar Camiones</span>
+      </div>
+      <div class="mft-right">
+        <span class="filter-count-badge" id="mobile-filter-count" style="display:none;">0</span>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" class="filter-chevron">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+    </button>
+
+    <div class="catalog-layout">
+      
+      <!-- LEFT SIDEBAR: FILTERS -->
+      <aside class="catalog-sidebar">
+        <div class="filter-card">
+          <div class="filter-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0;">Filtros de Búsqueda</h3>
+            <button id="clear-truck-filters" class="btn-link" style="font-size: 0.8rem; color: var(--primary-yellow); background: none; border: none; cursor: pointer;">Limpiar todo</button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem; display: block;">Buscar Camión / Modelo</label>
+            <input type="text" id="search-trucks" class="form-input" placeholder="Ej: Actros 2651, Volvo FH, Scania..." style="padding: 0.6rem 0.8rem; font-size: 0.9rem;">
+          </div>
+
+          <!-- Brand Filter -->
+          <div class="filter-group" style="margin-bottom: 1.5rem;">
+            <h4 class="filter-subtitle" style="font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: var(--primary-yellow); margin-bottom: 0.8rem;">Marca</h4>
+            <div id="truck-brand-filters" class="checkbox-group" style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <!-- Dynamic brands generated by JS -->
+            </div>
+          </div>
+
+          <!-- Configuration / Type Filter -->
+          <div class="filter-group" style="margin-bottom: 1.5rem;">
+            <h4 class="filter-subtitle" style="font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: var(--primary-yellow); margin-bottom: 0.8rem;">Configuración</h4>
+            <div class="checkbox-group" style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <label class="checkbox-label">
+                <input type="checkbox" value="Tractor Carretera" data-filter="truck-type" class="filter-checkbox">
+                Tractor Carretera
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" value="Chasis Volcador" data-filter="truck-type" class="filter-checkbox">
+                Chasis Volcador
+              </label>
+            </div>
+          </div>
+
+          <!-- Condition Filter -->
+          <div class="filter-group">
+            <h4 class="filter-subtitle" style="font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: var(--primary-yellow); margin-bottom: 0.8rem;">Estado de Unidad</h4>
+            <div class="checkbox-group" style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <label class="checkbox-label">
+                <input type="checkbox" value="Nuevo" data-filter="truck-condition" class="filter-checkbox">
+                Nuevo (0 km)
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" value="Usado" data-filter="truck-condition" class="filter-checkbox">
+                Usado Garantizado
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- RIGHT COLUMN: RESULTS GRID -->
+      <section class="catalog-main">
+        
+        <!-- Controls bar -->
+        <div class="catalog-controls" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: var(--bg-card); padding: 0.8rem 1.2rem; border-radius: 8px; border: 1px solid var(--border-color);">
+          <span id="trucks-count" style="font-size: 0.9rem; font-weight: 600; color: var(--text-secondary);">Cargando inventario...</span>
+          
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <label for="sort-trucks" style="font-size: 0.85rem; color: var(--text-secondary);">Ordenar por:</label>
+            <div class="custom-select-wrapper" style="min-width: 180px;">
+              <select id="sort-trucks">
+                <option value="featured">Destacados</option>
+                <option value="power-desc">Mayor Potencia (CV)</option>
+                <option value="price-asc">Precio: Menor a Mayor</option>
+                <option value="price-desc">Precio: Mayor a Menor</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid of Truck Cards -->
+        <div id="trucks-grid" class="products-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.2rem;">
+          <!-- Dynamically populated by app.js initCamionesPage() -->
+        </div>
+
+        <!-- Pagination Container -->
+        <div id="trucks-pagination" class="pagination-wrapper"></div>
+
+      </section>
+    </div>
+
+  </main>
+
+  <!-- --- TRUCK SERVICES & HIGHLIGHTS SECTION --- -->
+  <section class="truck-features-section">
+    <div class="container">
+      <div class="section-header" style="text-align: center; max-width: 750px; margin: 0 auto 3.5rem auto;">
+        <span class="section-tag">Servicio Integral de Flotas</span>
+        <h2 class="section-title">¿Por qué elegir nuestra <span class="text-yellow">División Camiones</span>?</h2>
+        <p class="section-subtitle">Acompañamos a las empresas de transporte y logística con tecnología de punta, soporte oficial y esquemas financieros a medida.</p>
+      </div>
+
+      <div class="truck-features-grid">
+        
+        <!-- Feature 1: Telemetría -->
+        <div class="truck-feature-card">
+          <div class="truck-feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/>
+              <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/>
+              <circle cx="12" cy="12" r="2"/>
+              <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/>
+              <path d="M19.1 4.9c3.9 3.9 3.9 10.3 0 14.2"/>
+            </svg>
+          </div>
+          <h3 class="truck-feature-title">Telemetría Integrada</h3>
+          <p class="truck-feature-desc">Monitoreo remoto en tiempo real del consumo de combustible, hábitos de manejo, geolocalización de flotas y diagnóstico preventivo de fallas.</p>
+        </div>
+
+        <!-- Feature 2: Servicio Técnico -->
+        <div class="truck-feature-card">
+          <div class="truck-feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            </svg>
+          </div>
+          <h3 class="truck-feature-title">Servicio Técnico Oficial</h3>
+          <p class="truck-feature-desc">Talleres propios con scanners originales de fábrica, técnicos certificados y stock permanente de repuestos OEM para minimizar paradas.</p>
+        </div>
+
+        <!-- Feature 3: Financiación -->
+        <div class="truck-feature-card">
+          <div class="truck-feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <h3 class="truck-feature-title">Financiación &amp; Leasing</h3>
+          <p class="truck-feature-desc">Planes flexibles adaptados a la estacionalidad de tu negocio. Créditos prendarios directos, leasing operativo con beneficios fiscales y cuotas fijas.</p>
+        </div>
+
+        <!-- Feature 4: Usados -->
+        <div class="truck-feature-card">
+          <div class="truck-feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"/>
+              <polyline points="1 20 1 14 7 14"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+          </div>
+          <h3 class="truck-feature-title">Recepción de Usados</h3>
+          <p class="truck-feature-desc">Tasación profesional inmediata de tu unidad usada como parte de pago, garantizando una transición ágil, segura y transparente en la renovación de tu flota.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  </main>
+
+  <!-- --- FOOTER --- -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-logo"><img src="assets/logotipo_png.png" alt="Maquinarias 9 de Abril" class="footer-logo-img"></div>
+          <p class="footer-desc">Desde 2019, soluciones integrales de elevación industrial, repuestos OEM y División Transporte de carga heavy duty.</p>
+          <div class="footer-socials">
+            <a href="https://www.instagram.com/autoelevadores9abril.oficial/" target="_blank" rel="noopener noreferrer" class="footer-social-link" title="Instagram">ig</a>
+            <a href="https://maps.app.goo.gl/mhy4bSas3qtBY5Lr8" target="_blank" rel="noopener noreferrer" class="footer-social-link" title="Ubicación en Google Maps">map</a>
+          </div>
+        </div>
+        <div>
+          <h4 class="footer-title">Líneas de Equipos</h4>
+          <ul class="footer-links">
+            <li><a href="catalog.html" class="footer-link">Autoelevadores</a></li>
+            <li><a href="catalog.html" class="footer-link">Apiladoras Eléctricas</a></li>
+            <li><a href="camiones.html" class="footer-link">Camiones Heavy Duty</a></li>
+            <li><a href="repuestos.html" class="footer-link">Repuestos OEM</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Servicio</h4>
+          <ul class="footer-links">
+            <li><a href="repuestos.html" class="footer-link">Buscador OEM</a></li>
+            <li><a href="repuestos.html" class="footer-link">Mantenimiento Preventivo</a></li>
+            <li><a href="#" class="footer-link open-quote-modal" data-product="Asistencia Mecánica de Flotas">Asistencia 24/7</a></li>
+            <li><a href="#" class="footer-link open-quote-modal" data-product="Financiación Camiones">Financiamiento</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Sede Central</h4>
+          <ul class="footer-links" style="color: var(--text-secondary); font-size: 0.9rem;">
+            <li style="margin-bottom: 0.5rem;">📍 <a href="https://maps.app.goo.gl/mhy4bSas3qtBY5Lr8" target="_blank" rel="noopener noreferrer" class="footer-link" style="display: inline-block; padding-left: 0;">San Antonio 1722, B1839CIT 9 de Abril, Buenos Aires</a></li>
+            <li style="margin-bottom: 0.5rem;">📞 <a href="https://wa.me/5491121699968" target="_blank" rel="noopener noreferrer" class="footer-link" style="display: inline-block; padding-left: 0;">+54 9 11 2169-9968</a></li>
+            <li>✉ <a href="mailto:info@autoelevadores9deabril.com" class="footer-link" style="display: inline-block; padding-left: 0;">info@autoelevadores9deabril.com</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Maquinarias 9 de Abril S.A. Todos los derechos reservados.</p>
+        <p>División Transporte Heavy Duty &amp; Elevación Industrial.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- --- GENERAL QUOTE MODAL --- -->
+  <div class="modal" id="quote-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <button type="button" class="modal-close-x" aria-label="Cerrar">&times;</button>
+      <div class="modal-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      </div>
+      <h3>Solicitud de Cotización de Camión</h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.2rem;">
+        Cotizaremos el producto <span id="modal-product-title" style="color: var(--primary-yellow); font-weight: 700;"></span> en menos de 2 horas hábiles.
+      </p>
+
+      <div style="margin-bottom: 1.5rem; text-align: center; background: rgba(37, 211, 102, 0.08); border: 1px solid rgba(37, 211, 102, 0.3); padding: 0.9rem; border-radius: 8px;">
+        <p style="font-size: 0.85rem; color: #25D366; font-weight: 600; margin-bottom: 0.6rem;">¿Buscás atención rápida e inmediata?</p>
+        <a id="modal-whatsapp-direct" href="https://wa.me/5491121699968?text=Hola%2C%20quisiera%20consultar%20sobre%3A%20Contacto%20Divisi%C3%B3n%20Camiones" target="_blank" rel="noopener noreferrer" style="background-color: #25D366; color: #ffffff; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 700; font-size: 0.9rem; border-radius: 6px; padding: 0.65rem 1rem; text-decoration: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Contactar por WhatsApp ahora
+        </a>
+      </div>
+
+      <div style="position: relative; text-align: center; margin: 1.2rem 0 1rem 0;">
+        <span style="background: var(--bg-card, #141414); padding: 0 0.8rem; font-size: 0.78rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; position: relative; z-index: 1;">o complete el formulario web</span>
+        <div style="position: absolute; top: 50%; left: 0; right: 0; border-top: 1px solid var(--border-color); z-index: 0;"></div>
+      </div>
+      <form id="modal-quote-form">
+        <div class="form-group">
+          <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Nombre Completo / Empresa</label>
+          <input type="text" id="quote-name" class="form-input" required placeholder="Ej: Transportes Logísticos SRL">
+        </div>
+        <div class="form-group">
+          <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Teléfono / WhatsApp de Contacto</label>
+          <input type="tel" id="quote-phone" class="form-input" required placeholder="+54 9 11 1234-5678">
+        </div>
+        <div class="form-group">
+          <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Cantidad de Unidades / Especificación</label>
+          <textarea id="quote-comments" class="form-input" rows="3" placeholder="Indique si requiere financiación, entrega inmediata o toma de usado..."></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary modal-close-btn">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Enviar Solicitud</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

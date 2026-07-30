@@ -9,6 +9,115 @@
 const WA_NUMBER = '5491126738983';
 const CREDENTIALS = { user: 'admin', pass: 'admin' };
 
+/* ═══════════════════════════════════════════════════════
+   SUPABASE INTEGRATION UI (CRM ADMIN)
+═══════════════════════════════════════════════════════ */
+const SupabaseUI = {
+  async init() {
+    const dot = $('sb-status-dot');
+    const label = $('sb-status-label');
+    if (!dot || !label) return;
+
+    if (window.M9Supabase && window.M9Supabase.isConfigured()) {
+      dot.className = 'sb-dot sb-dot-online';
+      label.textContent = '☁️ Supabase Conectado';
+      // Cargar los últimos datos desde la nube silenciosamente
+      const res = await window.M9Supabase.fetchAllAndCache();
+      if (res.ok && res.DB) {
+        if (typeof DB !== 'undefined') {
+          if (res.DB.autoelevadores && res.DB.autoelevadores.length) DB.autoelevadores = res.DB.autoelevadores;
+          if (res.DB.camiones && res.DB.camiones.length) DB.camiones = res.DB.camiones;
+          if (res.DB.repuestos && res.DB.repuestos.length) DB.repuestos = res.DB.repuestos;
+          syncInventoryWithWeb(DB);
+        }
+        if (res.leads && typeof CRM !== 'undefined' && Array.isArray(res.leads)) {
+          CRM.leads = res.leads;
+        }
+      }
+    } else {
+      dot.className = 'sb-dot sb-dot-offline';
+      label.textContent = '☁️ Conectar Supabase';
+    }
+  },
+  openModal() {
+    if ($('sb-cfg-url')) $('sb-cfg-url').value = window.M9Supabase ? window.M9Supabase.getUrl() : 'https://ktfrpccefxhlrrwlahmk.supabase.co';
+    if ($('sb-cfg-key')) $('sb-cfg-key').value = window.M9Supabase ? window.M9Supabase.getKey() : '';
+    if ($('sb-test-result')) $('sb-test-result').textContent = '';
+    Modal.open('modal-supabase');
+  },
+  async saveConfig() {
+    const url = $('sb-cfg-url') ? $('sb-cfg-url').value.trim() : '';
+    const key = $('sb-cfg-key') ? $('sb-cfg-key').value.trim() : '';
+    if (!key) {
+      toast('Ingresá tu Anon Key de Supabase', 'error');
+      return;
+    }
+    const res = window.M9Supabase.saveCredentials(url, key);
+    if (res) {
+      const el = $('sb-test-result');
+      if (el) el.textContent = 'Probando conexión...';
+      const test = await window.M9Supabase.testConnection();
+      if (test.ok) {
+        if (el) {
+          el.style.color = '#2ed573';
+          el.textContent = '✅ Conexión exitosa con Supabase';
+        }
+        toast('Conectado a Supabase correctamente', 'success');
+        this.init();
+        setTimeout(() => Modal.close('modal-supabase'), 1200);
+      } else {
+        if (el) {
+          el.style.color = '#ff4757';
+          el.textContent = '❌ Error de conexión: ' + test.error;
+        }
+        toast('Error al conectar: verifíca tu clave', 'error');
+      }
+    }
+  },
+  async syncNow(silent = false) {
+    if (!window.M9Supabase || !window.M9Supabase.isConfigured()) {
+      if (!silent) {
+        toast('Por favor configura tu clave de Supabase primero', 'error');
+        this.openModal();
+      }
+      return;
+    }
+    if (!silent) toast('Sincronizando con Supabase en la nube...', 'info');
+    const btn = $('btn-do-supabase-sync');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = '⏳ Subiendo a la nube...';
+    }
+    try {
+      const leads = (typeof DB !== 'undefined' && DB.leads) ? DB.leads : JSON.parse(localStorage.getItem('m9-crm-leads') || 'null');
+      const res = await window.M9Supabase.syncAllToSupabase(DB, leads);
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = '🚀 Subir base local a Supabase ahora';
+      }
+      if (res.ok) {
+        if (!silent) {
+          toast(`¡Nube actualizada! (${res.counts.autoelevadores} autoelev., ${res.counts.camiones} camiones, ${res.counts.leads || 0} leads)`, 'success');
+          const el = $('sb-test-result');
+          if (el) {
+            el.style.color = '#2ed573';
+            el.textContent = '✅ Sincronización completa a la nube.';
+          }
+        }
+        this.init();
+      } else {
+        if (!silent) toast('Advertencia al sincronizar: ' + res.error, 'error');
+      }
+    } catch (e) {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = '🚀 Subir base local a Supabase ahora';
+      }
+      if (!silent) toast('Error al sincronizar: ' + e.message, 'error');
+    }
+  }
+};
+
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let state = {
   activeView: 'home',
@@ -22,16 +131,26 @@ let state = {
   activeUnitId: null,
   activeLeadId: null,
   serviceUnitId: null,
+  editingImages: [],
+  editingPortadaIndex: 0,
 };
 
 // ─── MOCK DATA & STORAGE ──────────────────────────────────────────────────────
 let DB = {
   autoelevadores: [
-    { id: 1, name: 'Hangcha XS-20 Eléctrico', brand: 'Hangcha', capacity: '2.000 kg', motor: 'Eléctrico', hours: 1200, price: 18500, status: 'active', visible: true, img: '/assets/electric_forklift.png' },
-    { id: 2, name: 'HELI CPD15 Eléctrico',     brand: 'HELI',    capacity: '1.500 kg', motor: 'Eléctrico', hours: 850,  price: 14200, status: 'active', visible: true, img: '/assets/apiladora.jpg' },
-    { id: 3, name: 'Toyota 8FGF15 GLP',         brand: 'Toyota',  capacity: '1.500 kg', motor: 'GLP',       hours: 3400, price: 22000, status: 'active', visible: true, img: '/assets/autoelevador.jpg' },
-    { id: 4, name: 'Hangcha CPCD35 Diesel',     brand: 'Hangcha', capacity: '3.500 kg', motor: 'Diesel',    hours: 2100, price: 27500, status: 'active', visible: true, img: '/assets/diesel_forklift.png' },
-    { id: 5, name: 'Hecha CBD20 Eléctrico',     brand: 'Hecha',   capacity: '2.000 kg', motor: 'Eléctrico', hours: 600,  price: 12800, status: 'paused', visible: false, img: '/assets/apilador.png' },
+    { id: 1, name: 'Hangcha XS-20 Eléctrico', brand: 'Hangcha', capacity: '2.000 kg', motor: 'Eléctrico', hours: 1200, price: 18500, status: 'active', visible: true, img: '/assets/electric_forklift.png', type: 'Autoelevador', year: 2025, condition: 'Nuevo' },
+    { id: 2, name: 'HELI CPD15 Eléctrico',     brand: 'HELI',    capacity: '1.500 kg', motor: 'Eléctrico', hours: 850,  price: 14200, status: 'active', visible: true, img: '/assets/apiladora.jpg', type: 'Autoelevador', year: 2025, condition: 'Nuevo' },
+    { id: 3, name: 'Toyota 8FGF15 GLP',         brand: 'Toyota',  capacity: '1.500 kg', motor: 'GLP',       hours: 3400, price: 22000, status: 'active', visible: true, img: '/assets/autoelevador.jpg', type: 'Autoelevador', year: 2024, condition: 'Usado' },
+    { id: 4, name: 'Hangcha CPCD35 Diesel',     brand: 'Hangcha', capacity: '3.500 kg', motor: 'Diesel',    hours: 2100, price: 27500, status: 'active', visible: true, img: '/assets/diesel_forklift.png', type: 'Autoelevador', year: 2025, condition: 'Nuevo' },
+    { id: 5, name: 'Hecha CBD20 Eléctrico',     brand: 'Hecha',   capacity: '2.000 kg', motor: 'Eléctrico', hours: 600,  price: 12800, status: 'paused', visible: false, img: '/assets/apilador.png', type: 'Apiladora', year: 2024, condition: 'Usado' },
+    { id: 6, name: 'Toyota 8FG25',              brand: 'Toyota',  capacity: '2.500 kg', motor: 'Nafta/GNC', hours: 0,    price: 28500, status: 'active', visible: true, img: '/assets/diesel_forklift.png', type: 'Autoelevador', year: 2026, condition: 'Nuevo' },
+    { id: 7, name: 'Hecha HQ25D',               brand: 'Hecha',   capacity: '2.500 kg', motor: 'Diesel',    hours: 0,    price: 24500, status: 'active', visible: true, img: '/assets/diesel_forklift.png', type: 'Autoelevador', year: 2025, condition: 'Nuevo' },
+    { id: 8, name: 'Toyota 7FBE18',             brand: 'Toyota',  capacity: '1.800 kg', motor: 'Eléctrico', hours: 1500, price: 19500, status: 'active', visible: true, img: '/assets/electric_forklift.png', type: 'Autoelevador', year: 2023, condition: 'Usado' },
+    { id: 9, name: 'Toyota SWE120',             brand: 'Toyota',  capacity: '1.200 kg', motor: 'Eléctrico', hours: 0,    price: 14800, status: 'active', visible: true, img: '/assets/apilador.png', type: 'Apiladora', year: 2025, condition: 'Nuevo' },
+    { id: 10, name: 'Hecha HE20S',              brand: 'Hecha',   capacity: '2.000 kg', motor: 'Eléctrico', hours: 850,  price: 11500, status: 'active', visible: true, img: '/assets/apilador.png', type: 'Apiladora', year: 2024, condition: 'Usado' },
+    { id: 11, name: 'Toyota LWE200',            brand: 'Toyota',  capacity: '2.000 kg', motor: 'Eléctrico', hours: 0,    price: 6800,  status: 'active', visible: true, img: '/assets/transpallet.jpg', type: 'Zorra Transpallet', year: 2026, condition: 'Nuevo' },
+    { id: 12, name: 'Hecha HPT30',              brand: 'Hecha',   capacity: '3.000 kg', motor: 'Manual',    hours: 0,    price: 850,   status: 'active', visible: true, img: '/assets/transpallet.jpg', type: 'Zorra Transpallet', year: 2025, condition: 'Nuevo' },
+    { id: 13, name: 'Toyota LWE160',            brand: 'Toyota',  capacity: '1.600 kg', motor: 'Eléctrico', hours: 1200, price: 4200,  status: 'active', visible: true, img: '/assets/transpallet.jpg', type: 'Zorra Transpallet', year: 2022, condition: 'Usado' }
   ],
   repuestos: [
     { id: 1, oem: 'OEM-BAT-48500', name: 'Batería 48V 500Ah',   category: 'Eléctrico',  stock: 12, price: 1850, status: 'active', compat: 'Hangcha XS-20, HELI CPD15', img: '/assets/bateria_electrica.jpg' },
@@ -40,11 +159,31 @@ let DB = {
     { id: 4, oem: 'OEM-BOM-H20',  name: 'Bomba Hidráulica',     category: 'Hidráulico', stock: 3,  price: 2200, status: 'active', compat: 'Hangcha XS-20, Hangcha CPCD35', img: '/assets/bomba_hidraulica.jpg' },
     { id: 5, oem: 'OEM-CAR-4880', name: 'Cargador 48V 80A',     category: 'Eléctrico',  stock: 6,  price: 780,  status: 'active', compat: 'Universal eléctrico',         img: '/assets/bateria_electrica.jpg' },
     { id: 6, oem: 'OEM-MAS-T3M',  name: 'Mástil Telescópico 3m',category: 'Estructura', stock: 0,  price: 4500, status: 'paused', compat: 'Hangcha XS-20',                 img: '/assets/forklift_parts.png' },
+    { id: 7, oem: "HYD-4022", name: "Bomba Hidráulica de Engranajes", category: "Hidráulico", stock: 15, price: 2200, status: "active", compat: "Toyota 8FG25", img: "/assets/bomba_hidraulica.jpg" },
+    { id: 8, oem: "HYD-4050", name: "Válvula de Control Multipista", category: "Hidráulico", stock: 8, price: 1450, status: "active", compat: "Hangcha XS-20", img: "/assets/bomba_hidraulica.jpg" },
+    { id: 9, oem: "HYD-5011", name: "Juego de Sellos Cilindro Elevación", category: "Hidráulico", stock: 2, price: 280, status: "active", compat: "HELI CPD15", img: "/assets/bomba_hidraulica.jpg" },
+    { id: 10, oem: "HYD-1022", name: "Filtro de Aceite Hidráulico OEM-FIL-HID", category: "Hidráulico", stock: 45, price: 85, status: "active", compat: "Toyota 7FBE18", img: "/assets/forklift_parts.png" },
+    { id: 11, oem: "CAR-4Y01", name: "Carburador Industrial Toyota 4Y", category: "Motor", stock: 10, price: 680, status: "active", compat: "Toyota 8FG25", img: "/assets/carburador_motor.jpg" },
+    { id: 12, oem: "CAR-K250", name: "Carburador Industrial Nissan K25", category: "Motor", stock: 10, price: 720, status: "active", compat: "Hangcha CPCD35", img: "/assets/carburador_motor.jpg" },
+    { id: 13, oem: "ENG-8012", name: "Filtro de Combustible Diésel", category: "Motor", stock: 25, price: 95, status: "active", compat: "Hangcha CPCD35", img: "/assets/carburador_motor.jpg" },
+    { id: 14, oem: "ENG-9033", name: "Alternador de Motor 12V 80A", category: "Motor", stock: 3, price: 420, status: "active", compat: "Hecha HQ25D", img: "/assets/carburador_motor.jpg" },
+    { id: 15, oem: "TRN-2015", name: "Disco de Fricción Transmisión Powershift", category: "Motor", stock: 12, price: 310, status: "active", compat: "Toyota 8FG25", img: "/assets/carburador_motor.jpg" },
+    { id: 16, oem: "NEU-7001", name: "Neumático Macizo Súper Elástico 7.00-12", category: "Neumáticos", stock: 20, price: 350, status: "active", compat: "Toyota 8FG25", img: "/assets/neumaticos_ruedas.jpg" },
+    { id: 17, oem: "NEU-6009", name: "Rueda Directriz de Poliuretano 200x50", category: "Neumáticos", stock: 30, price: 180, status: "active", compat: "Toyota SWE120", img: "/assets/neumaticos_ruedas.jpg" },
+    { id: 18, oem: "NEU-5002", name: "Llantas de Acero Dividida 5.00F-10", category: "Neumáticos", stock: 14, price: 290, status: "active", compat: "HELI CPD15", img: "/assets/neumaticos_ruedas.jpg" },
+    { id: 19, oem: "ELE-1090", name: "Controlador de Motor AC Zapi Dual", category: "Eléctrico", stock: 2, price: 2400, status: "active", compat: "Hangcha XS-20", img: "/assets/bateria_electrica.jpg" },
+    { id: 20, oem: "ELE-4850", name: "Batería Industrial de Tracción 48V 500Ah", category: "Eléctrico", stock: 5, price: 1850, status: "active", compat: "Hangcha XS-20", img: "/assets/bateria_electrica.jpg" },
+    { id: 21, oem: "ELE-3012", name: "Faro de Seguridad LED Blue Spot", category: "Eléctrico", stock: 50, price: 140, status: "active", compat: "HELI CPD15", img: "/assets/bateria_electrica.jpg" },
+    { id: 22, oem: "MST-5020", name: "Rodamiento de Mástil Telescópico 3m", category: "Estructura", stock: 18, price: 210, status: "active", compat: "Toyota 8FG25", img: "/assets/forklift_parts.png" },
+    { id: 23, oem: "MST-9102", name: "Cadena de Elevación Flar (BL634)", category: "Estructura", stock: 3, price: 460, status: "active", compat: "Hangcha CPCD35", img: "/assets/forklift_parts.png" }
   ],
   camiones: [
-    { id: 1, name: 'Mercedes Benz Actros 2651', brand: 'Mercedes Benz', capacity: '26 Tn', motor: 'Diesel', hours: 380000, price: 95000, status: 'active', visible: true, img: '/assets/truck.png' },
-    { id: 2, name: 'Volvo FH 460',              brand: 'Volvo',         capacity: '24 Tn', motor: 'Diesel', hours: 210000, price: 110000, status: 'active', visible: true, img: '/assets/truck.png' },
-    { id: 3, name: 'Scania R450 6×2',           brand: 'Scania',        capacity: '22 Tn', motor: 'Diesel', hours: 290000, price: 88000, status: 'paused', visible: false, img: '/assets/truck.png' },
+    { id: 1, name: 'Mercedes-Benz Actros 2651 LS 6x4', brand: 'Mercedes Benz', capacity: '26 Tn', motor: 'Diesel 510 CV', hours: 0, price: 115000, status: 'active', visible: true, img: '/assets/truck.png' },
+    { id: 2, name: 'Volvo FH 460 Globetrotter 6x2T', brand: 'Volvo', capacity: '24 Tn', motor: 'Diesel 460 CV', hours: 185000, price: 98000, status: 'active', visible: true, img: '/assets/truck.png' },
+    { id: 3, name: 'Scania R450 Streamline Highline 6x2', brand: 'Scania', capacity: '22 Tn', motor: 'Diesel 450 CV', hours: 210000, price: 92000, status: 'active', visible: true, img: '/assets/truck.png' },
+    { id: 4, name: 'IVECO Stralis Hi-Way 440 4x2', brand: 'IVECO', capacity: '20 Tn', motor: 'Diesel 440 CV', hours: 0, price: 86000, status: 'active', visible: true, img: '/assets/truck.png' },
+    { id: 5, name: 'Ford Cargo 2042 4x2T Extra Pesado', brand: 'Ford', capacity: '20 Tn', motor: 'Diesel 420 CV', hours: 290000, price: 74000, status: 'active', visible: true, img: '/assets/truck.png' },
+    { id: 6, name: 'Volkswagen Constellation 31.330 6x4', brand: 'Volkswagen', capacity: '31 Tn', motor: 'Diesel 330 CV', hours: 0, price: 108000, status: 'active', visible: true, img: '/assets/truck.png' }
   ],
   leads: {
     nuevas: [
@@ -179,9 +318,10 @@ function loadDatabase() {
           }
         }
       } catch(e) {}
-    } else {
-      saveDatabase();
     }
+    syncInventoryWithWeb(DB);
+    updateNextIds(DB);
+    saveDatabase();
   } catch(e) {
     console.error('Error al cargar base de datos:', e);
   }
@@ -194,12 +334,123 @@ function saveDatabase() {
       const visible = DB.reviews.filter(r => r.visible !== false);
       localStorage.setItem('m9-reviews', JSON.stringify(visible));
     }
+    if (typeof SupabaseUI !== 'undefined' && window.M9Supabase && window.M9Supabase.isConfigured()) {
+      SupabaseUI.syncNow(true);
+    }
   } catch(e) {
     console.error('Error al guardar base de datos:', e);
   }
 }
 
-let nextId = { auto: 6, rep: 7, cam: 4, lead: 6, service: 6, quote: 3 };
+
+function syncInventoryWithWeb(db) {
+  let modified = false;
+
+  const fullAutos = [
+    { id: 1, name: 'Hangcha XS-20 Eléctrico', brand: 'Hangcha', capacity: '2.000 kg', motor: 'Eléctrico', hours: 1200, price: 18500, status: 'active', visible: true, img: '/assets/electric_forklift.png', type: 'Autoelevador', year: 2025, condition: 'Nuevo' },
+    { id: 2, name: 'HELI CPD15 Eléctrico',     brand: 'HELI',    capacity: '1.500 kg', motor: 'Eléctrico', hours: 850,  price: 14200, status: 'active', visible: true, img: '/assets/apiladora.jpg', type: 'Autoelevador', year: 2025, condition: 'Nuevo' },
+    { id: 3, name: 'Toyota 8FGF15 GLP',         brand: 'Toyota',  capacity: '1.500 kg', motor: 'GLP',       hours: 3400, price: 22000, status: 'active', visible: true, img: '/assets/autoelevador.jpg', type: 'Autoelevador', year: 2024, condition: 'Usado' },
+    { id: 4, name: 'Hangcha CPCD35 Diesel',     brand: 'Hangcha', capacity: '3.500 kg', motor: 'Diesel',    hours: 2100, price: 27500, status: 'active', visible: true, img: '/assets/diesel_forklift.png', type: 'Autoelevador', year: 2025, condition: 'Nuevo' },
+    { id: 5, name: 'Hecha CBD20 Eléctrico',     brand: 'Hecha',   capacity: '2.000 kg', motor: 'Eléctrico', hours: 600,  price: 12800, status: 'paused', visible: false, img: '/assets/apilador.png', type: 'Apiladora', year: 2024, condition: 'Usado' },
+    { id: 6, name: 'Toyota 8FG25',              brand: 'Toyota',  capacity: '2.500 kg', motor: 'Nafta/GNC', hours: 0,    price: 28500, status: 'active', visible: true, img: '/assets/diesel_forklift.png', type: 'Autoelevador', year: 2026, condition: 'Nuevo' },
+    { id: 7, name: 'Hecha HQ25D',               brand: 'Hecha',   capacity: '2.500 kg', motor: 'Diesel',    hours: 0,    price: 24500, status: 'active', visible: true, img: '/assets/diesel_forklift.png', type: 'Autoelevador', year: 2025, condition: 'Nuevo' },
+    { id: 8, name: 'Toyota 7FBE18',             brand: 'Toyota',  capacity: '1.800 kg', motor: 'Eléctrico', hours: 1500, price: 19500, status: 'active', visible: true, img: '/assets/electric_forklift.png', type: 'Autoelevador', year: 2023, condition: 'Usado' },
+    { id: 9, name: 'Toyota SWE120',             brand: 'Toyota',  capacity: '1.200 kg', motor: 'Eléctrico', hours: 0,    price: 14800, status: 'active', visible: true, img: '/assets/apilador.png', type: 'Apiladora', year: 2025, condition: 'Nuevo' },
+    { id: 10, name: 'Hecha HE20S',              brand: 'Hecha',   capacity: '2.000 kg', motor: 'Eléctrico', hours: 850,  price: 11500, status: 'active', visible: true, img: '/assets/apilador.png', type: 'Apiladora', year: 2024, condition: 'Usado' },
+    { id: 11, name: 'Toyota LWE200',            brand: 'Toyota',  capacity: '2.000 kg', motor: 'Eléctrico', hours: 0,    price: 6800,  status: 'active', visible: true, img: '/assets/transpallet.jpg', type: 'Zorra Transpallet', year: 2026, condition: 'Nuevo' },
+    { id: 12, name: 'Hecha HPT30',              brand: 'Hecha',   capacity: '3.000 kg', motor: 'Manual',    hours: 0,    price: 850,   status: 'active', visible: true, img: '/assets/transpallet.jpg', type: 'Zorra Transpallet', year: 2025, condition: 'Nuevo' },
+    { id: 13, name: 'Toyota LWE160',            brand: 'Toyota',  capacity: '1.600 kg', motor: 'Eléctrico', hours: 1200, price: 4200,  status: 'active', visible: true, img: '/assets/transpallet.jpg', type: 'Zorra Transpallet', year: 2022, condition: 'Usado' }
+  ];
+
+  if (!db.autoelevadores) db.autoelevadores = [];
+  let maxAutoId = db.autoelevadores.reduce((max, x) => Math.max(max, parseInt(x.id) || 0), 0);
+  fullAutos.forEach(item => {
+    if (!db.autoelevadores.some(x => x.name.toLowerCase() === item.name.toLowerCase())) {
+      maxAutoId++;
+      db.autoelevadores.push({ ...item, id: maxAutoId });
+      modified = true;
+    }
+  });
+
+  const fullRepuestos = [
+    { id: 1, oem: 'OEM-BAT-48500', name: 'Batería 48V 500Ah',   category: 'Eléctrico',  stock: 12, price: 1850, status: 'active', compat: 'Hangcha XS-20, HELI CPD15', img: '/assets/bateria_electrica.jpg' },
+    { id: 2, oem: 'OEM-FIL-HID',  name: 'Filtro Hidráulico',    category: 'Hidráulico', stock: 45, price: 85,   status: 'active', compat: 'Universal',                   img: '/assets/forklift_parts.png' },
+    { id: 3, oem: 'OEM-PAF-T15',  name: 'Pastillas de Freno',   category: 'Frenos',     stock: 8,  price: 120,  status: 'active', compat: 'Toyota 8FGF15, HELI CPD15',   img: '/assets/forklift_parts.png' },
+    { id: 4, oem: 'OEM-BOM-H20',  name: 'Bomba Hidráulica',     category: 'Hidráulico', stock: 3,  price: 2200, status: 'active', compat: 'Hangcha XS-20, Hangcha CPCD35', img: '/assets/bomba_hidraulica.jpg' },
+    { id: 5, oem: 'OEM-CAR-4880', name: 'Cargador 48V 80A',     category: 'Eléctrico',  stock: 6,  price: 780,  status: 'active', compat: 'Universal eléctrico',         img: '/assets/bateria_electrica.jpg' },
+    { id: 6, oem: 'OEM-MAS-T3M',  name: 'Mástil Telescópico 3m',category: 'Estructura', stock: 0,  price: 4500, status: 'paused', compat: 'Hangcha XS-20',                 img: '/assets/forklift_parts.png' },
+    { id: 7, oem: "HYD-4022", name: "Bomba Hidráulica de Engranajes", category: "Hidráulico", stock: 15, price: 2200, status: "active", compat: "Toyota 8FG25", img: "/assets/bomba_hidraulica.jpg" },
+    { id: 8, oem: "HYD-4050", name: "Válvula de Control Multipista", category: "Hidráulico", stock: 8, price: 1450, status: "active", compat: "Hangcha XS-20", img: "/assets/bomba_hidraulica.jpg" },
+    { id: 9, oem: "HYD-5011", name: "Juego de Sellos Cilindro Elevación", category: "Hidráulico", stock: 2, price: 280, status: "active", compat: "HELI CPD15", img: "/assets/bomba_hidraulica.jpg" },
+    { id: 10, oem: "HYD-1022", name: "Filtro de Aceite Hidráulico OEM-FIL-HID", category: "Hidráulico", stock: 45, price: 85, status: "active", compat: "Toyota 7FBE18", img: "/assets/forklift_parts.png" },
+    { id: 11, oem: "CAR-4Y01", name: "Carburador Industrial Toyota 4Y", category: "Motor", stock: 10, price: 680, status: "active", compat: "Toyota 8FG25", img: "/assets/carburador_motor.jpg" },
+    { id: 12, oem: "CAR-K250", name: "Carburador Industrial Nissan K25", category: "Motor", stock: 10, price: 720, status: "active", compat: "Hangcha CPCD35", img: "/assets/carburador_motor.jpg" },
+    { id: 13, oem: "ENG-8012", name: "Filtro de Combustible Diésel", category: "Motor", stock: 25, price: 95, status: "active", compat: "Hangcha CPCD35", img: "/assets/carburador_motor.jpg" },
+    { id: 14, oem: "ENG-9033", name: "Alternador de Motor 12V 80A", category: "Motor", stock: 3, price: 420, status: "active", compat: "Hecha HQ25D", img: "/assets/carburador_motor.jpg" },
+    { id: 15, oem: "TRN-2015", name: "Disco de Fricción Transmisión Powershift", category: "Motor", stock: 12, price: 310, status: "active", compat: "Toyota 8FG25", img: "/assets/carburador_motor.jpg" },
+    { id: 16, oem: "NEU-7001", name: "Neumático Macizo Súper Elástico 7.00-12", category: "Neumáticos", stock: 20, price: 350, status: "active", compat: "Toyota 8FG25", img: "/assets/neumaticos_ruedas.jpg" },
+    { id: 17, oem: "NEU-6009", name: "Rueda Directriz de Poliuretano 200x50", category: "Neumáticos", stock: 30, price: 180, status: "active", compat: "Toyota SWE120", img: "/assets/neumaticos_ruedas.jpg" },
+    { id: 18, oem: "NEU-5002", name: "Llantas de Acero Dividida 5.00F-10", category: "Neumáticos", stock: 14, price: 290, status: "active", compat: "HELI CPD15", img: "/assets/neumaticos_ruedas.jpg" },
+    { id: 19, oem: "ELE-1090", name: "Controlador de Motor AC Zapi Dual", category: "Eléctrico", stock: 2, price: 2400, status: "active", compat: "Hangcha XS-20", img: "/assets/bateria_electrica.jpg" },
+    { id: 20, oem: "ELE-4850", name: "Batería Industrial de Tracción 48V 500Ah", category: "Eléctrico", stock: 5, price: 1850, status: "active", compat: "Hangcha XS-20", img: "/assets/bateria_electrica.jpg" },
+    { id: 21, oem: "ELE-3012", name: "Faro de Seguridad LED Blue Spot", category: "Eléctrico", stock: 50, price: 140, status: "active", compat: "HELI CPD15", img: "/assets/bateria_electrica.jpg" },
+    { id: 22, oem: "MST-5020", name: "Rodamiento de Mástil Telescópico 3m", category: "Estructura", stock: 18, price: 210, status: "active", compat: "Toyota 8FG25", img: "/assets/forklift_parts.png" },
+    { id: 23, oem: "MST-9102", name: "Cadena de Elevación Flar (BL634)", category: "Estructura", stock: 3, price: 460, status: "active", compat: "Hangcha CPCD35", img: "/assets/forklift_parts.png" }
+  ];
+
+  if (!db.repuestos) db.repuestos = [];
+  let maxRepId = db.repuestos.reduce((max, x) => Math.max(max, parseInt(x.id) || 0), 0);
+  fullRepuestos.forEach(item => {
+    if (!db.repuestos.some(x => (x.oem && x.oem.toLowerCase() === item.oem.toLowerCase()) || (x.name && x.name.toLowerCase() === item.name.toLowerCase()))) {
+      maxRepId++;
+      db.repuestos.push({ ...item, id: maxRepId });
+      modified = true;
+    }
+  });
+
+  const fullCamiones = [
+    { id: 1, name: 'Mercedes-Benz Actros 2651 LS 6x4', brand: 'Mercedes Benz', capacity: '26 Tn', motor: 'Diesel 510 CV', hours: 0, price: 115000, status: 'active', visible: true, img: '/assets/truck.png' },
+    { id: 2, name: 'Volvo FH 460 Globetrotter 6x2T', brand: 'Volvo', capacity: '24 Tn', motor: 'Diesel 460 CV', hours: 185000, price: 98000, status: 'active', visible: true, img: '/assets/truck.png' },
+    { id: 3, name: 'Scania R450 Streamline Highline 6x2', brand: 'Scania', capacity: '22 Tn', motor: 'Diesel 450 CV', hours: 210000, price: 92000, status: 'active', visible: true, img: '/assets/truck.png' },
+    { id: 4, name: 'IVECO Stralis Hi-Way 440 4x2', brand: 'IVECO', capacity: '20 Tn', motor: 'Diesel 440 CV', hours: 0, price: 86000, status: 'active', visible: true, img: '/assets/truck.png' },
+    { id: 5, name: 'Ford Cargo 2042 4x2T Extra Pesado', brand: 'Ford', capacity: '20 Tn', motor: 'Diesel 420 CV', hours: 290000, price: 74000, status: 'active', visible: true, img: '/assets/truck.png' },
+    { id: 6, name: 'Volkswagen Constellation 31.330 6x4', brand: 'Volkswagen', capacity: '31 Tn', motor: 'Diesel 330 CV', hours: 0, price: 108000, status: 'active', visible: true, img: '/assets/truck.png' }
+  ];
+
+  if (!db.camiones) db.camiones = [];
+  db.camiones.forEach(c => {
+    if (c.name === 'Mercedes Benz Actros 2651') { c.name = 'Mercedes-Benz Actros 2651 LS 6x4'; c.motor = 'Diesel 510 CV'; modified = true; }
+    if (c.name === 'Volvo FH 460') { c.name = 'Volvo FH 460 Globetrotter 6x2T'; c.motor = 'Diesel 460 CV'; modified = true; }
+    if (c.name.startsWith('Scania R450')) { c.name = 'Scania R450 Streamline Highline 6x2'; c.motor = 'Diesel 450 CV'; c.status = 'active'; c.visible = true; modified = true; }
+  });
+  let maxCamId = db.camiones.reduce((max, x) => Math.max(max, parseInt(x.id) || 0), 0);
+  fullCamiones.forEach(item => {
+    if (!db.camiones.some(x => x.name.toLowerCase() === item.name.toLowerCase() || (x.name.toLowerCase().includes(item.name.toLowerCase().split(' ')[0]) && x.brand.toLowerCase() === item.brand.toLowerCase()))) {
+      maxCamId++;
+      db.camiones.push({ ...item, id: maxCamId });
+      modified = true;
+    }
+  });
+
+  return modified;
+}
+
+function updateNextIds(db) {
+  if (db.autoelevadores && db.autoelevadores.length) {
+    const maxAuto = db.autoelevadores.reduce((m, x) => Math.max(m, parseInt(x.id) || 0), 0);
+    nextId.auto = Math.max(nextId.auto, maxAuto + 1);
+  }
+  if (db.repuestos && db.repuestos.length) {
+    const maxRep = db.repuestos.reduce((m, x) => Math.max(m, parseInt(x.id) || 0), 0);
+    nextId.rep = Math.max(nextId.rep, maxRep + 1);
+  }
+  if (db.camiones && db.camiones.length) {
+    const maxCam = db.camiones.reduce((m, x) => Math.max(m, parseInt(x.id) || 0), 0);
+    nextId.cam = Math.max(nextId.cam, maxCam + 1);
+  }
+}
+
+let nextId = { auto: 14, rep: 24, cam: 7, lead: 6, service: 6, quote: 3 };
 
 // ─── UTILS ────────────────────────────────────────────────────────────────────
 function $(id) { return document.getElementById(id); }
@@ -313,6 +564,7 @@ const Auth = {
     const bnav = $('bottom-nav');
     if (bnav) bnav.style.display = '';
     App.init();
+    if (typeof SupabaseUI !== 'undefined') SupabaseUI.init();
   }
 };
 
@@ -436,6 +688,39 @@ const Modal = {
 
 // ─── INVENTORY MODULE ─────────────────────────────────────────────────────────
 const Inv = {
+  currentPage: 1,
+  PER_PAGE: 8,
+  renderPagination(totalPages) {
+    const container = $('inv-pagination');
+    if (!container) return;
+    if (totalPages <= 1) {
+      container.innerHTML = '';
+      return;
+    }
+    let html = `
+      <button class="inv-pagination-btn ${this.currentPage === 1 ? 'disabled' : ''}" 
+              onclick="if(Inv.currentPage > 1) { Inv.currentPage--; Inv.render(); }"
+              ${this.currentPage === 1 ? 'disabled' : ''}>
+        &laquo; Ant
+      </button>
+    `;
+    for (let i = 1; i <= totalPages; i++) {
+      html += `
+        <button class="inv-pagination-btn ${i === this.currentPage ? 'active' : ''}"
+                onclick="Inv.currentPage = ${i}; Inv.render();">
+          ${i}
+        </button>
+      `;
+    }
+    html += `
+      <button class="inv-pagination-btn ${this.currentPage === totalPages ? 'disabled' : ''}" 
+              onclick="if(Inv.currentPage < ${totalPages}) { Inv.currentPage++; Inv.render(); }"
+              ${this.currentPage === totalPages ? 'disabled' : ''}>
+        Sig &raquo;
+      </button>
+    `;
+    container.innerHTML = html;
+  },
   getItems() {
     return DB[state.activeTab] || [];
   },
@@ -500,14 +785,19 @@ const Inv = {
     const items = this.filteredItems();
     const tbody = $('inv-tbody');
     const empty = $('inv-empty');
+    const pagContainer = $('inv-pagination');
     if (items.length === 0) {
       tbody.innerHTML = '';
       empty.style.display = 'flex';
+      if (pagContainer) pagContainer.innerHTML = '';
       return;
     }
     empty.style.display = 'none';
+    const totalPages = Math.ceil(items.length / this.PER_PAGE);
+    if (this.currentPage > totalPages) this.currentPage = 1;
+    const pageItems = items.slice((this.currentPage - 1) * this.PER_PAGE, this.currentPage * this.PER_PAGE);
     if (state.activeTab === 'repuestos') {
-      tbody.innerHTML = items.map(r => {
+      tbody.innerHTML = pageItems.map(r => {
         const stockBadge = r.stock > 5
           ? `<span class="badge badge--stock-ok">● ${r.stock} u.</span>`
           : r.stock > 0
@@ -539,7 +829,7 @@ const Inv = {
         </tr>`;
       }).join('');
     } else {
-      tbody.innerHTML = items.map(item => {
+      tbody.innerHTML = pageItems.map(item => {
         const statusBadge = item.status === 'active'
           ? `<span class="badge badge--active">Activo</span>`
           : `<span class="badge badge--paused">Pausado</span>`;
@@ -569,6 +859,7 @@ const Inv = {
         </tr>`;
       }).join('');
     }
+    this.renderPagination(totalPages);
     // Update badge
     const total = DB.autoelevadores.length + DB.repuestos.length + DB.camiones.length;
     $('badge-inv').textContent = total;
@@ -623,7 +914,24 @@ const Inv = {
       $('m-status').value = item.status;
       $('m-visible').checked = item.visible;
       $('m-vis-lbl').textContent = item.visible ? 'Visible en el sitio' : 'Oculto en el sitio';
-      $('img-preview').innerHTML = '';
+      const defaultImgs = state.activeTab === 'camiones'
+        ? [item.img || '/assets/truck.png', '/assets/truck_hero.jpg']
+        : (item.type === 'Apiladora'
+            ? [item.img || '/assets/apilador.png', '/assets/apiladora.jpg']
+            : (item.type === 'Zorra Transpallet'
+                ? [item.img || '/assets/transpallet.jpg', '/assets/forklift_parts.png']
+                : [item.img || '/assets/electric_forklift.png', '/assets/hero_forklift.png', '/assets/forklift_parts.png']));
+      state.editingImages = (item.images && Array.isArray(item.images) && item.images.length > 0)
+        ? [...item.images]
+        : defaultImgs;
+      const currentPortada = item.img || state.editingImages[0];
+      const pIdx = state.editingImages.indexOf(currentPortada);
+      if (pIdx > 0) {
+        const [pImg] = state.editingImages.splice(pIdx, 1);
+        state.editingImages.unshift(pImg);
+      }
+      state.editingPortadaIndex = 0;
+      this.renderImagePreview();
       $('pdf-filename').textContent = 'Ningún archivo seleccionado';
       Modal.open('modal-machinery');
     }
@@ -660,7 +968,11 @@ const Inv = {
       $('form-machinery').reset();
       $('m-visible').checked = true;
       $('m-vis-lbl').textContent = 'Visible en el sitio';
-      $('img-preview').innerHTML = '';
+      state.editingImages = state.activeTab === 'camiones'
+        ? ['/assets/truck.png', '/assets/truck_hero.jpg']
+        : ['/assets/electric_forklift.png', '/assets/hero_forklift.png'];
+      state.editingPortadaIndex = 0;
+      this.renderImagePreview();
       $('pdf-filename').textContent = 'Ningún archivo seleccionado';
       Modal.open('modal-machinery');
     }
@@ -670,6 +982,8 @@ const Inv = {
     const brand = $('m-brand').value;
     const price = parseFloat($('m-price').value);
     if (!name || !brand || isNaN(price)) { toast('Completá los campos obligatorios (*)', 'error'); return; }
+    const savedPortada = state.editingImages[state.editingPortadaIndex] || state.editingImages[0] || (state.activeTab === 'camiones' ? '/assets/truck.png' : '/assets/electric_forklift.png');
+    const savedImages = [...(state.editingImages || [])];
     const item = {
       name, brand,
       capacity: $('m-capacity').value.trim(),
@@ -678,7 +992,8 @@ const Inv = {
       price,
       status:   $('m-status').value,
       visible:  $('m-visible').checked,
-      img: null,
+      img:      savedPortada,
+      images:   savedImages,
     };
     if (state.editingId) {
       const idx = DB[state.activeTab].findIndex(x => x.id === state.editingId);
@@ -687,7 +1002,7 @@ const Inv = {
     } else {
       const tab = state.activeTab;
       const newId = tab === 'camiones' ? nextId.cam++ : nextId.auto++;
-      DB[state.activeTab].unshift({ id: newId, ...item, img: '/assets/electric_forklift.png' });
+      DB[state.activeTab].unshift({ id: newId, ...item });
       toast('Equipo agregado correctamente');
     }
     Modal.close('modal-machinery');
@@ -696,6 +1011,9 @@ const Inv = {
   },
   publish() {
     saveDatabase();
+    if (typeof SupabaseUI !== 'undefined') {
+      SupabaseUI.syncNow(true);
+    }
   },
   saveRepuesto() {
     const oem  = $('r-oem').value.trim();
@@ -737,17 +1055,19 @@ const Inv = {
         state.filterBrand = '';
         if ($('inv-search')) $('inv-search').value = '';
         if ($('filter-status')) $('filter-status').value = '';
+        Inv.currentPage = 1;
         this.render();
       });
     });
     // Search
     $('inv-search').addEventListener('input', e => {
       state.searchQuery = e.target.value;
+      Inv.currentPage = 1;
       this.render();
     });
     // Filters
-    $('filter-status').addEventListener('change', e => { state.filterStatus = e.target.value; this.render(); });
-    $('filter-brand').addEventListener('change',  e => { state.filterBrand  = e.target.value; this.render(); });
+    $('filter-status').addEventListener('change', e => { state.filterStatus = e.target.value; Inv.currentPage = 1; this.render(); });
+    $('filter-brand').addEventListener('change',  e => { state.filterBrand  = e.target.value; Inv.currentPage = 1; this.render(); });
     // Add button
     $('btn-add-item').addEventListener('click', () => this.openAdd());
     // Forms
@@ -770,6 +1090,12 @@ const Inv = {
       imgZone.addEventListener('dragover', e => { e.preventDefault(); imgZone.classList.add('drag-over'); });
       imgZone.addEventListener('dragleave', () => imgZone.classList.remove('drag-over'));
       imgZone.addEventListener('drop', e => { e.preventDefault(); imgZone.classList.remove('drag-over'); this.previewImages(e.dataTransfer.files); });
+      imgInput.addEventListener('change', e => {
+        if (e.target.files.length) {
+          this.previewImages(e.target.files);
+          imgInput.value = '';
+        }
+      });
     }
     // Image upload zone (Repuestos)
     const rImgZone = $('r-img-zone');
@@ -806,16 +1132,66 @@ const Inv = {
     });
     this.render();
   },
-  previewImages(files) {
+  renderImagePreview() {
     const grid = $('img-preview');
-    Array.from(files).forEach(file => {
-      const url = URL.createObjectURL(file);
+    if (!grid) return;
+    grid.innerHTML = '';
+    if (!state.editingImages || state.editingImages.length === 0) {
+      grid.innerHTML = '<span style="font-size:0.82rem;color:var(--t3);padding:0.75rem 0;display:block;text-align:center;width:100%;">Sin imágenes cargadas</span>';
+      return;
+    }
+    state.editingImages.forEach((url, idx) => {
+      const isPortada = idx === 0;
       const wrap = document.createElement('div');
-      wrap.className = 'prev-item';
-      wrap.innerHTML = `<img src="${url}" alt="preview"><span class="prev-remove" title="Quitar">✕</span>`;
-      wrap.querySelector('.prev-remove').addEventListener('click', () => wrap.remove());
+      wrap.className = 'prev-item' + (isPortada ? ' is-portada' : '');
+      let actionHtml = isPortada
+        ? `<span class="portada-badge">★ Portada</span>`
+        : `<button type="button" class="btn-set-portada" onclick="Inv.setPortada(${idx})">★ Hacer portada</button>`;
+      wrap.innerHTML = `
+        <img src="${url}" alt="Equipo ${idx + 1}" loading="lazy">
+        ${actionHtml}
+        <div class="img-card-actions">
+          <button type="button" class="btn-move-img" onclick="Inv.moveImg(${idx}, -1)" title="Mover a la izquierda" ${idx === 0 ? 'disabled' : ''}>◀</button>
+          <span class="img-order-num">#${idx + 1}</span>
+          <button type="button" class="btn-move-img" onclick="Inv.moveImg(${idx}, 1)" title="Mover a la derecha" ${idx === state.editingImages.length - 1 ? 'disabled' : ''}>▶</button>
+        </div>
+        <span class="prev-remove" title="Quitar imagen" onclick="Inv.removeImage(${idx})">✕</span>
+      `;
       grid.appendChild(wrap);
     });
+  },
+  setPortada(idx) {
+    if (idx > 0 && idx < state.editingImages.length) {
+      const [chosen] = state.editingImages.splice(idx, 1);
+      state.editingImages.unshift(chosen);
+      state.editingPortadaIndex = 0;
+      this.renderImagePreview();
+      toast('Portada actualizada (ubicada en 1er lugar)', 'success');
+    }
+  },
+  moveImg(idx, dir) {
+    const targetIdx = idx + dir;
+    if (targetIdx >= 0 && targetIdx < state.editingImages.length) {
+      const temp = state.editingImages[idx];
+      state.editingImages[idx] = state.editingImages[targetIdx];
+      state.editingImages[targetIdx] = temp;
+      state.editingPortadaIndex = 0;
+      this.renderImagePreview();
+    }
+  },
+  removeImage(idx) {
+    if (idx >= 0 && idx < state.editingImages.length) {
+      state.editingImages.splice(idx, 1);
+      state.editingPortadaIndex = 0;
+      this.renderImagePreview();
+    }
+  },
+  previewImages(files) {
+    Array.from(files).forEach(file => {
+      const url = URL.createObjectURL(file);
+      state.editingImages.push(url);
+    });
+    this.renderImagePreview();
   }
 };
 

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Panel Admin | Maquinarias 9 de Abril</title>
   <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="/assets/logotipo_png.png">
   <link rel="stylesheet" href="/admin/admin.css">
 </head>
 <body>
@@ -159,6 +160,10 @@
           </div>
         </div>
         <div class="th-right">
+          <button id="btn-supabase-config" class="th-supabase-btn" title="Configurar y Sincronizar Supabase" onclick="SupabaseUI.openModal()">
+            <span id="sb-status-dot" class="sb-dot sb-dot-offline"></span>
+            <span id="sb-status-label">☁️ Supabase</span>
+          </button>
           <div class="th-user-pill">
             <div class="th-avatar">A</div>
             <div class="th-user-info">
@@ -374,6 +379,8 @@
             <p>Sin resultados</p>
             <span>Probá ajustando los filtros o la búsqueda</span>
           </div>
+          <!-- Inventory Pagination -->
+          <div id="inv-pagination" class="inv-pagination" style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; margin-top: 1.5rem; padding-bottom: 1.5rem;"></div>
         </div>
       </section>
 
@@ -1263,6 +1270,46 @@
     </div>
   </div>
 
+  <!-- ── MODAL SUPABASE CONFIG & SYNC ── -->
+  <div id="modal-supabase" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <div>
+          <h3 id="modal-supabase-title">☁️ Conexión con Supabase</h3>
+          <p class="modal-subtitle">Configuración de servidor en la nube y sincronización de datos</p>
+        </div>
+        <button class="modal-close" data-close="modal-supabase" aria-label="Cerrar modal">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 1.25rem 1.5rem;">
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label class="form-label">URL del Proyecto Supabase</label>
+          <input type="text" id="sb-cfg-url" class="form-input" value="https://ktfrpccefxhlrrwlahmk.supabase.co" placeholder="https://xxxxx.supabase.co">
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label class="form-label">Anon / Public Key (Clave API)</label>
+          <input type="text" id="sb-cfg-key" class="form-input" placeholder="ey..." autocomplete="off">
+          <p style="font-size: 0.75rem; color: var(--t3); margin-top: 0.35rem;">En Supabase: Project Settings ⚙️ → API → anon public key</p>
+        </div>
+        <div id="sb-test-result" style="margin: 0.75rem 0; font-size: 0.85rem; font-weight: 600;"></div>
+        <div style="background: var(--bg3); padding: 1rem; border-radius: 8px; border: 1px solid var(--bdr); margin-top: 1.25rem;">
+          <h4 style="font-size: 0.88rem; color: var(--y); margin-bottom: 0.4rem;">☁️ Sincronizar Inventario y Cotizaciones</h4>
+          <p style="font-size: 0.78rem; color: var(--t2); margin-bottom: 0.8rem;">
+            Sube todos los autoelevadores, camiones, repuestos y cotizaciones actuales desde esta máquina hacia tu base en la nube.
+          </p>
+          <button type="button" id="btn-do-supabase-sync" class="btn-primary" style="width: 100%; justify-content: center;" onclick="SupabaseUI.syncNow()">
+            🚀 Subir base local a Supabase ahora
+          </button>
+        </div>
+      </div>
+      <div class="modal-actions" style="margin-top: 1rem;">
+        <button type="button" class="btn-secondary" data-close="modal-supabase">Cerrar</button>
+        <button type="button" id="btn-save-sb-cfg" class="btn-primary" onclick="SupabaseUI.saveConfig()">
+          Guardar y Conectar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ── BOTTOM NAVIGATION (MOBILE) — solo botón Inicio ── -->
   <nav class="bottom-nav" id="bottom-nav">
     <button class="bnav-item bnav-item--home-only active" data-view="home" id="bnav-home">
@@ -1323,6 +1370,8 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/supabase-client.js"></script>
   <script src="/admin/admin.js"></script>
 </body>
 </html>

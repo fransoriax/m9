@@ -1,7 +1,16 @@
 {
   "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
     { "source": "/admin", "destination": "/admin/index.html" },
-    { "source": "/admin/", "destination": "/admin/index.html" }
+    { "source": "/admin/", "destination": "/admin/index.html" },
+    { "source": "/catalog", "destination": "/catalog.html" },
+    { "source": "/catalog/", "destination": "/catalog.html" },
+    { "source": "/repuestos", "destination": "/repuestos.html" },
+    { "source": "/repuestos/", "destination": "/repuestos.html" },
+    { "source": "/camiones", "destination": "/camiones.html" },
+    { "source": "/camiones/", "destination": "/camiones.html" },
+    { "source": "/detalle", "destination": "/detalle.html" },
+    { "source": "/detalle/", "destination": "/detalle.html" }
   ]
 }

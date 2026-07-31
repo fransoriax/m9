@@ -310,7 +310,7 @@ async function syncWithSupabaseIfAvailable() {
     try {
       const res = await window.M9Supabase.fetchAllAndCache();
       if (res.ok && res.DB) {
-        const path = window.location.pathname;
+        const path = window.location.pathname.replace(/\/+$/, "");
         const rawPage = path.split("/").pop() || "index.html";
         const cleanPage = rawPage.replace(".html", "").toLowerCase();
         if (cleanPage === "index" || cleanPage === "") {
@@ -338,7 +338,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupNavbar();
   
   // Detect current page with cleanUrls support (.html optional)
-  const path = window.location.pathname;
+  const path = window.location.pathname.replace(/\/+$/, "");
   const rawPage = path.split("/").pop() || "index.html";
   const cleanPage = rawPage.replace(".html", "").toLowerCase();
   
@@ -381,7 +381,8 @@ function setupNavbar() {
   
   // Highlight active link based on current page
   const links = document.querySelectorAll(".nav-link");
-  const rawPage = window.location.pathname.split("/").pop() || "index.html";
+  const path = window.location.pathname.replace(/\/+$/, "");
+  const rawPage = path.split("/").pop() || "index.html";
   const currentClean = rawPage.replace(".html", "").toLowerCase();
   
   links.forEach(link => {

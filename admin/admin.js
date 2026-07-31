@@ -689,35 +689,52 @@ const Modal = {
 // ─── INVENTORY MODULE ─────────────────────────────────────────────────────────
 const Inv = {
   currentPage: 1,
-  PER_PAGE: 8,
-  renderPagination(totalPages) {
+  PER_PAGE: 10,
+  renderPagination(totalPages, totalItems) {
     const container = $('inv-pagination');
     if (!container) return;
-    if (totalPages <= 1) {
+    if (!totalItems || totalItems === 0) {
       container.innerHTML = '';
       return;
     }
+    const startIdx = (this.currentPage - 1) * this.PER_PAGE + 1;
+    const endIdx = Math.min(this.currentPage * this.PER_PAGE, totalItems);
+    
     let html = `
-      <button class="inv-pagination-btn ${this.currentPage === 1 ? 'disabled' : ''}" 
-              onclick="if(Inv.currentPage > 1) { Inv.currentPage--; Inv.render(); }"
-              ${this.currentPage === 1 ? 'disabled' : ''}>
-        &laquo; Ant
-      </button>
+      <div class="inv-pagination-wrapper">
+        <div class="inv-pagination-info">
+          Mostrando <span>${startIdx} - ${endIdx}</span> de <span>${totalItems}</span> ítems
+        </div>
+        <div class="inv-pagination-buttons">
     `;
-    for (let i = 1; i <= totalPages; i++) {
+
+    if (totalPages > 1) {
       html += `
-        <button class="inv-pagination-btn ${i === this.currentPage ? 'active' : ''}"
-                onclick="Inv.currentPage = ${i}; Inv.render();">
-          ${i}
+        <button class="inv-pagination-btn ${this.currentPage === 1 ? 'disabled' : ''}" 
+                onclick="if(Inv.currentPage > 1) { Inv.currentPage--; Inv.render(); }"
+                ${this.currentPage === 1 ? 'disabled' : ''}>
+          &laquo; Anterior
+        </button>
+      `;
+      for (let i = 1; i <= totalPages; i++) {
+        html += `
+          <button class="inv-pagination-btn ${i === this.currentPage ? 'active' : ''}"
+                  onclick="Inv.currentPage = ${i}; Inv.render();">
+            ${i}
+          </button>
+        `;
+      }
+      html += `
+        <button class="inv-pagination-btn ${this.currentPage === totalPages ? 'disabled' : ''}" 
+                onclick="if(Inv.currentPage < ${totalPages}) { Inv.currentPage++; Inv.render(); }"
+                ${this.currentPage === totalPages ? 'disabled' : ''}>
+          Siguiente &raquo;
         </button>
       `;
     }
     html += `
-      <button class="inv-pagination-btn ${this.currentPage === totalPages ? 'disabled' : ''}" 
-              onclick="if(Inv.currentPage < ${totalPages}) { Inv.currentPage++; Inv.render(); }"
-              ${this.currentPage === totalPages ? 'disabled' : ''}>
-        Sig &raquo;
-      </button>
+        </div>
+      </div>
     `;
     container.innerHTML = html;
   },
@@ -859,7 +876,7 @@ const Inv = {
         </tr>`;
       }).join('');
     }
-    this.renderPagination(totalPages);
+    this.renderPagination(totalPages, items.length);
     // Update badge
     const total = DB.autoelevadores.length + DB.repuestos.length + DB.camiones.length;
     $('badge-inv').textContent = total;

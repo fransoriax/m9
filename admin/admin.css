@@ -412,8 +412,8 @@ input, select, textarea {
 ════════════════════════════════════════════ */
 .table-container {
   background: var(--bg3); border: 1px solid var(--bdr);
-  border-radius: var(--r-lg); overflow: hidden;
-  flex: 1;
+  border-radius: var(--r-lg); overflow-x: auto; overflow-y: visible;
+  flex: none; margin-bottom: 0.5rem;
 }
 .data-table { width: 100%; border-collapse: collapse; }
 .data-table thead th {
@@ -1086,9 +1086,37 @@ textarea.mf-input { resize: vertical; }
 /* ════════════════════════════════════════════
    INVENTORY PAGINATION
 ════════════════════════════════════════════ */
+.inv-pagination-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.9rem 1.25rem;
+  background: var(--bg2);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-lg);
+  margin-top: 0.25rem;
+  margin-bottom: 2rem;
+}
+.inv-pagination-info {
+  font-size: 0.85rem;
+  color: var(--t2);
+  font-weight: 600;
+}
+.inv-pagination-info span {
+  color: var(--t1);
+  font-weight: 700;
+}
+.inv-pagination-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
 .inv-pagination-btn {
   padding: 0.45rem 0.85rem;
-  background: var(--bg2);
+  background: var(--bg3);
   border: 1px solid var(--bdr);
   color: var(--t1);
   border-radius: 8px;
@@ -1098,7 +1126,7 @@ textarea.mf-input { resize: vertical; }
   transition: all 0.2s ease;
 }
 .inv-pagination-btn:hover:not(.disabled):not(.active) {
-  background: var(--bg3);
+  background: var(--bg1);
   border-color: var(--y);
   color: var(--y);
 }

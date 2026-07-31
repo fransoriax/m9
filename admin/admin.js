@@ -2201,6 +2201,8 @@ const Quotes = {
       * { margin:0; padding:0; box-sizing:border-box; }
       body { font-family: 'Segoe UI', Arial, sans-serif; background:#fff; color:#111; padding:40px; max-width:900px; margin:0 auto; }
       .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px; border-bottom:3px solid #FFB800; padding-bottom:20px; }
+      .brand-wrap { display:flex; align-items:center; gap:20px; }
+      .brand-logo { max-height:75px; width:auto; object-fit:contain; display:block; }
       .brand h1 { font-size:1.5rem; font-weight:900; color:#111; }
       .brand p { font-size:.85rem; color:#555; margin-top:4px; }
       .quote-meta { text-align:right; }
@@ -2227,10 +2229,13 @@ const Quotes = {
       @media print { body { padding:20px; } button { display:none; } }
     </style></head><body>
     <div class="header">
-      <div class="brand">
-        <h1>Maquinarias 9 de Abril</h1>
-        <p>Autoelevadores • Repuestos OEM • Camiones</p>
-        <p style="margin-top:8px;font-size:.8rem">Buenos Aires, Argentina &nbsp;|&nbsp; +54 9 11 2673-8983</p>
+      <div class="brand-wrap">
+        <img src="/assets/logotipo_png.png" alt="Maquinarias 9 de Abril" class="brand-logo">
+        <div class="brand">
+          <h1>Maquinarias 9 de Abril</h1>
+          <p>Autoelevadores • Repuestos OEM • Camiones</p>
+          <p style="margin-top:8px;font-size:.8rem">Buenos Aires, Argentina &nbsp;|&nbsp; +54 9 11 2673-8983</p>
+        </div>
       </div>
       <div class="quote-meta">
         <div class="number">${q.number}</div>

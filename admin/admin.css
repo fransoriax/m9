@@ -1148,7 +1148,7 @@ textarea.mf-input { resize: vertical; }
     padding-bottom: 20px; border-bottom: 3px solid #000; margin-bottom: 24px;
   }
   .pd-logo-area { display: flex; align-items: center; gap: 14px; }
-  .pd-logo { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
+  .pd-logo { max-height: 70px; width: auto; object-fit: contain; display: block; }
   .pd-brand { font-size: 18px; font-weight: 900; color: #000; margin-bottom: 4px; }
   .pd-logo-area p { font-size: 11px; color: #444; }
   .pd-meta { text-align: right; }

@@ -1306,29 +1306,41 @@ function initDetailPage() {
   if (mainImg) mainImg.src = portadaSrc;
 
   // Gallery thumbnails switcher
-  const thumbs = document.querySelectorAll(".gallery-thumb");
-  const galleryList = (item.images && Array.isArray(item.images) && item.images.length > 0)
-    ? item.images
-    : [portadaSrc, "assets/hero_forklift.png", "assets/forklift_parts.png"];
+  const thumbsContainer = document.getElementById("gallery-thumbnails-container");
+  if (thumbsContainer) {
+    thumbsContainer.innerHTML = ''; // Clear container
 
-  thumbs.forEach((thumb, idx) => {
-    const thumbImg = thumb.querySelector("img");
-    if (thumbImg) {
-      thumbImg.src = galleryList[idx % galleryList.length];
+    const galleryList = (item.images && Array.isArray(item.images) && item.images.length > 0)
+      ? item.images
+      : [portadaSrc, "assets/hero_forklift.png", "assets/forklift_parts.png"];
+    
+    // We only show multiple thumbnails if there is more than 1 image
+    if (galleryList.length > 1) {
+      galleryList.forEach((src, idx) => {
+        const thumb = document.createElement("div");
+        thumb.className = "gallery-thumb" + (idx === 0 ? " active" : "");
+        
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = `Vista ${idx + 1}`;
+        
+        thumb.appendChild(img);
+        thumbsContainer.appendChild(thumb);
+        
+        thumb.addEventListener("click", () => {
+          document.querySelectorAll(".gallery-thumb").forEach(t => t.classList.remove("active"));
+          thumb.classList.add("active");
+          if (mainImg) {
+            mainImg.style.opacity = "0.3";
+            setTimeout(() => {
+              mainImg.src = src;
+              mainImg.style.opacity = "1";
+            }, 150);
+          }
+        });
+      });
     }
-
-    thumb.addEventListener("click", () => {
-      thumbs.forEach(t => t.classList.remove("active"));
-      thumb.classList.add("active");
-      if (mainImg) {
-        mainImg.style.opacity = "0.3";
-        setTimeout(() => {
-          mainImg.src = thumbImg.src;
-          mainImg.style.opacity = "1";
-        }, 150);
-      }
-    });
-  });
+  }
 
   // PDF Spec Sheet download simulation
   const downloadBtn = document.getElementById("pdf-download-btn");

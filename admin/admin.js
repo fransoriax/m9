@@ -30,8 +30,18 @@ const SupabaseUI = {
           if (res.DB.repuestos && res.DB.repuestos.length) DB.repuestos = res.DB.repuestos;
           syncInventoryWithWeb(DB);
         }
-        if (res.leads && typeof CRM !== 'undefined' && Array.isArray(res.leads)) {
-          CRM.leads = res.leads;
+        if (res.leads && Array.isArray(res.leads)) {
+          // Group flat leads back into DB.leads object
+          const groupedLeads = { nuevas: [], cotizacion: [], enviado: [], ganado: [] };
+          res.leads.forEach(l => {
+            const status = l.status || 'nuevas';
+            if (groupedLeads[status]) {
+              groupedLeads[status].push(l);
+            } else {
+              groupedLeads.nuevas.push(l);
+            }
+          });
+          DB.leads = groupedLeads;
         }
       }
     } else {

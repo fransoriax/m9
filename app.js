@@ -833,6 +833,19 @@ function initDetailPage() {
       const allEquip = [...(parsedDB.autoelevadores || []), ...(parsedDB.camiones || [])];
       const found = allEquip.find(e => e.id.toString() === id.toString() || `crm-auto-${e.id}` === id || `crm-truck-${e.id}` === id || (item && e.name.toLowerCase() === item.name.toLowerCase()));
       if (found) {
+        let parsedImages = [];
+        if (Array.isArray(found.images)) {
+          parsedImages = found.images;
+        } else if (typeof found.images === 'string') {
+          try {
+            parsedImages = JSON.parse(found.images.replace(/^\{/, '[').replace(/\}$/, ']'));
+          } catch(e) {
+            const matches = found.images.match(/(data:image[^,]+|http[^,]+)/g);
+            if (matches) parsedImages = matches;
+          }
+        }
+        
+        const finalImg = found.img ? found.img.replace('../', '').replace(/^\//, '') : (parsedImages[0] || '');
         if (item) {
           item = {
             ...item,
@@ -841,8 +854,8 @@ function initDetailPage() {
             price: found.price !== undefined ? found.price : item.price,
             condition: found.condition || item.condition,
             year: found.year || item.year,
-            image: found.img ? found.img.replace('../', '').replace(/^\//, '') : item.image,
-            images: (found.images && Array.isArray(found.images)) ? found.images.map(u => typeof u === 'string' ? u.replace('../', '').replace(/^\//, '') : u) : item.images
+            image: finalImg || item.image,
+            images: parsedImages.length > 0 ? parsedImages.map(u => typeof u === 'string' ? u.replace('../', '').replace(/^\//, '') : u) : item.images
           };
         } else {
           item = {
@@ -854,8 +867,8 @@ function initDetailPage() {
             height: found.height || 4.5,
             year: found.year || 2025,
             condition: found.condition || (found.hours > 0 ? 'Usado' : 'Nuevo'),
-            image: found.img ? found.img.replace('../', '').replace(/^\//, '') : '',
-            images: (found.images && Array.isArray(found.images)) ? found.images.map(u => typeof u === 'string' ? u.replace('../', '').replace(/^\//, '') : u) : [],
+            image: finalImg,
+            images: parsedImages.map(u => typeof u === 'string' ? u.replace('../', '').replace(/^\//, '') : u),
             description: `Unidad industrial ${found.brand} ${found.name}.`,
             specs: {
               engine: found.motor || 'Convencional',

@@ -83,6 +83,25 @@
       if (error) console.error(`Error deleteRow (${tableName}):`, error);
       return { data, error };
     },
+    async uploadImage(file, bucketName = 'images') {
+      const client = this.getClient();
+      if (!client) return { url: null, error: 'No conectado' };
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+        const { data, error } = await client.storage.from(bucketName).upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+        if (error) throw error;
+        
+        const { data: publicData } = client.storage.from(bucketName).getPublicUrl(fileName);
+        return { url: publicData.publicUrl, error: null };
+      } catch (err) {
+        console.error('Error subiendo imagen:', err);
+        return { url: null, error: err.message };
+      }
+    },
     async syncAllToSupabase(DB, leadsArray) {
       const client = this.getClient();
       if (!client) return { ok: false, error: 'No se pudo conectar a Supabase. Verificá tu Anon Key.' };

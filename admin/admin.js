@@ -1122,14 +1122,26 @@ const Inv = {
       rImgZone.addEventListener('dragover', e => { e.preventDefault(); rImgZone.classList.add('drag-over'); });
       rImgZone.addEventListener('dragleave', () => rImgZone.classList.remove('drag-over'));
       
-      const handleRepFile = (file) => {
+      const handleRepFile = async (file) => {
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = ev => {
-          this.setRepImg(ev.target.result);
-          $('r-img-filename').textContent = file.name;
-        };
-        reader.readAsDataURL(file);
+        $('r-img-filename').textContent = 'Subiendo...';
+        if (typeof window.M9Supabase !== 'undefined' && window.M9Supabase.isConfigured()) {
+          const res = await window.M9Supabase.uploadImage(file, 'images');
+          if (res.url) {
+            this.setRepImg(res.url);
+            $('r-img-filename').textContent = file.name;
+          } else {
+            toast('Error subiendo: ' + res.error, 'error');
+            $('r-img-filename').textContent = 'Error al subir';
+          }
+        } else {
+          const reader = new FileReader();
+          reader.onload = ev => {
+            this.setRepImg(ev.target.result);
+            $('r-img-filename').textContent = file.name;
+          };
+          reader.readAsDataURL(file);
+        }
       };
 
       rImgInput.addEventListener('change', e => handleRepFile(e.target.files[0]));
@@ -1203,12 +1215,24 @@ const Inv = {
       this.renderImagePreview();
     }
   },
-  previewImages(files) {
-    Array.from(files).forEach(file => {
-      const url = URL.createObjectURL(file);
-      state.editingImages.push(url);
-    });
+  async previewImages(files) {
+    if (files.length === 0) return;
+    toast('Subiendo imagen(es)...', 'info');
+    for (const file of Array.from(files)) {
+      if (typeof window.M9Supabase !== 'undefined' && window.M9Supabase.isConfigured()) {
+        const res = await window.M9Supabase.uploadImage(file, 'images');
+        if (res.url) {
+          state.editingImages.push(res.url);
+        } else {
+          toast('Error subiendo imagen: ' + res.error, 'error');
+        }
+      } else {
+        const url = URL.createObjectURL(file);
+        state.editingImages.push(url);
+      }
+    }
     this.renderImagePreview();
+    toast('Imagen(es) procesada(s)', 'success');
   }
 };
 

@@ -116,7 +116,7 @@
         <div class="ecommerce-filter-group">
           <h4 class="ecommerce-filter-heading">CATEGORÍAS</h4>
           <ul class="ecommerce-filter-list" id="ecommerce-categories-list">
-            <!-- Populated dynamically by app.js?v=3 -->
+            <!-- Populated dynamically by app.js?v=4 -->
             <li><a href="#" class="active">TODAS LAS CATEGORÍAS</a></li>
           </ul>
         </div>
@@ -124,7 +124,7 @@
         <div class="ecommerce-filter-group" style="margin-top: 2rem;">
           <h4 class="ecommerce-filter-heading">MARCA</h4>
           <ul class="ecommerce-filter-list" id="ecommerce-brands-list">
-            <!-- Populated dynamically by app.js?v=3 -->
+            <!-- Populated dynamically by app.js?v=4 -->
           </ul>
         </div>
       </aside>
@@ -156,7 +156,7 @@
 
         <!-- Products Grid -->
         <div class="ecommerce-products-grid" id="parts-ml-container">
-          <!-- Populated dynamically by app.js?v=3 initPartsPage() -->
+          <!-- Populated dynamically by app.js?v=4 initPartsPage() -->
         </div>
 
         <!-- Pagination Container -->
@@ -333,9 +333,9 @@
             <button id="part-modal-add-cart" class="btn btn-primary" style="flex: 1; padding: 0.65rem 1rem; font-size: 0.88rem;">
               🛒 Agregar al Carrito
             </button>
-            <button id="part-modal-quote-btn" class="btn btn-outline-yellow open-quote-modal" style="flex: 1; padding: 0.65rem 1rem; font-size: 0.88rem;">
-              Cotizar Repuesto
-            </button>
+            <a id="part-modal-quote-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline-yellow" style="flex: 1; padding: 0.65rem 1rem; font-size: 0.88rem; text-align: center; text-decoration: none;">
+              Cotizar por WhatsApp
+            </a>
           </div>
         </div>
       </div>
@@ -352,7 +352,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=4"></script>
 </body>
 
 </html>

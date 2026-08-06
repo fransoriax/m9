@@ -796,7 +796,8 @@ function openPartDetailModal(item) {
     }
 
     if (quoteBtn) {
-      quoteBtn.setAttribute("data-product", `Repuesto OEM ${item.oem} - ${item.name}`);
+      const waText = encodeURIComponent(`Hola, quisiera cotizar el repuesto OEM ${item.oem} - ${item.name}`);
+      quoteBtn.href = `https://wa.me/5491121699968?text=${waText}`;
     }
 
     modal.classList.add("active");

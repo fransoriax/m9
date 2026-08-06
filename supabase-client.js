@@ -83,12 +83,14 @@
       if (error) console.error(`Error deleteRow (${tableName}):`, error);
       return { data, error };
     },
-    async uploadImage(file, bucketName = 'images') {
+    async uploadImage(file, bucketName = 'images', folder = '') {
       const client = this.getClient();
       if (!client) return { url: null, error: 'No conectado' };
       try {
         const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+        const baseFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+        const fileName = folder ? `${folder}/${baseFileName}` : baseFileName;
+        
         const { data, error } = await client.storage.from(bucketName).upload(fileName, file, {
           cacheControl: '3600',
           upsert: false

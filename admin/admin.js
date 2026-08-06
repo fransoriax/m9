@@ -1126,7 +1126,7 @@ const Inv = {
         if (!file) return;
         $('r-img-filename').textContent = 'Subiendo...';
         if (typeof window.M9Supabase !== 'undefined' && window.M9Supabase.isConfigured()) {
-          const res = await window.M9Supabase.uploadImage(file, 'images');
+          const res = await window.M9Supabase.uploadImage(file, 'images', 'repuestos');
           if (res.url) {
             this.setRepImg(res.url);
             $('r-img-filename').textContent = file.name;
@@ -1220,7 +1220,8 @@ const Inv = {
     toast('Subiendo imagen(es)...', 'info');
     for (const file of Array.from(files)) {
       if (typeof window.M9Supabase !== 'undefined' && window.M9Supabase.isConfigured()) {
-        const res = await window.M9Supabase.uploadImage(file, 'images');
+        const folderName = state.activeTab || 'equipos';
+        const res = await window.M9Supabase.uploadImage(file, 'images', folderName);
         if (res.url) {
           state.editingImages.push(res.url);
         } else {

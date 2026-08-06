@@ -727,9 +727,22 @@
             <label class="mf-label">Horas de Uso</label>
             <input type="number" class="mf-input" id="m-hours" placeholder="Ej: 1200" min="0">
           </div>
+          <div class="mf-row">
+            <div class="mf-group">
+              <label class="mf-label">Moneda</label>
+              <select class="mf-input" id="m-currency">
+                <option value="USD">USD</option>
+                <option value="ARS">ARS</option>
+              </select>
+            </div>
+            <div class="mf-group">
+              <label class="mf-label">Precio *</label>
+              <input type="number" class="mf-input" id="m-price" placeholder="Ej: 18500" min="0">
+            </div>
+          </div>
           <div class="mf-group">
-            <label class="mf-label">Precio (USD) *</label>
-            <input type="number" class="mf-input" id="m-price" placeholder="Ej: 18500" min="0">
+            <label class="mf-label">Descuento (%)</label>
+            <input type="number" class="mf-input" id="m-discount" placeholder="Ej: 10 (Opcional)" min="0" max="100">
           </div>
           <div class="mf-group">
             <label class="mf-label">Estado</label>
@@ -809,9 +822,22 @@
               <option>Transmisión</option><option>Motor</option><option>Estructura</option><option>Otros</option>
             </select>
           </div>
+          <div class="mf-row">
+            <div class="mf-group">
+              <label class="mf-label">Moneda</label>
+              <select class="mf-input" id="r-currency">
+                <option value="USD">USD</option>
+                <option value="ARS">ARS</option>
+              </select>
+            </div>
+            <div class="mf-group">
+              <label class="mf-label">Precio *</label>
+              <input type="number" class="mf-input" id="r-price" placeholder="Ej: 350" min="0">
+            </div>
+          </div>
           <div class="mf-group">
-            <label class="mf-label">Precio Unitario (USD) *</label>
-            <input type="number" class="mf-input" id="r-price" placeholder="Ej: 350">
+            <label class="mf-label">Descuento (%)</label>
+            <input type="number" class="mf-input" id="r-discount" placeholder="Ej: 15 (Opcional)" min="0" max="100">
           </div>
           <div class="mf-group">
             <label class="mf-label">Stock Actual</label>

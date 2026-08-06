@@ -697,6 +697,8 @@ const Inv = {
       $('r-stock').value = r.stock;
       $('r-status').value = r.status;
       $('r-compat').value = r.compat || '';
+      $('r-currency').value = r.currency || 'USD';
+      $('r-discount').value = r.discount || '';
       this.setRepImg(r.img || null);
       Modal.open('modal-repuesto');
     } else {
@@ -711,6 +713,8 @@ const Inv = {
       $('m-motor').value = item.motor || '';
       $('m-hours').value = item.hours || 0;
       $('m-price').value = item.price;
+      $('m-currency').value = item.currency || 'USD';
+      $('m-discount').value = item.discount || '';
       $('m-status').value = item.status;
       $('m-visible').checked = item.visible;
       $('m-vis-lbl').textContent = item.visible ? 'Visible en el sitio' : 'Oculto en el sitio';
@@ -761,6 +765,8 @@ const Inv = {
       $('modal-repuesto-title').textContent = 'Nuevo Repuesto';
       $('form-repuesto').reset();
       $('r-stock').value = 0;
+      $('r-currency').value = 'USD';
+      $('r-discount').value = '';
       this.setRepImg(null);
       Modal.open('modal-repuesto');
     } else {
@@ -768,6 +774,8 @@ const Inv = {
       $('form-machinery').reset();
       $('m-visible').checked = true;
       $('m-vis-lbl').textContent = 'Visible en el sitio';
+      $('m-currency').value = 'USD';
+      $('m-discount').value = '';
       state.editingImages = state.activeTab === 'camiones'
         ? ['/assets/truck.png', '/assets/truck_hero.jpg']
         : ['/assets/electric_forklift.png', '/assets/hero_forklift.png'];
@@ -781,6 +789,8 @@ const Inv = {
     const name = $('m-name').value.trim();
     const brand = $('m-brand').value;
     const price = parseFloat($('m-price').value);
+    const currency = $('m-currency').value || 'USD';
+    const discount = parseInt($('m-discount').value) || 0;
     if (!name || !brand || isNaN(price)) { toast('Completá los campos obligatorios (*)', 'error'); return; }
     const savedPortada = state.editingImages[state.editingPortadaIndex] || state.editingImages[0] || (state.activeTab === 'camiones' ? '/assets/truck.png' : '/assets/electric_forklift.png');
     const savedImages = [...(state.editingImages || [])];
@@ -790,6 +800,8 @@ const Inv = {
       motor:    $('m-motor').value,
       hours:    parseInt($('m-hours').value) || 0,
       price,
+      currency,
+      discount,
       status:   $('m-status').value,
       visible:  $('m-visible').checked,
       img:      savedPortada,
@@ -819,11 +831,15 @@ const Inv = {
     const oem  = $('r-oem').value.trim();
     const name = $('r-name').value.trim();
     const price = parseFloat($('r-price').value);
+    const currency = $('r-currency').value || 'USD';
+    const discount = parseInt($('r-discount').value) || 0;
     if (!oem || !name || isNaN(price)) { toast('Completá los campos obligatorios (*)', 'error'); return; }
     const item = {
       oem, name,
       category: $('r-category').value,
       price,
+      currency,
+      discount,
       stock:    parseInt($('r-stock').value) || 0,
       status:   $('r-status').value,
       compat:   $('r-compat').value.trim(),

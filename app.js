@@ -100,6 +100,21 @@ function setupNavbar() {
 }
 
 // 3. HOME PAGE ENGINE
+function formatPriceHTML(item) {
+  const currency = item.currency || 'USD';
+  const sym = currency === 'ARS' ? '$' : 'U$S';
+  const price = item.price || 0;
+  const discount = item.discount || 0;
+  
+  if (price === 0) return '<span class="price-discounted">Consultar</span>';
+  
+  if (discount > 0) {
+    const discountedPrice = price * (1 - discount / 100);
+    return `<span class="price-original">${sym} ${price.toLocaleString('es-AR')}</span><span class="price-discounted">${sym} ${discountedPrice.toLocaleString('es-AR')}</span>`;
+  }
+  return `<span class="price-discounted">${sym} ${price.toLocaleString('es-AR')}</span>`;
+}
+
 function initHomePage() {
 
   // ── Entrance animations ──────────────────────────────────────
@@ -377,6 +392,9 @@ function initCatalogPage() {
         <div class="product-card-content">
           <span class="product-card-brand">${fork.brand}</span>
           <h3 class="product-card-title">${fork.name}</h3>
+          <div class="product-card-price" style="margin: 0.5rem 0;">
+            ${formatPriceHTML(fork)}
+          </div>
           <div class="product-card-specs">
             <div class="product-card-spec">
               <span class="product-card-spec-label">Capacidad</span>
@@ -782,7 +800,7 @@ function initPartsPage() {
           </div>
           <div class="parts-ml-details-row">
             <div class="parts-ml-price-box">
-              <span class="parts-ml-price">USD $${(item.price || 100).toLocaleString('es-AR')}</span>
+              <span class="parts-ml-price">${formatPriceHTML(item)}</span>
               ${stockBadge}
             </div>
             <div class="parts-ml-actions">
@@ -841,7 +859,7 @@ function initPartsPage() {
     if (titleEl) titleEl.textContent = item.name;
     if (oemEl) oemEl.textContent = `OEM: ${item.oem}`;
     if (compatEl) compatEl.innerHTML = `<strong>Compatibilidad:</strong> ${item.machine}<br><span style="margin-top: 0.3rem; display: inline-block;">${item.desc}</span>`;
-    if (priceEl) priceEl.textContent = `USD $${(item.price || 100).toLocaleString('es-AR')}`;
+    if (priceEl) priceEl.innerHTML = formatPriceHTML(item);
     
     if (stockEl) {
       const isStockIn = item.stock === "in";
@@ -943,6 +961,11 @@ function initDetailPage() {
   document.getElementById("detail-condition-badge").textContent = item.condition;
   document.getElementById("detail-type-badge").textContent = item.type;
   document.getElementById("detail-description").textContent = item.description;
+  
+  const priceContainer = document.getElementById("detail-price-container");
+  if (priceContainer) {
+    priceContainer.innerHTML = formatPriceHTML(item);
+  }
 
   // Set quotes product name input
   const inputProduct = document.getElementById("quote-product-name");
@@ -1946,7 +1969,7 @@ function initCamionesPage() {
           <div class="product-card-footer truck-card-footer-mobile" style="display:flex; align-items:center; justify-content:space-between; gap:0.6rem; margin-top:0.8rem;">
             <div>
               <span style="font-size:0.7rem; color:var(--text-secondary); display:block; text-transform:uppercase;">Valor referencia</span>
-              <span class="product-price" style="font-size:1.05rem; font-weight:800; color:var(--text-primary);">${truck.priceLabel}</span>
+              <span class="product-price" style="font-size:1.05rem; font-weight:800; color:var(--text-primary);">${formatPriceHTML(truck)}</span>
             </div>
             <div style="display:flex; gap:0.4rem;">
               <a href="detalle.html?id=${truck.id}" class="btn btn-secondary btn-sm" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">Ver Detalle</a>

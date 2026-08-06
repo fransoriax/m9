@@ -121,7 +121,7 @@ const SupabaseUI = {
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let state = {
   activeView: 'home',
-  activeTab: 'autoelevadores',
+  activeTab: localStorage.getItem('m9-admin-inv-tab') || 'autoelevadores',
   searchQuery: '',
   filterStatus: '',
   filterBrand: '',
@@ -381,6 +381,7 @@ const Router = {
       view = allowed[0] || 'inventario';
     }
     state.activeView = view;
+    localStorage.setItem('m9-admin-view', view);
     $$('.view-panel').forEach(p => p.classList.remove('active-panel'));
     $$('.sb-item').forEach(b => b.classList.remove('active'));
     $$('.crm-hmod-card').forEach(b => b.classList.remove('active'));
@@ -609,12 +610,13 @@ const Inv = {
         const thumb = r.img
           ? `<img class="td-thumb" src="${r.img}" alt="${r.name}" loading="lazy">`
           : `<div class="td-thumb-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+        const discountHtml = (r.discount > 0) ? `<span style="color:#ffaa00; font-size:0.75rem; font-weight:700; margin-left:6px; background:rgba(255,170,0,0.15); padding:2px 5px; border-radius:4px;">-${r.discount}%</span>` : '';
         return `<tr>
           <td>${thumb}</td>
           <td><span class="badge badge--oem">${r.oem}</span></td>
           <td><div class="td-name">${r.name}</div></td>
           <td><span class="badge badge--cat">${r.category||'General'}</span></td>
-          <td><span class="td-price-tag">${r.currency||'USD'} ${r.price.toLocaleString('es-AR')}</span></td>
+          <td><div style="display:flex; align-items:center;"><span class="td-price-tag">${r.currency||'USD'} ${r.price.toLocaleString('es-AR')}</span>${discountHtml}</div></td>
           <td><div class="td-badges-group">${stockBadge} ${statusBadge}</div></td>
           <td><span class="td-compat-info">${r.compat ? 'Compatibilidad: ' + r.compat : ''}</span></td>
           <td></td>
@@ -645,7 +647,7 @@ const Inv = {
           <td><span class="badge badge--brand">${item.brand}</span></td>
           <td><div class="td-specs-row"><span class="td-spec-chip">Capacidad: ${item.capacity||'—'}</span> <span class="td-spec-chip">Motor: ${item.motor||'—'}</span></div></td>
           <td></td>
-          <td><span class="td-price-tag">${item.currency||'USD'} ${item.price.toLocaleString('es-AR')}</span></td>
+          <td><div style="display:flex; align-items:center;"><span class="td-price-tag">${item.currency||'USD'} ${item.price.toLocaleString('es-AR')}</span>${item.discount > 0 ? `<span style="color:#ffaa00; font-size:0.75rem; font-weight:700; margin-left:6px; background:rgba(255,170,0,0.15); padding:2px 5px; border-radius:4px;">-${item.discount}%</span>` : ''}</div></td>
           <td><div class="td-badges-group">${statusBadge} ${visBadge}</div></td>
           <td></td>
           <td><div class="td-actions">
@@ -783,7 +785,7 @@ const Inv = {
     const currency = $('m-currency').value || 'USD';
     const discount = parseInt($('m-discount').value) || 0;
     if (!name || !brand || isNaN(price)) { toast('Completá los campos obligatorios (*)', 'error'); return; }
-    const savedPortada = state.editingImages[state.editingPortadaIndex] || state.editingImages[0] || (state.activeTab === 'camiones' ? '/assets/truck.png' : '/assets/electric_forklift.png');
+    const savedPortada = state.editingImages[state.editingPortadaIndex] || state.editingImages[0] || '';
     const savedImages = [...(state.editingImages || [])];
     const item = {
       name, brand,
@@ -834,7 +836,7 @@ const Inv = {
       stock:    parseInt($('r-stock').value) || 0,
       status:   $('r-status').value,
       compat:   $('r-compat').value.trim(),
-      img:      state.editingRepImg || '/assets/forklift_parts.png',
+      img:      state.editingRepImg || '',
     };
     if (state.editingId) {
       const idx = DB.repuestos.findIndex(x => x.id === state.editingId);
@@ -851,12 +853,16 @@ const Inv = {
   init() {
     this.publish();
     // Tabs & Mobile Visual Category Cards
+    $$('.cat-tab, .crm-mcat-card').forEach(t => t.classList.remove('active'));
+    $$(`.cat-tab[data-tab="${state.activeTab}"], .crm-mcat-card[data-tab="${state.activeTab}"]`).forEach(t => t.classList.add('active'));
+
     $$('.cat-tab, .crm-mcat-card').forEach(tab => {
       tab.addEventListener('click', () => {
         const tabKey = tab.dataset.tab;
         $$('.cat-tab, .crm-mcat-card').forEach(t => t.classList.remove('active'));
         $$(`.cat-tab[data-tab="${tabKey}"], .crm-mcat-card[data-tab="${tabKey}"]`).forEach(t => t.classList.add('active'));
         state.activeTab = tabKey;
+        localStorage.setItem('m9-admin-inv-tab', tabKey);
         state.searchQuery = '';
         state.filterStatus = '';
         state.filterBrand = '';
@@ -927,8 +933,34 @@ const Inv = {
         } else {
           const reader = new FileReader();
           reader.onload = ev => {
-            this.setRepImg(ev.target.result);
-            $('r-img-filename').textContent = file.name;
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              const MAX_WIDTH = 1000;
+              const MAX_HEIGHT = 1000;
+              let width = img.width;
+              let height = img.height;
+              
+              if (width > height) {
+                if (width > MAX_WIDTH) {
+                  height *= MAX_WIDTH / width;
+                  width = MAX_WIDTH;
+                }
+              } else {
+                if (height > MAX_HEIGHT) {
+                  width *= MAX_HEIGHT / height;
+                  height = MAX_HEIGHT;
+                }
+              }
+              
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+              this.setRepImg(canvas.toDataURL('image/jpeg', 0.8));
+              $('r-img-filename').textContent = file.name;
+            };
+            img.src = ev.target.result;
           };
           reader.readAsDataURL(file);
         }
@@ -1018,8 +1050,43 @@ const Inv = {
           toast('Error subiendo imagen: ' + res.error, 'error');
         }
       } else {
-        const url = URL.createObjectURL(file);
-        state.editingImages.push(url);
+        const compressedBase64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              const MAX_WIDTH = 1000;
+              const MAX_HEIGHT = 1000;
+              let width = img.width;
+              let height = img.height;
+              
+              if (width > height) {
+                if (width > MAX_WIDTH) {
+                  height *= MAX_WIDTH / width;
+                  width = MAX_WIDTH;
+                }
+              } else {
+                if (height > MAX_HEIGHT) {
+                  width *= MAX_HEIGHT / height;
+                  height = MAX_HEIGHT;
+                }
+              }
+              
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL('image/jpeg', 0.8));
+            };
+            img.onerror = () => {
+              resolve(e.target.result); // Fallback to original
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+        state.editingImages.push(compressedBase64);
       }
     }
     this.renderImagePreview();
@@ -2352,7 +2419,10 @@ const App = {
 
     const user = Auth.getCurrentUser();
     const allowed = user.modules || ['inventario','cotizaciones'];
-    const initialView = window.innerWidth < 769 ? 'home' : (allowed[0] || 'inventario');
+    let initialView = localStorage.getItem('m9-admin-view');
+    if (!initialView || !allowed.includes(initialView)) {
+      initialView = window.innerWidth < 769 ? 'home' : (allowed[0] || 'inventario');
+    }
     Router.go(initialView);
   }
 };

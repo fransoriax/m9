@@ -736,6 +736,7 @@ function initPartsPage() {
           <img src="${item.image || fallbackImg}" alt="${item.name}" loading="lazy">
         </div>
         <div class="ecommerce-card-body">
+          <p class="ecommerce-card-oem">OEM: ${item.oem}</p>
           <h3 class="ecommerce-card-title">${item.name}</h3>
           <div class="ecommerce-card-price">
             ${formatPriceHTML(item)}
@@ -838,7 +839,9 @@ function initDetailPage() {
             brand: found.brand || item.brand,
             price: found.price !== undefined ? found.price : item.price,
             condition: found.condition || item.condition,
-            year: found.year || item.year
+            year: found.year || item.year,
+            image: found.img ? found.img.replace('../', '').replace(/^\//, '') : item.image,
+            images: (found.images && Array.isArray(found.images)) ? found.images.map(u => typeof u === 'string' ? u.replace('../', '').replace(/^\//, '') : u) : item.images
           };
         } else {
           item = {
@@ -850,7 +853,8 @@ function initDetailPage() {
             height: found.height || 4.5,
             year: found.year || 2025,
             condition: found.condition || (found.hours > 0 ? 'Usado' : 'Nuevo'),
-            image: found.img ? found.img.replace('../', '').replace(/^\//, '') : (found.motor ? 'assets/truck.png' : 'assets/diesel_forklift.png'),
+            image: found.img ? found.img.replace('../', '').replace(/^\//, '') : '',
+            images: (found.images && Array.isArray(found.images)) ? found.images.map(u => typeof u === 'string' ? u.replace('../', '').replace(/^\//, '') : u) : [],
             description: `Unidad industrial ${found.brand} ${found.name}.`,
             specs: {
               engine: found.motor || 'Convencional',
@@ -946,9 +950,9 @@ function initDetailPage() {
   }
 
   // Main gallery image (Portada)
-  const mainImg = document.getElementById("gallery-main-img");
-  const portadaSrc = item.image || item.img || (item.images && item.images[0]) || "assets/electric_forklift.png";
-  if (mainImg) mainImg.src = portadaSrc;
+  const portadaSrc = item.image || item.img || (item.images && item.images[0]) || "";
+  if (mainImg && portadaSrc) mainImg.src = portadaSrc;
+  else if (mainImg) mainImg.style.display = 'none';
 
   // Gallery thumbnails switcher
   const thumbsContainer = document.getElementById("gallery-thumbnails-container");
@@ -1775,7 +1779,8 @@ function initCamionesPage() {
               currency: crmItem.currency || 'USD',
               discount: crmItem.discount || 0,
               priceLabel: ``,
-              image: crmItem.img ? crmItem.img.replace('../', '').replace(/^\//, '') : (staticMatch ? staticMatch.image : "assets/truck.png"),
+              image: crmItem.img ? crmItem.img.replace('../', '').replace(/^\//, '') : '',
+              images: (crmItem.images && Array.isArray(crmItem.images)) ? crmItem.images.map(u => typeof u === 'string' ? u.replace('../', '').replace(/^\//, '') : u) : [],
               description: staticMatch ? staticMatch.description : `Unidad ${crmItem.brand} ${crmItem.name}.`,
               specs: staticMatch ? staticMatch.specs : {
                 engine: crmItem.motor || "Diesel HD",

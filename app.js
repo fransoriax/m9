@@ -759,9 +759,6 @@ function initPartsPage() {
     });
   }
 
-  // Initial render
-  applyPartsFilter();
-}
 function openPartDetailModal(item) {
     const modal = document.getElementById("part-detail-modal");
     if (!modal) return;

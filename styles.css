@@ -5637,13 +5637,14 @@ select option {
 
 .price-original {
   text-decoration: line-through;
+
   color: var(--text-secondary);
   font-size: 0.85em;
   margin-right: 8px;
   font-weight: 500;
 }
 .price-discounted {
-  color: #ff3b30;
+  color: var(--primary-yellow);
   font-weight: 800;
 }
 
@@ -5849,7 +5850,7 @@ select option {
   margin-bottom: 0.5rem;
 }
 .ecommerce-card-promo {
-  color: #ff3b30;
+  color: var(--primary-yellow);
   font-size: 0.75rem;
   margin-bottom: 0.8rem;
 }

@@ -894,6 +894,13 @@ function initDetailPage() {
   if (inputProduct) {
     inputProduct.value = `${item.brand} ${item.name}`;
   }
+  
+  // Set detail whatsapp direct link
+  const detailWa = document.getElementById("detail-whatsapp-direct");
+  if (detailWa) {
+    const waText = encodeURIComponent(`Hola, quisiera consultar sobre el equipo: ${item.brand} ${item.name}`);
+    detailWa.href = `https://wa.me/5491121699968?text=${waText}`;
+  }
 
   // Populate Specs
   const specList = document.getElementById("detail-specs-list");
@@ -1045,13 +1052,44 @@ function setupGlobalModals() {
     });
   }
 
+  // Function to create lead in CRM
+  const addLeadToCRM = (client, product, phone, email, message) => {
+    try {
+      const rawDB = localStorage.getItem('m9-inventory-db');
+      const db = rawDB ? JSON.parse(rawDB) : {};
+      if (!db.leads) {
+        db.leads = { nuevas: [], enproceso: [], cotizado: [], ganado: [], perdido: [] };
+      }
+      if (!db.leads.nuevas) db.leads.nuevas = [];
+      const leadId = Date.now();
+      db.leads.nuevas.unshift({
+        id: leadId,
+        client: client,
+        phone: phone || "No provisto",
+        email: email || "No provisto",
+        product: product,
+        date: new Date().toISOString().split('T')[0],
+        urgency: 'normal',
+        notes: message ? [message] : [],
+        source: 'Formulario Web'
+      });
+      localStorage.setItem('m9-inventory-db', JSON.stringify(db));
+    } catch (err) {
+      console.error("Error saving lead:", err);
+    }
+  };
+
   // Quote Form Submission logic
   const detailsForm = document.getElementById("detail-quote-form");
   if (detailsForm) {
     detailsForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const product = document.getElementById("quote-product-name").value;
-      const client = detailsForm.querySelector("input[type='text']").value;
+      const client = document.getElementById("client-name").value;
+      const email = document.getElementById("client-email").value;
+      const message = document.getElementById("client-message").value;
+      
+      addLeadToCRM(client, product, '', email, message);
       
       openNotificationModal("Cotización Enviada", `Gracias ${client}. Hemos recibido su consulta para el equipo ${product}. Un asesor comercial premium se contactará con usted a la brevedad.`);
       detailsForm.reset();
@@ -1065,6 +1103,11 @@ function setupGlobalModals() {
       const product = productTitleEl ? productTitleEl.textContent : "Equipo";
       const clientNameEl = document.getElementById("modal-client-name") || document.getElementById("quote-name");
       const clientName = clientNameEl ? clientNameEl.value : "Cliente";
+      const clientEmail = document.getElementById("modal-client-email") ? document.getElementById("modal-client-email").value : "";
+      const clientPhone = document.getElementById("modal-client-phone") ? document.getElementById("modal-client-phone").value : "";
+      const clientMessage = document.getElementById("modal-message") ? document.getElementById("modal-message").value : "";
+      
+      addLeadToCRM(clientName, product, clientPhone, clientEmail, clientMessage);
       
       closeModal(modal);
       openNotificationModal("Cotización Solicitada", `Estimado ${clientName}, su cotización por "${product}" ha sido registrada con éxito. Recibirá detalles a la brevedad.`);

@@ -6,8 +6,8 @@
 'use strict';
 
 (function(global) {
-  const DEFAULT_URL = '';
-  const DEFAULT_KEY = '';
+  const DEFAULT_URL = 'https://ktfrpccefxhlrrwlahmk.supabase.co';
+  const DEFAULT_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0ZnJwY2NlZnhobHJyd2xhaG1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0NDA5MjQsImV4cCI6MjEwMTAxNjkyNH0.xwA9KdywcUm6mlmtlsCpjA6lR_6CoX61b3_Kf9DB1xk';
   
   let _client = null;
 

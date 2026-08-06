@@ -1041,53 +1041,43 @@ const Inv = {
     if (files.length === 0) return;
     toast('Subiendo imagen(es)...', 'info');
     for (const file of Array.from(files)) {
-      if (typeof window.M9Supabase !== 'undefined' && window.M9Supabase.isConfigured()) {
-        const folderName = state.activeTab || 'equipos';
-        const res = await window.M9Supabase.uploadImage(file, 'images', folderName);
-        if (res.url) {
-          state.editingImages.push(res.url);
-        } else {
-          toast('Error subiendo imagen: ' + res.error, 'error');
-        }
-      } else {
-        const compressedBase64 = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-              const canvas = document.createElement('canvas');
-              const MAX_WIDTH = 1000;
-              const MAX_HEIGHT = 1000;
-              let width = img.width;
-              let height = img.height;
-              
-              if (width > height) {
-                if (width > MAX_WIDTH) {
-                  height *= MAX_WIDTH / width;
-                  width = MAX_WIDTH;
-                }
-              } else {
-                if (height > MAX_HEIGHT) {
-                  width *= MAX_HEIGHT / height;
-                  height = MAX_HEIGHT;
-                }
+      const compressedBase64 = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 1000;
+            const MAX_HEIGHT = 1000;
+            let width = img.width;
+            let height = img.height;
+            
+            if (width > height) {
+              if (width > MAX_WIDTH) {
+                height *= MAX_WIDTH / width;
+                width = MAX_WIDTH;
               }
-              
-              canvas.width = width;
-              canvas.height = height;
-              const ctx = canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, width, height);
-              resolve(canvas.toDataURL('image/jpeg', 0.8));
-            };
-            img.onerror = () => {
-              resolve(e.target.result); // Fallback to original
-            };
-            img.src = e.target.result;
+            } else {
+              if (height > MAX_HEIGHT) {
+                width *= MAX_HEIGHT / height;
+                height = MAX_HEIGHT;
+              }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', 0.8));
           };
-          reader.readAsDataURL(file);
-        });
-        state.editingImages.push(compressedBase64);
-      }
+          img.onerror = () => {
+            resolve(e.target.result); // Fallback to original
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+      state.editingImages.push(compressedBase64);
     }
     this.renderImagePreview();
     toast('Imagen(es) procesada(s)', 'success');

@@ -325,8 +325,10 @@ function initCatalogPage() {
               capacity: capKg,
               height: crmItem.height || (staticMatch ? staticMatch.height : 4.5),
               year: crmItem.year || (staticMatch ? staticMatch.year : 2025),
-              condition: crmItem.condition || (staticMatch ? staticMatch.condition : "Nuevo"),
+              condition: crmItem.hours > 0 ? "Usado" : (crmItem.condition || (staticMatch ? staticMatch.condition : "Nuevo")),
               price: crmItem.price !== undefined ? crmItem.price : (staticMatch ? staticMatch.price : 25000),
+              currency: crmItem.currency || 'USD',
+              discount: crmItem.discount || 0,
               image: crmItem.img ? crmItem.img.replace('../', '').replace(/^\//, '') : (staticMatch ? staticMatch.image : "assets/diesel_forklift.png"),
               description: staticMatch ? staticMatch.description : `Equipo de elevación industrial ${crmItem.brand} ${crmItem.name}.`,
               specs: staticMatch ? staticMatch.specs : {
@@ -1039,7 +1041,7 @@ function initDetailPage() {
 
     const galleryList = (item.images && Array.isArray(item.images) && item.images.length > 0)
       ? item.images
-      : [portadaSrc, "assets/hero_forklift.png", "assets/forklift_parts.png"];
+      : [portadaSrc];
     
     // We only show multiple thumbnails if there is more than 1 image
     if (galleryList.length > 1) {
@@ -1854,9 +1856,11 @@ function initCamionesPage() {
               year: crmItem.year || (staticMatch ? staticMatch.year : 2024),
               condition: crmItem.condition || (staticMatch ? staticMatch.condition : (crmItem.hours > 0 ? "Usado" : "Nuevo")),
               price: crmItem.price !== undefined ? crmItem.price : (staticMatch ? staticMatch.price : 85000),
-              priceLabel: `U$S ${crmItem.price ? crmItem.price.toLocaleString('es-AR') : (staticMatch ? staticMatch.priceLabel : 'Consultar')}`,
+              currency: crmItem.currency || 'USD',
+              discount: crmItem.discount || 0,
+              priceLabel: ``,
               image: crmItem.img ? crmItem.img.replace('../', '').replace(/^\//, '') : (staticMatch ? staticMatch.image : "assets/truck.png"),
-              description: staticMatch ? staticMatch.description : `Unidad de carga pesada ${crmItem.brand} ${crmItem.name}.`,
+              description: staticMatch ? staticMatch.description : `Unidad ${crmItem.brand} ${crmItem.name}.`,
               specs: staticMatch ? staticMatch.specs : {
                 engine: crmItem.motor || "Diesel HD",
                 transmission: "Automatizada HD",

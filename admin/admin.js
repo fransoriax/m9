@@ -614,7 +614,7 @@ const Inv = {
           <td><span class="badge badge--oem">${r.oem}</span></td>
           <td><div class="td-name">${r.name}</div></td>
           <td><span class="badge badge--cat">${r.category||'General'}</span></td>
-          <td><span class="td-price-tag">USD ${r.price.toLocaleString('es-AR')}</span></td>
+          <td><span class="td-price-tag">${r.currency||'USD'} ${r.price.toLocaleString('es-AR')}</span></td>
           <td><div class="td-badges-group">${stockBadge} ${statusBadge}</div></td>
           <td><span class="td-compat-info">${r.compat ? 'Compatibilidad: ' + r.compat : ''}</span></td>
           <td></td>
@@ -645,7 +645,7 @@ const Inv = {
           <td><span class="badge badge--brand">${item.brand}</span></td>
           <td><div class="td-specs-row"><span class="td-spec-chip">Capacidad: ${item.capacity||'—'}</span> <span class="td-spec-chip">Motor: ${item.motor||'—'}</span></div></td>
           <td></td>
-          <td><span class="td-price-tag">USD ${item.price.toLocaleString('es-AR')}</span></td>
+          <td><span class="td-price-tag">${item.currency||'USD'} ${item.price.toLocaleString('es-AR')}</span></td>
           <td><div class="td-badges-group">${statusBadge} ${visBadge}</div></td>
           <td></td>
           <td><div class="td-actions">
@@ -718,16 +718,9 @@ const Inv = {
       $('m-status').value = item.status;
       $('m-visible').checked = item.visible;
       $('m-vis-lbl').textContent = item.visible ? 'Visible en el sitio' : 'Oculto en el sitio';
-      const defaultImgs = state.activeTab === 'camiones'
-        ? [item.img || '/assets/truck.png', '/assets/truck_hero.jpg']
-        : (item.type === 'Apiladora'
-            ? [item.img || '/assets/apilador.png', '/assets/apiladora.jpg']
-            : (item.type === 'Zorra Transpallet'
-                ? [item.img || '/assets/transpallet.jpg', '/assets/forklift_parts.png']
-                : [item.img || '/assets/electric_forklift.png', '/assets/hero_forklift.png', '/assets/forklift_parts.png']));
       state.editingImages = (item.images && Array.isArray(item.images) && item.images.length > 0)
         ? [...item.images]
-        : defaultImgs;
+        : (item.img ? [item.img] : []);
       const currentPortada = item.img || state.editingImages[0];
       const pIdx = state.editingImages.indexOf(currentPortada);
       if (pIdx > 0) {
@@ -776,9 +769,7 @@ const Inv = {
       $('m-vis-lbl').textContent = 'Visible en el sitio';
       $('m-currency').value = 'USD';
       $('m-discount').value = '';
-      state.editingImages = state.activeTab === 'camiones'
-        ? ['/assets/truck.png', '/assets/truck_hero.jpg']
-        : ['/assets/electric_forklift.png', '/assets/hero_forklift.png'];
+      state.editingImages = [];
       state.editingPortadaIndex = 0;
       this.renderImagePreview();
       $('pdf-filename').textContent = 'Ningún archivo seleccionado';

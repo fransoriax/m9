@@ -137,104 +137,17 @@ let state = {
 
 // ─── MOCK DATA & STORAGE ──────────────────────────────────────────────────────
 let DB = {
-  autoelevadores: [
-    { id: 1, name: 'Hangcha XS-20 Eléctrico', brand: 'Hangcha', capacity: '2.000 kg', motor: 'Eléctrico', hours: 1200, price: 18500, status: 'active', visible: true, img: '/assets/electric_forklift.png', type: 'Autoelevador', year: 2025, condition: 'Nuevo' },
-    { id: 2, name: 'HELI CPD15 Eléctrico',     brand: 'HELI',    capacity: '1.500 kg', motor: 'Eléctrico', hours: 850,  price: 14200, status: 'active', visible: true, img: '/assets/apiladora.jpg', type: 'Autoelevador', year: 2025, condition: 'Nuevo' },
-    { id: 3, name: 'Toyota 8FGF15 GLP',         brand: 'Toyota',  capacity: '1.500 kg', motor: 'GLP',       hours: 3400, price: 22000, status: 'active', visible: true, img: '/assets/autoelevador.jpg', type: 'Autoelevador', year: 2024, condition: 'Usado' },
-    { id: 4, name: 'Hangcha CPCD35 Diesel',     brand: 'Hangcha', capacity: '3.500 kg', motor: 'Diesel',    hours: 2100, price: 27500, status: 'active', visible: true, img: '/assets/diesel_forklift.png', type: 'Autoelevador', year: 2025, condition: 'Nuevo' },
-    { id: 5, name: 'Hecha CBD20 Eléctrico',     brand: 'Hecha',   capacity: '2.000 kg', motor: 'Eléctrico', hours: 600,  price: 12800, status: 'paused', visible: false, img: '/assets/apilador.png', type: 'Apiladora', year: 2024, condition: 'Usado' },
-    { id: 6, name: 'Toyota 8FG25',              brand: 'Toyota',  capacity: '2.500 kg', motor: 'Nafta/GNC', hours: 0,    price: 28500, status: 'active', visible: true, img: '/assets/diesel_forklift.png', type: 'Autoelevador', year: 2026, condition: 'Nuevo' },
-    { id: 7, name: 'Hecha HQ25D',               brand: 'Hecha',   capacity: '2.500 kg', motor: 'Diesel',    hours: 0,    price: 24500, status: 'active', visible: true, img: '/assets/diesel_forklift.png', type: 'Autoelevador', year: 2025, condition: 'Nuevo' },
-    { id: 8, name: 'Toyota 7FBE18',             brand: 'Toyota',  capacity: '1.800 kg', motor: 'Eléctrico', hours: 1500, price: 19500, status: 'active', visible: true, img: '/assets/electric_forklift.png', type: 'Autoelevador', year: 2023, condition: 'Usado' },
-    { id: 9, name: 'Toyota SWE120',             brand: 'Toyota',  capacity: '1.200 kg', motor: 'Eléctrico', hours: 0,    price: 14800, status: 'active', visible: true, img: '/assets/apilador.png', type: 'Apiladora', year: 2025, condition: 'Nuevo' },
-    { id: 10, name: 'Hecha HE20S',              brand: 'Hecha',   capacity: '2.000 kg', motor: 'Eléctrico', hours: 850,  price: 11500, status: 'active', visible: true, img: '/assets/apilador.png', type: 'Apiladora', year: 2024, condition: 'Usado' },
-    { id: 11, name: 'Toyota LWE200',            brand: 'Toyota',  capacity: '2.000 kg', motor: 'Eléctrico', hours: 0,    price: 6800,  status: 'active', visible: true, img: '/assets/transpallet.jpg', type: 'Zorra Transpallet', year: 2026, condition: 'Nuevo' },
-    { id: 12, name: 'Hecha HPT30',              brand: 'Hecha',   capacity: '3.000 kg', motor: 'Manual',    hours: 0,    price: 850,   status: 'active', visible: true, img: '/assets/transpallet.jpg', type: 'Zorra Transpallet', year: 2025, condition: 'Nuevo' },
-    { id: 13, name: 'Toyota LWE160',            brand: 'Toyota',  capacity: '1.600 kg', motor: 'Eléctrico', hours: 1200, price: 4200,  status: 'active', visible: true, img: '/assets/transpallet.jpg', type: 'Zorra Transpallet', year: 2022, condition: 'Usado' }
-  ],
-  repuestos: [
-    { id: 1, oem: 'OEM-BAT-48500', name: 'Batería 48V 500Ah',   category: 'Eléctrico',  stock: 12, price: 1850, status: 'active', compat: 'Hangcha XS-20, HELI CPD15', img: '/assets/bateria_electrica.jpg' },
-    { id: 2, oem: 'OEM-FIL-HID',  name: 'Filtro Hidráulico',    category: 'Hidráulico', stock: 45, price: 85,   status: 'active', compat: 'Universal',                   img: '/assets/forklift_parts.png' },
-    { id: 3, oem: 'OEM-PAF-T15',  name: 'Pastillas de Freno',   category: 'Frenos',     stock: 8,  price: 120,  status: 'active', compat: 'Toyota 8FGF15, HELI CPD15',   img: '/assets/forklift_parts.png' },
-    { id: 4, oem: 'OEM-BOM-H20',  name: 'Bomba Hidráulica',     category: 'Hidráulico', stock: 3,  price: 2200, status: 'active', compat: 'Hangcha XS-20, Hangcha CPCD35', img: '/assets/bomba_hidraulica.jpg' },
-    { id: 5, oem: 'OEM-CAR-4880', name: 'Cargador 48V 80A',     category: 'Eléctrico',  stock: 6,  price: 780,  status: 'active', compat: 'Universal eléctrico',         img: '/assets/bateria_electrica.jpg' },
-    { id: 6, oem: 'OEM-MAS-T3M',  name: 'Mástil Telescópico 3m',category: 'Estructura', stock: 0,  price: 4500, status: 'paused', compat: 'Hangcha XS-20',                 img: '/assets/forklift_parts.png' },
-    { id: 7, oem: "HYD-4022", name: "Bomba Hidráulica de Engranajes", category: "Hidráulico", stock: 15, price: 2200, status: "active", compat: "Toyota 8FG25", img: "/assets/bomba_hidraulica.jpg" },
-    { id: 8, oem: "HYD-4050", name: "Válvula de Control Multipista", category: "Hidráulico", stock: 8, price: 1450, status: "active", compat: "Hangcha XS-20", img: "/assets/bomba_hidraulica.jpg" },
-    { id: 9, oem: "HYD-5011", name: "Juego de Sellos Cilindro Elevación", category: "Hidráulico", stock: 2, price: 280, status: "active", compat: "HELI CPD15", img: "/assets/bomba_hidraulica.jpg" },
-    { id: 10, oem: "HYD-1022", name: "Filtro de Aceite Hidráulico OEM-FIL-HID", category: "Hidráulico", stock: 45, price: 85, status: "active", compat: "Toyota 7FBE18", img: "/assets/forklift_parts.png" },
-    { id: 11, oem: "CAR-4Y01", name: "Carburador Industrial Toyota 4Y", category: "Motor", stock: 10, price: 680, status: "active", compat: "Toyota 8FG25", img: "/assets/carburador_motor.jpg" },
-    { id: 12, oem: "CAR-K250", name: "Carburador Industrial Nissan K25", category: "Motor", stock: 10, price: 720, status: "active", compat: "Hangcha CPCD35", img: "/assets/carburador_motor.jpg" },
-    { id: 13, oem: "ENG-8012", name: "Filtro de Combustible Diésel", category: "Motor", stock: 25, price: 95, status: "active", compat: "Hangcha CPCD35", img: "/assets/carburador_motor.jpg" },
-    { id: 14, oem: "ENG-9033", name: "Alternador de Motor 12V 80A", category: "Motor", stock: 3, price: 420, status: "active", compat: "Hecha HQ25D", img: "/assets/carburador_motor.jpg" },
-    { id: 15, oem: "TRN-2015", name: "Disco de Fricción Transmisión Powershift", category: "Motor", stock: 12, price: 310, status: "active", compat: "Toyota 8FG25", img: "/assets/carburador_motor.jpg" },
-    { id: 16, oem: "NEU-7001", name: "Neumático Macizo Súper Elástico 7.00-12", category: "Neumáticos", stock: 20, price: 350, status: "active", compat: "Toyota 8FG25", img: "/assets/neumaticos_ruedas.jpg" },
-    { id: 17, oem: "NEU-6009", name: "Rueda Directriz de Poliuretano 200x50", category: "Neumáticos", stock: 30, price: 180, status: "active", compat: "Toyota SWE120", img: "/assets/neumaticos_ruedas.jpg" },
-    { id: 18, oem: "NEU-5002", name: "Llantas de Acero Dividida 5.00F-10", category: "Neumáticos", stock: 14, price: 290, status: "active", compat: "HELI CPD15", img: "/assets/neumaticos_ruedas.jpg" },
-    { id: 19, oem: "ELE-1090", name: "Controlador de Motor AC Zapi Dual", category: "Eléctrico", stock: 2, price: 2400, status: "active", compat: "Hangcha XS-20", img: "/assets/bateria_electrica.jpg" },
-    { id: 20, oem: "ELE-4850", name: "Batería Industrial de Tracción 48V 500Ah", category: "Eléctrico", stock: 5, price: 1850, status: "active", compat: "Hangcha XS-20", img: "/assets/bateria_electrica.jpg" },
-    { id: 21, oem: "ELE-3012", name: "Faro de Seguridad LED Blue Spot", category: "Eléctrico", stock: 50, price: 140, status: "active", compat: "HELI CPD15", img: "/assets/bateria_electrica.jpg" },
-    { id: 22, oem: "MST-5020", name: "Rodamiento de Mástil Telescópico 3m", category: "Estructura", stock: 18, price: 210, status: "active", compat: "Toyota 8FG25", img: "/assets/forklift_parts.png" },
-    { id: 23, oem: "MST-9102", name: "Cadena de Elevación Flar (BL634)", category: "Estructura", stock: 3, price: 460, status: "active", compat: "Hangcha CPCD35", img: "/assets/forklift_parts.png" }
-  ],
-  camiones: [
-    { id: 1, name: 'Mercedes-Benz Actros 2651 LS 6x4', brand: 'Mercedes Benz', capacity: '26 Tn', motor: 'Diesel 510 CV', hours: 0, price: 115000, status: 'active', visible: true, img: '/assets/truck.png' },
-    { id: 2, name: 'Volvo FH 460 Globetrotter 6x2T', brand: 'Volvo', capacity: '24 Tn', motor: 'Diesel 460 CV', hours: 185000, price: 98000, status: 'active', visible: true, img: '/assets/truck.png' },
-    { id: 3, name: 'Scania R450 Streamline Highline 6x2', brand: 'Scania', capacity: '22 Tn', motor: 'Diesel 450 CV', hours: 210000, price: 92000, status: 'active', visible: true, img: '/assets/truck.png' },
-    { id: 4, name: 'IVECO Stralis Hi-Way 440 4x2', brand: 'IVECO', capacity: '20 Tn', motor: 'Diesel 440 CV', hours: 0, price: 86000, status: 'active', visible: true, img: '/assets/truck.png' },
-    { id: 5, name: 'Ford Cargo 2042 4x2T Extra Pesado', brand: 'Ford', capacity: '20 Tn', motor: 'Diesel 420 CV', hours: 290000, price: 74000, status: 'active', visible: true, img: '/assets/truck.png' },
-    { id: 6, name: 'Volkswagen Constellation 31.330 6x4', brand: 'Volkswagen', capacity: '31 Tn', motor: 'Diesel 330 CV', hours: 0, price: 108000, status: 'active', visible: true, img: '/assets/truck.png' }
-  ],
+  autoelevadores: [],
+  repuestos: [],
+  camiones: [],
   leads: {
-    nuevas: [
-      { id: 'L001', client: 'Juan García', phone: '+54 9 11 5678-1234', product: 'Autoelevador Eléctrico 2T', date: '2026-07-23', urgency: 'alta', notes: [] },
-      { id: 'L002', client: 'Logística del Sur SRL', phone: '+54 9 11 8765-4321', product: '5 unidades Hangcha XS-20', date: '2026-07-22', urgency: 'alta', notes: [] },
-    ],
-    cotizacion: [
-      { id: 'L003', client: 'Carlos Mendoza', phone: '+54 9 11 5555-4444', product: 'Filtro hidráulico OEM-FIL-HID x10', date: '2026-07-21', urgency: 'media', notes: ['Cliente pidió precio final el viernes'] },
-    ],
-    enviado: [
-      { id: 'L004', client: 'Frigorífico Norte SA', phone: '+54 9 11 7777-8888', product: 'Hangcha CPCD35 Diesel 3.5T', date: '2026-07-19', urgency: 'media', notes: ['Presupuesto enviado por mail el 19/07'] },
-    ],
-    ganado: [
-      { id: 'L005', client: 'Distribuidora Pérez', phone: '+54 9 11 9999-0000', product: '2× HELI CPD15 Eléctrico', date: '2026-07-15', urgency: 'normal', notes: ['¡Cerrado! Entrega programada para 30/07'] },
-    ],
+    nuevas: [],
+    cotizacion: [],
+    enviado: [],
+    ganado: []
   },
-  units: [
-    {
-      id: 'U001', model: 'Hangcha XS-20 Eléctrico', serial: 'HC-2024-001', chassis: 'CHX20240001',
-      client: 'Logística del Sur SRL', saleDate: '2024-03-15', warrantyExpiry: '2025-03-15',
-      img: '/assets/electric_forklift.png',
-      services: [
-        { id: 'S1', date: '2024-06-01', hours: 500,  type: 'Cambio de aceite y filtros',  parts: 'Filtro OEM-FIL-HID, Aceite 10W40 5L', notes: 'Equipo en perfecto estado. Se realizó el primer service de 500hs sin novedades.', tech: 'Ramiro Blanco' },
-        { id: 'S2', date: '2024-09-15', hours: 1000, type: 'Service general',               parts: 'Filtro OEM-FIL-HID, Pastillas OEM-PAF-T15, Aceite 10W40 5L', notes: 'Se reemplazaron pastillas de freno por desgaste. Todo lo demás OK. Próximo service: 1500hs.', tech: 'Pablo Ríos' },
-      ]
-    },
-    {
-      id: 'U002', model: 'HELI CPD15 Eléctrico', serial: 'HE-2023-087', chassis: 'HLC20230087',
-      client: 'Frigorífico Norte SA', saleDate: '2023-11-10', warrantyExpiry: '2024-11-10',
-      img: '/assets/apiladora.jpg',
-      services: [
-        { id: 'S3', date: '2024-02-15', hours: 300, type: 'Ajuste de frenos', parts: 'Pastillas OEM-PAF-T15', notes: 'Cliente reportó frenado con vibración. Se ajustaron pastillas traseras. Solución aplicada con éxito.', tech: 'Ramiro Blanco' },
-        { id: 'S4', date: '2024-05-20', hours: 600, type: 'Cambio de batería', parts: 'Batería OEM-BAT-48500, Cargador OEM-CAR-4880', notes: 'Batería original con capacidad reducida al 60%. Se reemplazó por unidad nueva. Rendimiento óptimo restaurado.', tech: 'Pablo Ríos' },
-      ]
-    },
-    {
-      id: 'U003', model: 'Toyota 8FGF15 GLP', serial: 'TY-2024-022', chassis: 'TOY20240022',
-      client: 'Distribuidora Pérez', saleDate: '2024-05-20', warrantyExpiry: '2025-05-20',
-      img: '/assets/autoelevador.jpg',
-      services: [
-        { id: 'S5', date: '2024-09-10', hours: 200, type: 'Mantenimiento preventivo', parts: 'Filtro OEM-FIL-HID, Aceite 10W40 3L', notes: 'Primera revisión preventiva. Equipo en excelentes condiciones. Sin observaciones.', tech: 'Matías Sosa' },
-      ]
-    },
-  ],
-  reviews: [
-    { id: 'R001', author: 'Carlos Mendoza', stars: 5, date: 'hace 2 meses', text: 'Excelente atención y servicio. Compramos un autoelevador Toyota y quedamos muy conformes con la calidad del equipo y el asesoramiento del equipo de ventas. Muy profesionales.', visible: true },
-    { id: 'R002', author: 'Logística del Sur SRL', stars: 5, date: 'hace 4 meses', text: 'Adquirimos 3 unidades Hangcha para nuestro depósito. El servicio postventa es impecable, responden rápido y los repuestos son originales. Los recomendamos sin dudas.', visible: true },
-    { id: 'R003', author: 'María González', stars: 5, date: 'hace 1 mes', text: 'Muy buena experiencia. El equipo de trabajo es muy atento y nos asesoraron perfectamente para elegir el apilador eléctrico que necesitábamos. Entrega en tiempo y forma.', visible: true },
-    { id: 'R004', author: 'Distribuidora Norte SA', stars: 4, date: 'hace 6 meses', text: 'Buen servicio técnico y atención al cliente. Los repuestos OEM llegan rápido y a buen precio. Seguimos eligiéndolos para el mantenimiento de toda nuestra flota.', visible: true },
-    { id: 'R005', author: 'Ricardo Flores', stars: 5, date: 'hace 3 semanas', text: 'Compramos un autoelevador diesel de segunda mano en excelente estado. Precio justo, documentación en orden y garantía real. Muy recomendable para empresas que buscan calidad.', visible: true },
-  ],
+  units: [],
+  reviews: [],
   accounts: [
     {
       id: 'acc-1',
@@ -244,50 +157,9 @@ let DB = {
       role: 'Superadmin CRM',
       isSuperAdmin: true,
       modules: ['inventario', 'cotizaciones', 'presupuestos', 'postventa', 'resenas', 'reportes', 'cuentas']
-    },
-    {
-      id: 'acc-2',
-      user: 'vendedor',
-      pass: 'vendedor123',
-      name: 'Carlos Mendoza',
-      role: 'Ejecutivo de Ventas',
-      isSuperAdmin: false,
-      modules: ['inventario', 'cotizaciones', 'presupuestos']
-    },
-    {
-      id: 'acc-3',
-      user: 'tecnico',
-      pass: 'tecnico123',
-      name: 'Ramiro Blanco',
-      role: 'Técnico de Servicio',
-      isSuperAdmin: false,
-      modules: ['postventa']
     }
   ],
-  quotes: [
-    {
-      id: 'Q001', number: 'PRE-2026-001', client: 'Logística del Sur SRL', company: 'Logística del Sur SRL',
-      phone: '+54 9 11 8765-4321', email: 'compras@logisticadelsur.com', cuit: '30-71234567-9',
-      date: '2026-07-20', validUntil: '2026-08-20', status: 'enviado',
-      items: [
-        { desc: 'Hangcha XS-20 Eléctrico 2T', qty: 2, unit: 'unidad', price: 18500 },
-        { desc: 'Batería 48V 500Ah OEM-BAT-48500', qty: 2, unit: 'unidad', price: 1850 }
-      ],
-      conditions: 'Precio en USD. Entrega en 15 días hábiles. Garantía 12 meses.',
-      notes: 'Cliente interesado en financiación en cuotas.'
-    },
-    {
-      id: 'Q002', number: 'PRE-2026-002', client: 'Carlos Mendoza', company: 'Frigorífico Norte SA',
-      phone: '+54 9 11 5555-4444', email: 'carlos@fnorte.com', cuit: '20-28765432-5',
-      date: '2026-07-25', validUntil: '2026-08-25', status: 'borrador',
-      items: [
-        { desc: 'Filtro Hidráulico OEM-FIL-HID', qty: 10, unit: 'unidad', price: 85 },
-        { desc: 'Aceite Hidráulico 20L', qty: 5, unit: 'bidón', price: 120 }
-      ],
-      conditions: 'Precio en USD. Stock disponible inmediato.',
-      notes: ''
-    }
-  ],
+  quotes: []
 };
 
 function loadDatabase() {

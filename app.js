@@ -1075,6 +1075,11 @@ function setupGlobalModals() {
         source: 'Formulario Web'
       });
       localStorage.setItem('m9-inventory-db', JSON.stringify(db));
+      if (window.M9Supabase && window.M9Supabase.isConfigured()) {
+        window.M9Supabase.syncAllToSupabase(db, db.leads || null).catch(err => {
+          console.error("Error syncing lead to Supabase:", err);
+        });
+      }
     } catch (err) {
       console.error("Error saving lead:", err);
     }

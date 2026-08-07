@@ -1217,14 +1217,18 @@ const K = {
     const hasEmail = l.email && l.email !== "No provisto" && l.email.includes('@');
     const mailUrl = hasEmail ? `mailto:${l.email}?subject=Consulta%20-%20Maquinarias%209%20de%20Abril` : '#';
     
-    const emailBtnHtml = hasEmail ? `<a class="kcard-wa" style="background-color:#007BFF; margin-right: 0.4rem;" href="${mailUrl}" target="_blank" rel="noopener noreferrer" ontouchstart="event.stopPropagation()">
+    const emailBtnHtml = hasEmail ? `<a class="kcard-wa" style="background-color:#007BFF; color:white; margin-right: 0.4rem;" href="${mailUrl}" target="_blank" rel="noopener noreferrer" ontouchstart="event.stopPropagation()">
           <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="margin-right:4px"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
           Email
         </a>` : '';
 
+    const urgency = l.urgency || 'normal';
+    const productStr = l.product || l.unit || 'Sin equipo';
+    const dateStr = l.date || l.created_at || l.createdAt || new Date().toISOString();
+
     return `<div class="kcard" data-id="${l.id}">
       <div class="kcard-top-bar">
-        <span class="kcard-urgency kcard-urgency--${l.urgency}">${urgLabel[l.urgency]||l.urgency}</span>
+        <span class="kcard-urgency kcard-urgency--${urgency}">${urgLabel[urgency]||urgency}</span>
         <div class="kcard-actions-row">
           <span class="kcard-drag-handle" draggable="true" title="Arrastrar para mover">⋮⋮</span>
           <button class="kcard-btn-move" onclick="K.openMoveMenu(event, '${l.id}')" ontouchstart="event.stopPropagation()" title="Mover etapa">
@@ -1237,9 +1241,9 @@ const K = {
         </div>
       </div>
       <div class="kcard-name">${l.client}</div>
-      <div class="kcard-product">${l.product}</div>
+      <div class="kcard-product">${productStr}</div>
       <div class="kcard-meta">
-        <span class="kcard-date">${daysFrom(l.date)}</span>
+        <span class="kcard-date">${daysFrom(dateStr)}</span>
         <div style="display:flex;">
         ${emailBtnHtml}
         <a class="kcard-wa" href="${waUrl}" target="_blank" rel="noopener noreferrer" ontouchstart="event.stopPropagation()">

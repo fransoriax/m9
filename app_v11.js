@@ -629,6 +629,29 @@ function initPartsPage() {
     sortSelect.addEventListener("change", applyPartsFilter);
   }
 
+  // Category visual cards click handler
+  document.querySelectorAll(".part-cat-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const catKey = card.dataset.catKey;
+      activeCategory = catKey; // default fallback
+      
+      if (categoriesList) {
+        categoriesList.querySelectorAll("a").forEach(lnk => {
+          lnk.classList.remove("active");
+          const normalizedCat = lnk.dataset.cat.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+          if (normalizedCat === catKey) {
+            lnk.classList.add("active");
+            activeCategory = lnk.dataset.cat; // Use exact DB string
+          }
+        });
+      }
+      
+      applyPartsFilter();
+      const layout = document.querySelector(".ecommerce-layout");
+      if (layout) layout.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
   // Formatting helpers
   function formatCategoryName(cat) {
     const names = {

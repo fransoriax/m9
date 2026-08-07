@@ -973,6 +973,7 @@ function initDetailPage() {
   // Main gallery image (Portada)
   let portadaSrc = "";
   try {
+    const mainImg = document.getElementById("gallery-main-img");
     portadaSrc = item.image || item.img || (item.images && item.images[0]) || "";
     if (mainImg && typeof portadaSrc === 'string' && portadaSrc.length > 0) {
       mainImg.src = portadaSrc;

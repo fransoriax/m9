@@ -845,7 +845,7 @@ function initDetailPage() {
           }
         }
         
-        const finalImg = found.img ? found.img.replace('../', '').replace(/^\//, '') : (parsedImages[0] || '');
+        const finalImg = found.img ? found.img : (parsedImages[0] || '');
         if (item) {
           item = {
             ...item,
@@ -855,7 +855,7 @@ function initDetailPage() {
             condition: found.condition || item.condition,
             year: found.year || item.year,
             image: finalImg || item.image,
-            images: parsedImages.length > 0 ? parsedImages.map(u => typeof u === 'string' ? u.replace('../', '').replace(/^\//, '') : u) : item.images
+            images: parsedImages.length > 0 ? parsedImages : item.images
           };
         } else {
           item = {
@@ -868,7 +868,7 @@ function initDetailPage() {
             year: found.year || 2025,
             condition: found.condition || (found.hours > 0 ? 'Usado' : 'Nuevo'),
             image: finalImg,
-            images: parsedImages.map(u => typeof u === 'string' ? u.replace('../', '').replace(/^\//, '') : u),
+            images: parsedImages,
             description: `Unidad industrial ${found.brand} ${found.name}.`,
             specs: {
               engine: found.motor || 'Convencional',

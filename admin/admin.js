@@ -2275,30 +2275,46 @@ const Reports = {
   },
 
   renderMetrics() {
-    // Stock value
-    const stockVal = [
-      ...DB.autoelevadores.filter(x => x.status === 'active'),
-      ...DB.camiones.filter(x => x.status === 'active'),
-    ].reduce((s, x) => s + x.price, 0);
-    const partsVal = DB.repuestos.reduce((s, x) => s + (x.price * x.stock), 0);
-    const totalVal = stockVal + partsVal;
+    let totalUsd = 0;
+    let totalArs = 0;
 
-    // Active equipment
-    const activeEquip = DB.autoelevadores.filter(x => x.status === 'active').length +
-                        DB.camiones.filter(x => x.status === 'active').length;
+    // Stock value from active equipment
+    const activeEquipArr = [
+      ...(DB.autoelevadores || []).filter(x => x.status === 'active'),
+      ...(DB.camiones || []).filter(x => x.status === 'active')
+    ];
+    
+    activeEquipArr.forEach(x => {
+      if ((x.currency || 'USD') === 'ARS') totalArs += x.price || 0;
+      else totalUsd += x.price || 0;
+    });
+
+    // Stock value from parts
+    (DB.repuestos || []).forEach(x => {
+      const p = (x.price || 0) * (x.stock || 0);
+      if ((x.currency || 'USD') === 'ARS') totalArs += p;
+      else totalUsd += p;
+    });
+
+    let stockStr = [];
+    if (totalUsd > 0 || totalArs === 0) stockStr.push(`USD ${totalUsd.toLocaleString('es-AR')}`);
+    if (totalArs > 0) stockStr.push(`ARS ${totalArs.toLocaleString('es-AR')}`);
+
+    // Active equipment count
+    const activeEquipCount = activeEquipArr.length;
 
     // Active leads (all non-ganado/perdido columns)
-    const allLeads = Object.values(DB.leads).flat();
+    const allLeads = Object.values(DB.leads || {}).flat();
     const activeLeads = allLeads.filter(l => l).length;
-    const wonLeads = (DB.leads.ganado || []).length;
+    const wonLeads = ((DB.leads && DB.leads.ganado) || []).length;
 
     // Quotes
     const totalQuotes = (DB.quotes || []).length;
     const sentQuotes = (DB.quotes || []).filter(q => q.status === 'enviado').length;
 
     const set = (id, val) => { const el = $(id); if (el) el.textContent = val; };
-    set('rpt-stock-val', `USD ${totalVal.toLocaleString('es-AR')}`);
-    set('rpt-active-equip', activeEquip);
+    set('rpt-stock-val', stockStr.join(' + '));
+    set('rpt-active-equip', activeEquipCount);
     set('rpt-active-leads', activeLeads);
     set('rpt-won-leads', wonLeads);
     set('rpt-total-quotes', totalQuotes);

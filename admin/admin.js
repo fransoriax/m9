@@ -1163,7 +1163,7 @@ const K = {
     }
     let currentCol = null;
     for (const [colKey, arr] of Object.entries(DB.leads)) {
-      if (arr.some(x => x.id === id)) { currentCol = colKey; break; }
+      if (arr.some(x => String(x.id) === String(id))) { currentCol = colKey; break; }
     }
     if (!currentCol) return;
 
@@ -1208,7 +1208,7 @@ const K = {
   },
   moveLeadTo(id, fromCol, targetCol) {
     if (!id || fromCol === targetCol) return;
-    const leadIdx = DB.leads[fromCol].findIndex(l => l.id === id);
+    const leadIdx = DB.leads[fromCol].findIndex(l => String(l.id) === String(id));
     if (leadIdx === -1) return;
     const [lead] = DB.leads[fromCol].splice(leadIdx, 1);
     DB.leads[targetCol].push(lead);
@@ -1291,7 +1291,7 @@ const K = {
     this.draggingFrom = null;
 
     if (!dragId || dragFrom === targetCol || !dragFrom) return;
-    const leadIdx = DB.leads[dragFrom].findIndex(l => l.id === dragId);
+    const leadIdx = DB.leads[dragFrom].findIndex(l => String(l.id) === String(dragId));
     if (leadIdx === -1) return;
     const [lead] = DB.leads[dragFrom].splice(leadIdx, 1);
     DB.leads[targetCol].push(lead);
@@ -1300,8 +1300,8 @@ const K = {
   },
   findLead(id) {
     for (const col of Object.values(DB.leads)) {
-      const l = col.find(x => x.id === id);
-      if (l) return l;
+      const f = col.find(x => String(x.id) === String(id));
+      if (f) return f;
     }
     return null;
   },

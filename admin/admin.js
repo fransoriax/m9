@@ -650,7 +650,7 @@ const Inv = {
           ? `<img class="td-thumb" src="${r.img}" alt="${r.name}" loading="lazy">`
           : `<div class="td-thumb-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
         const discountHtml = (r.discount > 0) ? `<span style="color:#ffaa00; font-size:0.75rem; font-weight:700; margin-left:6px; background:rgba(255,170,0,0.15); padding:2px 5px; border-radius:4px;">-${r.discount}%</span>` : '';
-        const isSelected = (state.selectedItems && state.selectedItems.has(r.id)) ? 'checked' : '';
+        const isSelected = (state.selectedItems && state.selectedItems.has(String(r.id))) ? 'checked' : '';
         return `<tr>
           <td><input type="checkbox" class="inv-row-cb" value="${r.id}" ${isSelected} onchange="Inv.toggleSelect(${r.id}, event.target.checked)"></td>
           <td>${thumb}</td>
@@ -682,7 +682,7 @@ const Inv = {
         const thumb = item.img
           ? `<img class="td-thumb" src="${item.img}" alt="${item.name}" loading="lazy">`
           : `<div class="td-thumb-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
-        const isSelected = (state.selectedItems && state.selectedItems.has(item.id)) ? 'checked' : '';
+        const isSelected = (state.selectedItems && state.selectedItems.has(String(item.id))) ? 'checked' : '';
         return `<tr>
           <td><input type="checkbox" class="inv-row-cb" value="${item.id}" ${isSelected} onchange="Inv.toggleSelect(${item.id}, event.target.checked)"></td>
           <td>${thumb}</td>

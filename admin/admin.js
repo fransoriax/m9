@@ -791,18 +791,19 @@ const Inv = {
     if (checked) {
       const items = this.filteredItems();
       const pageItems = items.slice((this.currentPage - 1) * this.PER_PAGE, this.currentPage * this.PER_PAGE);
-      pageItems.forEach(i => state.selectedItems.add(i.id));
+      pageItems.forEach(i => state.selectedItems.add(String(i.id)));
     }
     this.render();
   },
   toggleSelect(id, checked) {
     if (!state.selectedItems) state.selectedItems = new Set();
-    if (checked) state.selectedItems.add(id);
-    else state.selectedItems.delete(id);
+    const strId = String(id);
+    if (checked) state.selectedItems.add(strId);
+    else state.selectedItems.delete(strId);
     this.updateDeleteBtn();
     const items = this.filteredItems();
     const pageItems = items.slice((this.currentPage - 1) * this.PER_PAGE, this.currentPage * this.PER_PAGE);
-    const allChecked = pageItems.length > 0 && pageItems.every(i => state.selectedItems.has(i.id));
+    const allChecked = pageItems.length > 0 && pageItems.every(i => state.selectedItems.has(String(i.id)));
     const cbAll = $('inv-select-all');
     if (cbAll) cbAll.checked = allChecked;
   },
@@ -826,20 +827,34 @@ const Inv = {
   },
   async doDelete() {
     const { deletingId: id, deletingType: type } = state;
+    const tab = state.activeTab;
+    
+    const deleteFromSupabase = async (itemId) => {
+      if (typeof window.M9Supabase !== 'undefined' && window.M9Supabase.isConfigured()) {
+        try {
+          await window.M9Supabase.deleteRow(tab, itemId);
+        } catch(e) { console.error('Error supabase delete', e); }
+      }
+    };
+
     if (id === 'multiple') {
       const idsToDelete = Array.from(state.selectedItems);
-      const tab = state.activeTab;
-      DB[tab] = DB[tab].filter(x => !state.selectedItems.has(x.id));
+      DB[tab] = DB[tab].filter(x => !state.selectedItems.has(String(x.id)));
       state.selectedItems.clear();
       toast(`${idsToDelete.length} registros eliminados`, 'success');
+      
+      idsToDelete.forEach(itemId => deleteFromSupabase(itemId));
     } else {
       if (type === 'rep') {
-        DB.repuestos = DB.repuestos.filter(x => x.id !== id);
+        DB.repuestos = DB.repuestos.filter(x => String(x.id) !== String(id));
       } else {
-        DB[state.activeTab] = DB[state.activeTab].filter(x => x.id !== id);
+        DB[state.activeTab] = DB[state.activeTab].filter(x => String(x.id) !== String(id));
       }
       toast('Registro eliminado correctamente', 'success');
+      
+      deleteFromSupabase(id);
     }
+    
     Modal.close('modal-delete');
     this.publish();
     this.render();

@@ -703,13 +703,19 @@
           </div>
           <div class="mf-group">
             <label class="mf-label">Marca *</label>
-            <select class="mf-input" id="m-brand">
-              <option value="">Seleccionar marca</option>
-              <option>Hangcha</option><option>HELI</option><option>Toyota</option>
-              <option>Crown</option><option>Hecha</option><option>Linde</option>
-              <option>Jungheinrich</option><option>Mercedes Benz</option>
-              <option>Volvo</option><option>Scania</option>
-            </select>
+            <input type="text" class="mf-input" id="m-brand" placeholder="Escribir o seleccionar marca..." list="brand-list">
+            <datalist id="brand-list">
+              <option value="Hangcha">
+              <option value="HELI">
+              <option value="Toyota">
+              <option value="Crown">
+              <option value="Hecha">
+              <option value="Linde">
+              <option value="Jungheinrich">
+              <option value="Mercedes Benz">
+              <option value="Volvo">
+              <option value="Scania">
+            </datalist>
           </div>
           <div class="mf-group">
             <label class="mf-label">Capacidad de Carga</label>

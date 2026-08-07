@@ -971,48 +971,13 @@ function initDetailPage() {
   }
 
   // Main gallery image (Portada)
-  let portadaSrc = "";
-  try {
-    const mainImg = document.getElementById("gallery-main-img");
-    portadaSrc = item.image || item.img || (item.images && item.images[0]) || "";
-    if (mainImg && typeof portadaSrc === 'string' && portadaSrc.length > 0) {
-      mainImg.src = portadaSrc;
-    } else if (mainImg) {
-      mainImg.style.display = 'none';
-    }
-  } catch(e) {
-    console.error(e);
+  const mainImg = document.getElementById("gallery-main-img");
+  const portadaSrc = item.image || item.img || (item.images && item.images[0]) || "";
+  if (mainImg && typeof portadaSrc === 'string' && portadaSrc.length > 0) {
+    mainImg.src = portadaSrc;
+  } else if (mainImg) {
+    mainImg.style.display = 'none';
   }
-
-  // --- DEBUG BOX ---
-  try {
-    const debugBox = document.createElement("div");
-    debugBox.style.position = "fixed";
-    debugBox.style.bottom = "10px";
-    debugBox.style.right = "10px";
-    debugBox.style.background = "rgba(0,0,0,0.9)";
-    debugBox.style.color = "lime";
-    debugBox.style.padding = "15px";
-    debugBox.style.zIndex = "999999";
-    debugBox.style.fontSize = "14px";
-    debugBox.style.maxWidth = "400px";
-    debugBox.style.wordBreak = "break-all";
-    
-    let dbgStr = "<b>DEBUG:</b><br>";
-    dbgStr += "finalImg len: " + (item.image ? item.image.length : 0) + "<br>";
-    dbgStr += "images isArr: " + Array.isArray(item.images) + "<br>";
-    if (Array.isArray(item.images) && item.images.length > 0) {
-      dbgStr += "img0 len: " + (item.images[0] ? item.images[0].length : 0) + "<br>";
-      if (typeof item.images[0] === 'string') {
-        dbgStr += "img0 start: " + item.images[0].substring(0, 30) + "<br>";
-      }
-    }
-    debugBox.innerHTML = dbgStr;
-    document.body.appendChild(debugBox);
-  } catch(e) {
-    alert("Error creating debug box: " + e.message);
-  }
-  // -----------------
 
 
   // Gallery thumbnails switcher

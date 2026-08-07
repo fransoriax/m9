@@ -416,7 +416,7 @@ function initCatalogPage() {
             </div>
           </div>
           <div class="product-card-actions">
-            <a href="detalle.html?id=${fork.id}" class="btn btn-secondary">Ver Detalle</a>
+            <a href="detalle.html?id=${fork.id}&cb=${Date.now()}" class="btn btn-secondary">Ver Detalle</a>
             <button class="btn btn-primary open-quote-modal" data-product="${fork.name}">Cotizar</button>
           </div>
         </div>
@@ -1984,7 +1984,7 @@ function initCamionesPage() {
               <span class="product-price" style="font-size:1.05rem; font-weight:800; color:var(--text-primary);">${formatPriceHTML(truck)}</span>
             </div>
             <div style="display:flex; gap:0.4rem;">
-              <a href="detalle.html?id=${truck.id}" class="btn btn-secondary btn-sm" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">Ver Detalle</a>
+              <a href="detalle.html?id=${truck.id}&cb=${Date.now()}" class="btn btn-secondary btn-sm" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">Ver Detalle</a>
               <button class="btn btn-primary btn-sm open-quote-modal" data-product="Camión: ${truck.name} (${truck.power})" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">
                 Cotizar
               </button>

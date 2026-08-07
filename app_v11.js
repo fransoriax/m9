@@ -971,32 +971,46 @@ function initDetailPage() {
   }
 
   // Main gallery image (Portada)
-  const portadaSrc = item.image || item.img || (item.images && item.images[0]) || "";
-  if (mainImg && portadaSrc) mainImg.src = portadaSrc;
-  else if (mainImg) mainImg.style.display = 'none';
+  let portadaSrc = "";
+  try {
+    portadaSrc = item.image || item.img || (item.images && item.images[0]) || "";
+    if (mainImg && typeof portadaSrc === 'string' && portadaSrc.length > 0) {
+      mainImg.src = portadaSrc;
+    } else if (mainImg) {
+      mainImg.style.display = 'none';
+    }
+  } catch(e) {
+    console.error(e);
+  }
 
   // --- DEBUG BOX ---
-  const debugBox = document.createElement("div");
-  debugBox.style.position = "fixed";
-  debugBox.style.bottom = "10px";
-  debugBox.style.right = "10px";
-  debugBox.style.background = "rgba(0,0,0,0.8)";
-  debugBox.style.color = "lime";
-  debugBox.style.padding = "10px";
-  debugBox.style.zIndex = "9999";
-  debugBox.style.fontSize = "12px";
-  debugBox.style.maxWidth = "300px";
-  debugBox.style.wordBreak = "break-all";
-  debugBox.innerHTML = `
-    <b>DEBUG INFO</b><br>
-    finalImg length: ${item.image ? item.image.length : 0}<br>
-    portadaSrc start: ${portadaSrc ? portadaSrc.substring(0, 50) : "empty"}<br>
-    item.images isArray: ${Array.isArray(item.images)}<br>
-    item.images length: ${item.images ? item.images.length : 0}<br>
-    found.img length: ${found && found.img ? found.img.length : 0}<br>
-    found.images type: ${found ? typeof found.images : "undefined"}
-  `;
-  document.body.appendChild(debugBox);
+  try {
+    const debugBox = document.createElement("div");
+    debugBox.style.position = "fixed";
+    debugBox.style.bottom = "10px";
+    debugBox.style.right = "10px";
+    debugBox.style.background = "rgba(0,0,0,0.9)";
+    debugBox.style.color = "lime";
+    debugBox.style.padding = "15px";
+    debugBox.style.zIndex = "999999";
+    debugBox.style.fontSize = "14px";
+    debugBox.style.maxWidth = "400px";
+    debugBox.style.wordBreak = "break-all";
+    
+    let dbgStr = "<b>DEBUG:</b><br>";
+    dbgStr += "finalImg len: " + (item.image ? item.image.length : 0) + "<br>";
+    dbgStr += "images isArr: " + Array.isArray(item.images) + "<br>";
+    if (Array.isArray(item.images) && item.images.length > 0) {
+      dbgStr += "img0 len: " + (item.images[0] ? item.images[0].length : 0) + "<br>";
+      if (typeof item.images[0] === 'string') {
+        dbgStr += "img0 start: " + item.images[0].substring(0, 30) + "<br>";
+      }
+    }
+    debugBox.innerHTML = dbgStr;
+    document.body.appendChild(debugBox);
+  } catch(e) {
+    alert("Error creating debug box: " + e.message);
+  }
   // -----------------
 
 

@@ -801,11 +801,6 @@ const Inv = {
     if (checked) state.selectedItems.add(strId);
     else state.selectedItems.delete(strId);
     this.updateDeleteBtn();
-    const items = this.filteredItems();
-    const pageItems = items.slice((this.currentPage - 1) * this.PER_PAGE, this.currentPage * this.PER_PAGE);
-    const allChecked = pageItems.length > 0 && pageItems.every(i => state.selectedItems.has(String(i.id)));
-    const cbAll = $('inv-select-all');
-    if (cbAll) cbAll.checked = allChecked;
   },
   updateDeleteBtn() {
     const btn = $('btn-delete-selected');
@@ -818,6 +813,12 @@ const Inv = {
     } else {
       btn.style.display = 'none';
     }
+    
+    const items = this.filteredItems();
+    const pageItems = items.slice((this.currentPage - 1) * this.PER_PAGE, this.currentPage * this.PER_PAGE);
+    const allChecked = pageItems.length > 0 && pageItems.every(i => state.selectedItems.has(String(i.id)));
+    const cbAll = $('inv-select-all');
+    if (cbAll) cbAll.checked = allChecked;
   },
   confirmDeleteSelected() {
     if (!state.selectedItems || state.selectedItems.size === 0) return;

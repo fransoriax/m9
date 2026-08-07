@@ -583,12 +583,14 @@ const Inv = {
     const thead = $('inv-thead');
     if (state.activeTab === 'repuestos') {
       thead.innerHTML = `<tr>
+        <th style="width:40px"><input type="checkbox" id="inv-select-all" onchange="Inv.toggleSelectAll(event)"></th>
         <th>Foto</th><th>Código OEM</th><th>Nombre</th><th>Categoría</th>
         <th>Precio</th><th>Stock</th><th>Compatibilidad</th>
         <th>Estado</th><th>Acciones</th>
       </tr>`;
     } else {
       thead.innerHTML = `<tr>
+        <th style="width:40px"><input type="checkbox" id="inv-select-all" onchange="Inv.toggleSelectAll(event)"></th>
         <th></th><th>Nombre</th><th>Marca</th>
         <th>Capacidad</th><th>Motorización</th><th>Precio</th>
         <th>Estado</th><th>Web</th><th>Acciones</th>
@@ -648,7 +650,9 @@ const Inv = {
           ? `<img class="td-thumb" src="${r.img}" alt="${r.name}" loading="lazy">`
           : `<div class="td-thumb-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
         const discountHtml = (r.discount > 0) ? `<span style="color:#ffaa00; font-size:0.75rem; font-weight:700; margin-left:6px; background:rgba(255,170,0,0.15); padding:2px 5px; border-radius:4px;">-${r.discount}%</span>` : '';
+        const isSelected = (state.selectedItems && state.selectedItems.has(r.id)) ? 'checked' : '';
         return `<tr>
+          <td><input type="checkbox" class="inv-row-cb" value="${r.id}" ${isSelected} onchange="Inv.toggleSelect(${r.id}, event.target.checked)"></td>
           <td>${thumb}</td>
           <td><span class="badge badge--oem">${r.oem}</span></td>
           <td><div class="td-name">${r.name}</div></td>
@@ -678,7 +682,9 @@ const Inv = {
         const thumb = item.img
           ? `<img class="td-thumb" src="${item.img}" alt="${item.name}" loading="lazy">`
           : `<div class="td-thumb-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+        const isSelected = (state.selectedItems && state.selectedItems.has(item.id)) ? 'checked' : '';
         return `<tr>
+          <td><input type="checkbox" class="inv-row-cb" value="${item.id}" ${isSelected} onchange="Inv.toggleSelect(${item.id}, event.target.checked)"></td>
           <td>${thumb}</td>
           <td><div class="td-name">${item.name}</div></td>
           <td><span class="badge badge--brand">${item.brand}</span></td>
@@ -702,6 +708,7 @@ const Inv = {
     // Update badge
     const total = DB.autoelevadores.length + DB.repuestos.length + DB.camiones.length;
     $('badge-inv').textContent = total;
+    this.updateDeleteBtn();
   },
   setRepImg(src) {
     state.editingRepImg = src;
@@ -778,17 +785,64 @@ const Inv = {
     $('delete-msg').textContent = `¿Eliminás "${name}"?`;
     Modal.open('modal-delete');
   },
-  doDelete() {
-    const { deletingId: id, deletingType: type } = state;
-    if (type === 'rep') {
-      DB.repuestos = DB.repuestos.filter(x => x.id !== id);
+  toggleSelectAll(e) {
+    const checked = e.target.checked;
+    state.selectedItems = new Set();
+    if (checked) {
+      const items = this.filteredItems();
+      const pageItems = items.slice((this.currentPage - 1) * this.PER_PAGE, this.currentPage * this.PER_PAGE);
+      pageItems.forEach(i => state.selectedItems.add(i.id));
+    }
+    this.render();
+  },
+  toggleSelect(id, checked) {
+    if (!state.selectedItems) state.selectedItems = new Set();
+    if (checked) state.selectedItems.add(id);
+    else state.selectedItems.delete(id);
+    this.updateDeleteBtn();
+    const items = this.filteredItems();
+    const pageItems = items.slice((this.currentPage - 1) * this.PER_PAGE, this.currentPage * this.PER_PAGE);
+    const allChecked = pageItems.length > 0 && pageItems.every(i => state.selectedItems.has(i.id));
+    const cbAll = $('inv-select-all');
+    if (cbAll) cbAll.checked = allChecked;
+  },
+  updateDeleteBtn() {
+    const btn = $('btn-delete-selected');
+    const cnt = $('sel-count');
+    if (!btn || !cnt) return;
+    if (!state.selectedItems) state.selectedItems = new Set();
+    if (state.selectedItems.size > 0) {
+      btn.style.display = 'inline-flex';
+      cnt.textContent = `(${state.selectedItems.size})`;
     } else {
-      DB[state.activeTab] = DB[state.activeTab].filter(x => x.id !== id);
+      btn.style.display = 'none';
+    }
+  },
+  confirmDeleteSelected() {
+    if (!state.selectedItems || state.selectedItems.size === 0) return;
+    state.deletingId = 'multiple';
+    $('delete-msg').textContent = `¿Eliminás ${state.selectedItems.size} registros seleccionados?`;
+    Modal.open('modal-delete');
+  },
+  async doDelete() {
+    const { deletingId: id, deletingType: type } = state;
+    if (id === 'multiple') {
+      const idsToDelete = Array.from(state.selectedItems);
+      const tab = state.activeTab;
+      DB[tab] = DB[tab].filter(x => !state.selectedItems.has(x.id));
+      state.selectedItems.clear();
+      toast(`${idsToDelete.length} registros eliminados`, 'success');
+    } else {
+      if (type === 'rep') {
+        DB.repuestos = DB.repuestos.filter(x => x.id !== id);
+      } else {
+        DB[state.activeTab] = DB[state.activeTab].filter(x => x.id !== id);
+      }
+      toast('Registro eliminado correctamente', 'success');
     }
     Modal.close('modal-delete');
     this.publish();
     this.render();
-    toast('Registro eliminado correctamente', 'success');
     state.deletingId = null; state.deletingType = null;
   },
   openAdd() {
@@ -899,6 +953,7 @@ const Inv = {
         $$('.cat-tab, .crm-mcat-card').forEach(t => t.classList.remove('active'));
         $$(`.cat-tab[data-tab="${tabKey}"], .crm-mcat-card[data-tab="${tabKey}"]`).forEach(t => t.classList.add('active'));
         state.activeTab = tabKey;
+        state.selectedItems = new Set();
         localStorage.setItem('m9-admin-inv-tab', tabKey);
         state.searchQuery = '';
         state.filterStatus = '';
@@ -919,6 +974,7 @@ const Inv = {
     $('filter-status').addEventListener('change', e => { state.filterStatus = e.target.value; Inv.currentPage = 1; this.render(); });
     $('filter-brand').addEventListener('change',  e => { state.filterBrand  = e.target.value; Inv.currentPage = 1; this.render(); });
     // Add button
+    $('btn-delete-selected').addEventListener('click', () => this.confirmDeleteSelected());
     $('btn-add-item').addEventListener('click', () => this.openAdd());
     // Forms
     $('form-machinery').addEventListener('submit', e => { e.preventDefault(); this.saveMachinery(); });

@@ -43,6 +43,10 @@ const SupabaseUI = {
           });
           DB.leads = groupedLeads;
         }
+        if (typeof Router !== 'undefined') Router.updateAllBadges();
+        if (typeof Router !== 'undefined' && state.activeView && state.activeView !== 'home') {
+          Router.go(state.activeView);
+        }
       }
     } else {
       dot.className = 'sb-dot sb-dot-offline';
@@ -203,6 +207,7 @@ function loadDatabase() {
     }
     syncInventoryWithWeb(DB);
     updateNextIds(DB);
+    if (typeof Router !== 'undefined') Router.updateAllBadges();
     saveDatabase();
   } catch(e) {
     console.error('Error al cargar base de datos:', e);
@@ -372,6 +377,28 @@ const Router = {
     resenas:       { title: 'Reseñas Google',             crumb: 'Gestión de opiniones visibles en el sitio web' },
     reportes:      { title: 'Reportes',                   crumb: 'Métricas del negocio, alertas y rendimiento comercial' },
     cuentas:       { title: 'Centro de Cuentas',          crumb: 'Gestión de usuarios y permisos de acceso al CRM' },
+  },
+  updateAllBadges() {
+    let totalInv = 0;
+    if (DB.autoelevadores) totalInv += DB.autoelevadores.length;
+    if (DB.camiones) totalInv += DB.camiones.length;
+    if (DB.repuestos) totalInv += DB.repuestos.length;
+    if ($('badge-inv')) $('badge-inv').textContent = totalInv;
+    if ($('hmbadge-inv')) $('hmbadge-inv').textContent = totalInv;
+    
+    let totalCot = 0;
+    if (DB.leads) {
+      Object.values(DB.leads).forEach(arr => { if(arr) totalCot += arr.length; });
+    }
+    if ($('badge-cot')) $('badge-cot').textContent = totalCot;
+    if ($('hmbadge-cot')) $('hmbadge-cot').textContent = totalCot;
+    
+    const totalPre = DB.quotes ? DB.quotes.length : 0;
+    if ($('badge-presupuestos')) $('badge-presupuestos').textContent = totalPre;
+    if ($('hmbadge-pre')) $('hmbadge-pre').textContent = totalPre;
+    
+    if ($('badge-resenas')) $('badge-resenas').textContent = DB.reviews ? DB.reviews.length : 0;
+    if ($('badge-cuentas')) $('badge-cuentas').textContent = DB.accounts ? DB.accounts.length : 0;
   },
   go(view) {
     const user = Auth.getCurrentUser();

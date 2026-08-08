@@ -1005,31 +1005,6 @@ function initDetailPage() {
     mainImg.style.display = 'none';
   }
 
-  // --- DEBUG BOX ---
-  const debugBox = document.createElement("div");
-  debugBox.style.position = "fixed";
-  debugBox.style.bottom = "10px";
-  debugBox.style.right = "10px";
-  debugBox.style.background = "rgba(0,0,0,0.8)";
-  debugBox.style.color = "lime";
-  debugBox.style.padding = "10px";
-  debugBox.style.zIndex = "9999";
-  debugBox.style.fontSize = "12px";
-  debugBox.style.maxWidth = "300px";
-  debugBox.style.wordBreak = "break-all";
-  debugBox.innerHTML = `
-    <b>DEBUG INFO</b><br>
-    finalImg length: ${item.image ? item.image.length : 0}<br>
-    portadaSrc start: ${portadaSrc ? portadaSrc.substring(0, 50) : "empty"}<br>
-    item.images isArray: ${Array.isArray(item.images)}<br>
-    item.images length: ${item.images ? item.images.length : 0}<br>
-    found.img length: ${found && found.img ? found.img.length : 0}<br>
-    found.images type: ${found ? typeof found.images : "undefined"}
-  `;
-  document.body.appendChild(debugBox);
-  // -----------------
-
-
   // Gallery thumbnails switcher
   const thumbsContainer = document.getElementById("gallery-thumbnails-container");
   if (thumbsContainer) {

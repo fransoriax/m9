@@ -986,9 +986,13 @@ function initDetailPage() {
   }
 
   // Main gallery image (Portada)
+  const mainImg = document.getElementById("gallery-main-img");
   const portadaSrc = item.image || item.img || (item.images && item.images[0]) || "";
-  if (mainImg && portadaSrc) mainImg.src = portadaSrc;
-  else if (mainImg) mainImg.style.display = 'none';
+  if (mainImg && typeof portadaSrc === 'string' && portadaSrc.length > 0) {
+    mainImg.src = portadaSrc;
+  } else if (mainImg) {
+    mainImg.style.display = 'none';
+  }
 
   // --- DEBUG BOX ---
   const debugBox = document.createElement("div");

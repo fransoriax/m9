@@ -2092,7 +2092,7 @@ const Quotes = {
     if (!thead) return;
 
     thead.innerHTML = `<tr>
-      <th>N° Presupuesto</th><th>Cliente / Empresa</th><th>Fecha</th><th>Válido hasta</th><th>Total USD</th><th>Estado</th><th>Acciones</th>
+      <th>N° Presupuesto</th><th>Cliente / Empresa</th><th>Fecha</th><th>Válido hasta</th><th>Total</th><th>Estado</th><th>Acciones</th>
     </tr>`;
 
     if (!list.length) { tbody.innerHTML = ''; empty.style.display = 'flex'; return; }
@@ -2108,7 +2108,7 @@ const Quotes = {
         </td>
         <td style="color:var(--t2);font-size:.85rem">${formatDate(q.date)}</td>
         <td style="color:var(--t2);font-size:.85rem">${formatDate(q.validUntil)}</td>
-        <td><span class="td-price-tag">USD ${total.toLocaleString('es-AR')}</span></td>
+        <td><span class="td-price-tag">${q.currency || 'USD'} ${total.toLocaleString('es-AR')}</span></td>
         <td><span class="badge ${this.statusClass[q.status]}">${this.statusLabel[q.status]}</span></td>
         <td>
           <div class="td-actions">

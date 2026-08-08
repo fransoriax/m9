@@ -32,13 +32,18 @@ const SupabaseUI = {
         }
         if (res.leads && Array.isArray(res.leads)) {
           // Group flat leads back into DB.leads object
-          const groupedLeads = { nuevas: [], cotizacion: [], enviado: [], ganado: [] };
+          const groupedLeads = { nuevas: [], cotizacion: [], enviado: [], ganado: [], archivado: [] };
           res.leads.forEach(l => {
             const status = l.status || 'nuevas';
             if (groupedLeads[status]) {
               groupedLeads[status].push(l);
             } else {
-              groupedLeads.nuevas.push(l);
+              if (status === 'archivado') {
+                groupedLeads.archivado = groupedLeads.archivado || [];
+                groupedLeads.archivado.push(l);
+              } else {
+                groupedLeads.nuevas.push(l);
+              }
             }
           });
           DB.leads = groupedLeads;
@@ -1199,10 +1204,13 @@ const K = {
   draggingFrom: null,
 
   render() {
-    ['nuevas','cotizacion','enviado','ganado'].forEach(col => {
+    ['nuevas','cotizacion','enviado','ganado','archivado'].forEach(col => {
+      if (!DB.leads[col]) DB.leads[col] = [];
       const el = $(`col-${col}`);
+      if (!el) return;
       el.innerHTML = DB.leads[col].map(l => this.cardHTML(l)).join('');
-      $(`count-${col}`).textContent = DB.leads[col].length;
+      const countEl = $(`count-${col}`);
+      if (countEl) countEl.textContent = DB.leads[col].length;
       // Rebind drag events
       el.querySelectorAll('.kcard').forEach(card => {
         const handle = card.querySelector('.kcard-drag-handle');
@@ -1405,6 +1413,29 @@ const K = {
     $('q-obs').value = '';
     Modal.open('modal-lead');
   },
+  archiveLead() {
+    const l = this.findLead(state.activeLeadId);
+    if (!l) return;
+    
+    // Remove from current col
+    for (const [colName, colList] of Object.entries(DB.leads)) {
+      const idx = colList.findIndex(x => String(x.id) === String(l.id));
+      if (idx !== -1) {
+        colList.splice(idx, 1);
+        break;
+      }
+    }
+    
+    if (!DB.leads.archivado) DB.leads.archivado = [];
+    DB.leads.archivado.unshift(l);
+    
+    this.render();
+    Modal.close('modal-lead');
+    toast('Consulta archivada');
+    
+    // trigger save
+    if (typeof admin !== 'undefined' && admin.publish) admin.publish();
+  },
   renderNotes(l) {
     const feed = $('notes-feed');
     if (!l.notes || l.notes.length === 0) {
@@ -1462,6 +1493,31 @@ const K = {
     $('btn-add-lead').addEventListener('click', () => this.openAddLead());
     $('btn-add-note').addEventListener('click', () => this.addNote());
     $('btn-print-quote').addEventListener('click', () => this.printQuote());
+    
+    const btnArchive = $('btn-archive-lead');
+    if (btnArchive) {
+      btnArchive.addEventListener('click', () => this.archiveLead());
+    }
+
+    const btnToggleArchived = $('btn-toggle-archived');
+    if (btnToggleArchived) {
+      btnToggleArchived.addEventListener('click', () => {
+        const col = $('kcol-wrap-archivado');
+        const tab = $('kstage-tab-archivado');
+        if (col.style.display === 'none') {
+          col.style.display = 'flex';
+          if(tab) tab.style.display = 'inline-flex';
+          btnToggleArchived.classList.add('active');
+          btnToggleArchived.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="18" height="18"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg> Ocultar Archivados';
+        } else {
+          col.style.display = 'none';
+          if(tab) tab.style.display = 'none';
+          btnToggleArchived.classList.remove('active');
+          btnToggleArchived.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="18" height="18"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg> Ver Archivados';
+        }
+      });
+    }
+
     $$('.kstage-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         const col = tab.dataset.col;

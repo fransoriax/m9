@@ -2308,7 +2308,7 @@ const Quotes = {
     </style></head><body>
     <div class="header">
       <div class="brand-wrap">
-        <img src="/assets/logo_presupuesto.png" alt="Maquinarias 9 de Abril" class="brand-logo" onerror="this.src='/assets/logotipo_png.png'">
+        <img src="/assets/logo_presupuesto.jpg" alt="Maquinarias 9 de Abril" class="brand-logo" onerror="this.src='/assets/logotipo_png.png'">
         <div class="brand">
           <h1>Maquinarias 9 de Abril</h1>
           <p>Autoelevadores • Repuestos OEM • Camiones</p>

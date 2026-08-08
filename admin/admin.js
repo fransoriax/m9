@@ -2233,6 +2233,7 @@ const Quotes = {
       date: $('qt-date').value,
       validUntil: $('qt-valid').value,
       status: $('qt-status').value,
+      currency: $('qt-currency')?.value || 'USD',
       conditions: $('qt-conditions').value.trim(),
       notes: $('qt-notes').value.trim(),
       items,

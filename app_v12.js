@@ -851,14 +851,25 @@ function initDetailPage() {
         let parsedImages = [];
         if (Array.isArray(found.images)) {
           parsedImages = found.images;
-        } else if (typeof found.images === 'string') {
+        } else if (typeof found.images === 'string' && found.images.trim().length > 0) {
           try {
             parsedImages = JSON.parse(found.images.replace(/^\{/, '[').replace(/\}$/, ']'));
           } catch(e) {
             const matches = found.images.match(/(data:image\/[^;]+;base64,[^"',\}]+|https?:\/\/[^\s"',\}]+|[\w\.\/-]+\.(?:jpg|jpeg|png|webp|gif))/gi);
-            if (matches) parsedImages = matches;
+            if (matches) {
+              parsedImages = matches;
+            } else {
+              parsedImages = found.images.split(',').map(s => s.trim().replace(/^['"]|['"]$/g, '')).filter(s => s.length > 0);
+            }
           }
         }
+        
+        parsedImages = parsedImages.map(img => {
+          if (typeof img === 'object' && img !== null) {
+            return img.url || img.src || img.image || '';
+          }
+          return img;
+        }).filter(img => typeof img === 'string' && img.trim().length > 0);
         
         const finalImg = found.img ? found.img : (parsedImages[0] || '');
         if (item) {

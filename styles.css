@@ -5887,37 +5887,37 @@ select option {
   .ecommerce-card {
     flex-direction: row;
     height: auto;
-    min-height: 120px;
+    min-height: 145px;
     padding: 0;
     gap: 0;
     overflow: hidden;
   }
   .ecommerce-card-img-wrap {
-    width: 120px;
-    height: 120px;
+    width: 145px;
+    height: 145px;
     aspect-ratio: auto;
     padding: 0.5rem;
   }
   .ecommerce-card-body {
-    padding: 0.8rem 0.5rem;
+    padding: 0.8rem 0.5rem 0.8rem 1rem;
     justify-content: center;
   }
   .ecommerce-card-title {
-    font-size: 0.85rem;
+    font-size: 1.05rem;
     height: auto;
     max-height: 2.6em;
     margin-bottom: 0.3rem;
   }
   .ecommerce-card-price {
-    font-size: 1.15rem;
+    font-size: 1.4rem;
     margin-bottom: 0.1rem;
   }
   .ecommerce-card-oem {
-    font-size: 0.65rem;
+    font-size: 0.78rem;
     margin-bottom: 0.2rem;
   }
   .ecommerce-card-installments, .ecommerce-card-promo {
-    font-size: 0.7rem;
+    font-size: 0.85rem;
     margin-bottom: 0;
   }
   .ecommerce-products-grid {

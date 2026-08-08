@@ -1963,11 +1963,11 @@ function initCamionesPage() {
           <span class="badge ${truck.condition === 'Nuevo' ? 'badge-yellow' : 'badge-dark'}">${truck.condition}</span>
           <span class="truck-brand-badge">${truck.brand}</span>
         </div>
-        <div class="product-card-body" style="padding: 1.2rem;">
-          <div class="product-category" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-secondary); margin-bottom:0.3rem;">${truck.type} • ${truck.axles}</div>
-          <h3 class="product-title" style="font-family:var(--font-headings); font-size:1.15rem; font-weight:700; color:var(--text-primary); margin-bottom: 0.8rem; line-height:1.3;">${truck.name}</h3>
+        <div class="product-card-body truck-card-body-v2" style="padding: 1.2rem;">
+          <div class="product-category truck-card-category-v2" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-secondary); margin-bottom:0.3rem;">${truck.type} • ${truck.axles}</div>
+          <h3 class="product-title truck-card-title-v2" style="font-family:var(--font-headings); font-size:1.15rem; font-weight:700; color:var(--text-primary); margin-bottom: 0.8rem; line-height:1.3;">${truck.name}</h3>
           
-          <div class="product-specs-grid" style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; margin: 0.8rem 0 1.2rem 0; padding: 0.6rem 0.8rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 6px;">
+          <div class="product-specs-grid truck-card-specs-v2" style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; margin: 0.8rem 0 1.2rem 0; padding: 0.6rem 0.8rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 6px;">
             <div class="spec-item">
               <span class="spec-label" style="display:block; font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Potencia</span>
               <span class="spec-value" style="font-size:0.92rem; color:var(--primary-yellow); font-weight:700;">${truck.power}</span>
@@ -1979,15 +1979,25 @@ function initCamionesPage() {
           </div>
           
           <div class="product-card-footer truck-card-footer-mobile" style="display:flex; align-items:center; justify-content:space-between; gap:0.6rem; margin-top:0.8rem;">
-            <div>
-              <span style="font-size:0.7rem; color:var(--text-secondary); display:block; text-transform:uppercase;">Valor referencia</span>
-              <span class="product-price" style="font-size:1.05rem; font-weight:800; color:var(--text-primary);">${formatPriceHTML(truck)}</span>
+            <div class="truck-card-price-wrap-v2">
+              <span class="truck-card-price-label-v2" style="font-size:0.7rem; color:var(--text-secondary); display:block; text-transform:uppercase;">Valor referencia</span>
+              <span class="product-price truck-card-price-val-v2" style="font-size:1.05rem; font-weight:800; color:var(--text-primary);">${formatPriceHTML(truck)}</span>
             </div>
-            <div style="display:flex; gap:0.4rem;">
-              <a href="detalle.html?id=${truck.id}&cb=${Date.now()}" class="btn btn-secondary btn-sm" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">Ver Detalle</a>
-              <button class="btn btn-primary btn-sm open-quote-modal" data-product="Camión: ${truck.name} (${truck.power})" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">
+            
+            <div class="truck-card-mobile-info-v2" style="display:none; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.6rem;">
+              <div style="font-weight: 500; color: var(--text-primary); margin-bottom: 0.1rem;">${truck.year || new Date().getFullYear()}</div>
+              <div style="font-size: 0.7rem;">Capital Federal - Capital Federal</div>
+            </div>
+
+            <div class="truck-card-actions-v2" style="display:flex; gap:0.4rem; width:100%;">
+              <a href="detalle.html?id=${truck.id}&cb=${Date.now()}" class="btn btn-secondary btn-sm truck-btn-detail" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">Ver Detalle</a>
+              <button class="btn btn-primary btn-sm open-quote-modal truck-btn-quote" data-product="${truck.type}: ${truck.name} (${truck.power})" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">
                 Cotizar
               </button>
+              <a href="https://wa.me/?text=Hola, quiero consultar por ${encodeURIComponent(truck.name)}" target="_blank" class="btn btn-primary btn-sm truck-btn-wa" style="display:none; padding: 0.5rem 0.75rem; font-size: 0.85rem; background: #E8F0FE; color: #1a73e8; border: none; font-weight: 600; width: 100%; text-align: center; justify-content: center; align-items: center; gap: 0.4rem;">
+                <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24"><path d="M12.031 21.033c-1.503 0-2.969-.39-4.274-1.127l-4.72.932 1.341-4.227a8.956 8.956 0 01-1.229-4.524c0-4.945 4.024-8.97 8.97-8.97 4.945 0 8.97 4.025 8.97 8.97 0 4.945-4.025 8.97-8.97 8.97h-.088zm0-19.537c-5.836 0-10.584 4.748-10.584 10.584 0 1.865.488 3.687 1.417 5.292L1 23l5.808-1.516a10.536 10.536 0 005.223 1.385h.1c5.836 0 10.584-4.748 10.584-10.584C22.615 6.244 17.867 1.496 12.031 1.496zm5.811 14.86c-.32-.16-1.895-.935-2.188-1.042-.293-.107-.506-.16-.72.16-.214.32-.826 1.042-1.012 1.254-.186.213-.372.24-.693.08-1.558-.787-2.736-1.425-3.805-3.32-.213-.373-.022-.572.138-.732.146-.145.32-.372.48-.56.16-.186.213-.32.32-.533.107-.213.053-.4-.027-.56-.08-.16-.72-1.734-.987-2.375-.26-.625-.526-.54-.72-.547-.186-.008-.4-.01-.613-.01-.213 0-.56.08-.853.4s-1.12 1.094-1.12 2.668 1.147 3.095 1.307 3.308c.16.213 2.253 3.441 5.466 4.828.766.333 1.365.533 1.834.683.771.246 1.472.211 2.023.128.62-.093 1.895-.774 2.161-1.52.267-.747.267-1.388.187-1.52-.08-.134-.294-.214-.614-.374z"/></svg>
+                WhatsApp
+              </a>
             </div>
           </div>
         </div>

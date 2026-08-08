@@ -5924,3 +5924,72 @@ select option {
     gap: 0.8rem;
   }
 }
+@media (max-width: 768px) {
+  .truck-card-v2 {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    min-height: 160px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+  }
+  .truck-card-v2 .product-card-img-wrapper {
+    width: 140px;
+    height: auto;
+    aspect-ratio: auto !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    flex-shrink: 0;
+    padding: 0;
+  }
+  .truck-card-v2 .product-card-img {
+    border-radius: 6px 0 0 6px;
+  }
+  .truck-card-v2 .badge, .truck-card-v2 .truck-brand-badge {
+    display: none !important;
+  }
+  .truck-card-v2 .truck-card-body-v2 {
+    padding: 0.8rem 0.8rem 0.8rem 1rem !important;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .truck-card-v2 .truck-card-category-v2 {
+    display: none !important;
+  }
+  .truck-card-v2 .truck-card-title-v2 {
+    font-size: 1.05rem !important;
+    font-weight: 400 !important;
+    height: auto;
+    margin-bottom: 0.4rem !important;
+  }
+  .truck-card-v2 .truck-card-specs-v2 {
+    display: none !important;
+  }
+  .truck-card-v2 .truck-card-footer-mobile {
+    flex-direction: column;
+    align-items: stretch !important;
+    margin-top: 0 !important;
+    gap: 0 !important;
+  }
+  .truck-card-v2 .truck-card-price-wrap-v2 {
+    margin-bottom: 0.4rem;
+  }
+  .truck-card-v2 .truck-card-price-label-v2 {
+    display: none !important;
+  }
+  .truck-card-v2 .truck-card-price-val-v2 {
+    font-size: 1.4rem !important;
+    font-weight: 500 !important;
+  }
+  .truck-card-v2 .truck-card-mobile-info-v2 {
+    display: block !important;
+  }
+  .truck-card-v2 .truck-btn-detail, .truck-card-v2 .truck-btn-quote {
+    display: none !important;
+  }
+  .truck-card-v2 .truck-btn-wa {
+    display: flex !important;
+  }
+}

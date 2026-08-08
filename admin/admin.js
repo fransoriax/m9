@@ -2158,6 +2158,7 @@ const Quotes = {
     $('qt-date').value = q.date;
     $('qt-valid').value = q.validUntil;
     $('qt-status').value = q.status;
+    $('qt-currency').value = q.currency || 'USD'; $('qt-currency').addEventListener('change', () => Quotes.recalcTotal());
     $('qt-conditions').value = q.conditions;
     $('qt-notes').value = q.notes;
     this.clearItems();
@@ -2179,7 +2180,7 @@ const Quotes = {
       <td><input class="mf-input qt-item-qty" type="number" min="1" value="${item.qty||1}" style="width:70px"></td>
       <td>
         <select class="mf-input qt-item-unit" style="width:100px">
-          ${['unidad','kit','par','bidón','metro','hora','servicio'].map(u => `<option${item.unit===u?' selected':''}>${u}</option>`).join('')}
+          ${['unidad','repuesto'].map(u => `<option${item.unit===u?' selected':''}>${u}</option>`).join('')}
         </select>
       </td>
       <td><input class="mf-input qt-item-price" type="number" min="0" step="0.01" placeholder="0.00" value="${item.price||''}" style="width:100px"></td>
@@ -2200,11 +2201,11 @@ const Quotes = {
       const price = parseFloat(row.querySelector('.qt-item-price')?.value) || 0;
       const sub = qty * price;
       const subCell = row.querySelector('.qt-item-subtotal');
-      if (subCell) subCell.textContent = `USD ${sub.toLocaleString('es-AR')}`;
+      const curr = $('qt-currency') ? $('qt-currency').value : 'USD'; if (subCell) subCell.textContent = `${curr} ${sub.toLocaleString('es-AR')}`;
       total += sub;
     });
     const el = $('qt-total-display');
-    if (el) el.textContent = `USD ${total.toLocaleString('es-AR')}`;
+    const curr = $('qt-currency') ? $('qt-currency').value : 'USD'; if (el) el.textContent = `${curr} ${total.toLocaleString('es-AR')}`;
   },
 
   collectItems() {
@@ -2307,7 +2308,7 @@ const Quotes = {
     </style></head><body>
     <div class="header">
       <div class="brand-wrap">
-        <img src="/assets/logotipo_png.png" alt="Maquinarias 9 de Abril" class="brand-logo">
+        <img src="/assets/logo_presupuesto.png" alt="Maquinarias 9 de Abril" class="brand-logo" onerror="this.src='/assets/logotipo_png.png'">
         <div class="brand">
           <h1>Maquinarias 9 de Abril</h1>
           <p>Autoelevadores • Repuestos OEM • Camiones</p>
@@ -2342,7 +2343,7 @@ const Quotes = {
         <tbody>${itemsHTML}</tbody>
         <tfoot><tr class="total-row">
           <td colspan="4" style="padding:12px 10px">TOTAL GENERAL</td>
-          <td style="padding:12px 10px;text-align:right;color:#a67c00">USD ${total.toLocaleString('es-AR')}</td>
+          <td style="padding:12px 10px;text-align:right;color:#a67c00">${q.currency} ${total.toLocaleString('es-AR')}</td>
         </tr></tfoot>
       </table>
     </div>
@@ -2350,11 +2351,6 @@ const Quotes = {
     <div class="footer">
       <div><strong>Condiciones</strong><p>${q.conditions||'Consultar condiciones con el vendedor.'}</p></div>
       ${q.notes ? `<div><strong>Observaciones</strong><p>${q.notes}</p></div>` : '<div></div>'}
-    </div>
-
-    <div class="sign-block" style="margin-top:60px;display:flex;justify-content:space-around">
-      <div><div class="line"></div><p>Firma y Sello del Vendedor</p></div>
-      <div><div class="line"></div><p>Conformidad del Cliente</p></div>
     </div>
 
     <div style="text-align:center;margin-top:32px">

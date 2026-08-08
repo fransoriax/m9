@@ -5883,4 +5883,44 @@ select option {
   color: var(--primary-yellow);
   font-size: 0.75rem;
   margin-bottom: 0.8rem;
+}@media (max-width: 768px) {
+  .ecommerce-card {
+    flex-direction: row;
+    height: auto;
+    min-height: 120px;
+    padding: 0;
+    gap: 0;
+    overflow: hidden;
+  }
+  .ecommerce-card-img-wrap {
+    width: 120px;
+    height: 120px;
+    aspect-ratio: auto;
+    padding: 0.5rem;
+  }
+  .ecommerce-card-body {
+    padding: 0.8rem 0.5rem;
+    justify-content: center;
+  }
+  .ecommerce-card-title {
+    font-size: 0.85rem;
+    height: auto;
+    max-height: 2.6em;
+    margin-bottom: 0.3rem;
+  }
+  .ecommerce-card-price {
+    font-size: 1.15rem;
+    margin-bottom: 0.1rem;
+  }
+  .ecommerce-card-oem {
+    font-size: 0.65rem;
+    margin-bottom: 0.2rem;
+  }
+  .ecommerce-card-installments, .ecommerce-card-promo {
+    font-size: 0.7rem;
+    margin-bottom: 0;
+  }
+  .ecommerce-products-grid {
+    gap: 0.8rem;
+  }
 }

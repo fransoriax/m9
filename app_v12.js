@@ -855,7 +855,7 @@ function initDetailPage() {
           try {
             parsedImages = JSON.parse(found.images.replace(/^\{/, '[').replace(/\}$/, ']'));
           } catch(e) {
-            const matches = found.images.match(/(data:image\/[^;]+;base64,[^"',\}]+|https?:\/\/[^\s"',\}]+)/g);
+            const matches = found.images.match(/(data:image\/[^;]+;base64,[^"',\}]+|https?:\/\/[^\s"',\}]+|[\w\.\/-]+\.(?:jpg|jpeg|png|webp|gif))/gi);
             if (matches) parsedImages = matches;
           }
         }

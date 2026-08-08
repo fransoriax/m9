@@ -237,7 +237,13 @@
         if (autosRes.error || camsRes.error || repsRes.error) {
           throw new Error('Error consultando tablas desde Supabase');
         }
+        const currentDBStr = localStorage.getItem('m9-inventory-db');
+        let currentDB = {};
+        if (currentDBStr) {
+          try { currentDB = JSON.parse(currentDBStr); } catch(e) {}
+        }
         const syncedDB = {
+          ...currentDB,
           autoelevadores: autosRes.data || [],
           camiones: camsRes.data || [],
           repuestos: repsRes.data || []

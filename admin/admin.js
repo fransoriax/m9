@@ -769,6 +769,7 @@ const Inv = {
       $('m-status').value = item.status;
       $('m-visible').checked = item.visible;
       $('m-vis-lbl').textContent = item.visible ? 'Visible en el sitio' : 'Oculto en el sitio';
+      if ($('m-description')) $('m-description').value = item.description || '';
       state.editingImages = (item.images && Array.isArray(item.images) && item.images.length > 0)
         ? [...item.images]
         : (item.img ? [item.img] : []);
@@ -909,6 +910,7 @@ const Inv = {
       discount,
       status:   $('m-status').value,
       visible:  $('m-visible').checked,
+      description: $('m-description') ? $('m-description').value.trim() : '',
       img:      savedPortada,
       images:   savedImages,
     };

@@ -415,7 +415,7 @@ function initCatalogPage() {
           </div>
           
           <div class="product-card-footer truck-card-footer-mobile" style="display:flex; align-items:center; justify-content:space-between; gap:0.6rem; margin-top:auto;">
-            <div class="truck-card-price-wrap-v2">
+            <div class="truck-card-price-wrap-v2" style="flex-shrink: 0; min-width: max-content;">
               <span class="truck-card-price-label-v2" style="font-size:0.7rem; color:var(--text-secondary); display:block; text-transform:uppercase;">Valor referencia</span>
               <span class="product-price truck-card-price-val-v2" style="font-size:1.15rem; font-weight:800; color:var(--text-primary); display:block; margin-bottom:0.4rem;">${formatPriceHTML(fork)}</span>
             </div>
@@ -425,7 +425,7 @@ function initCatalogPage() {
               <div style="font-size: 0.7rem;">Capital Federal - Capital Federal</div>
             </div>
 
-            <div class="truck-card-actions-v2" style="display:flex; gap:0.4rem; width:100%;">
+            <div class="truck-card-actions-v2" style="display:flex; gap:0.4rem; width:auto; justify-content: flex-end;">
               <a href="detalle.html?id=${fork.id}&cb=${Date.now()}" class="btn btn-secondary btn-sm truck-btn-detail" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">Ver Detalle</a>
               <button class="btn btn-primary btn-sm open-quote-modal truck-btn-quote" data-product="${fork.type}: ${fork.name}" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">Cotizar</button>
               <a href="https://wa.me/?text=Hola, quiero consultar por ${encodeURIComponent(fork.name)}" target="_blank" class="btn btn-primary btn-sm truck-btn-wa" style="display:none; padding: 0.5rem 0.75rem; font-size: 0.85rem; background: #E8F0FE; color: #1a73e8; border: none; font-weight: 600; width: 100%; text-align: center; justify-content: center; align-items: center; gap: 0.4rem;">
@@ -1968,7 +1968,7 @@ function initCamionesPage() {
           <span class="badge ${truck.condition === 'Nuevo' ? 'badge-yellow' : 'badge-dark'}">${truck.condition}</span>
           <span class="truck-brand-badge">${truck.brand}</span>
         </div>
-        <div class="product-card-body truck-card-body-v2" style="padding: 1.2rem;">
+        <div class="product-card-body truck-card-body-v2" style="padding: 1.2rem; display: flex; flex-direction: column; flex-grow: 1;">
           <div class="product-category truck-card-category-v2" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-secondary); margin-bottom:0.3rem;">${truck.type} • ${truck.axles}</div>
           <h3 class="product-title truck-card-title-v2" style="font-family:var(--font-headings); font-size:1.15rem; font-weight:700; color:var(--text-primary); margin-bottom: 0.8rem; line-height:1.3;">${truck.name}</h3>
           
@@ -1983,8 +1983,8 @@ function initCamionesPage() {
             </div>
           </div>
           
-          <div class="product-card-footer truck-card-footer-mobile" style="display:flex; align-items:center; justify-content:space-between; gap:0.6rem; margin-top:0.8rem;">
-            <div class="truck-card-price-wrap-v2">
+          <div class="product-card-footer truck-card-footer-mobile" style="display:flex; align-items:center; justify-content:space-between; gap:0.6rem; margin-top:auto;">
+            <div class="truck-card-price-wrap-v2" style="flex-shrink: 0; min-width: max-content;">
               <span class="truck-card-price-label-v2" style="font-size:0.7rem; color:var(--text-secondary); display:block; text-transform:uppercase;">Valor referencia</span>
               <span class="product-price truck-card-price-val-v2" style="font-size:1.05rem; font-weight:800; color:var(--text-primary);">${formatPriceHTML(truck)}</span>
             </div>
@@ -1994,7 +1994,7 @@ function initCamionesPage() {
               <div style="font-size: 0.7rem;">Capital Federal - Capital Federal</div>
             </div>
 
-            <div class="truck-card-actions-v2" style="display:flex; gap:0.4rem; width:100%;">
+            <div class="truck-card-actions-v2" style="display:flex; gap:0.4rem; width:auto; justify-content: flex-end;">
               <a href="detalle.html?id=${truck.id}&cb=${Date.now()}" class="btn btn-secondary btn-sm truck-btn-detail" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">Ver Detalle</a>
               <button class="btn btn-primary btn-sm open-quote-modal truck-btn-quote" data-product="${truck.type}: ${truck.name} (${truck.power})" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">
                 Cotizar

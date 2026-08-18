@@ -880,6 +880,7 @@ function initDetailPage() {
             price: found.price !== undefined ? found.price : item.price,
             condition: found.condition || item.condition,
             year: found.year || item.year,
+            description: found.description || item.description,
             image: finalImg || item.image,
             images: parsedImages.length > 0 ? parsedImages : item.images
           };
@@ -895,7 +896,7 @@ function initDetailPage() {
             condition: found.condition || (found.hours > 0 ? 'Usado' : 'Nuevo'),
             image: finalImg,
             images: parsedImages,
-            description: `Unidad industrial ${found.brand} ${found.name}.`,
+            description: found.description || `Unidad industrial ${found.brand} ${found.name}.`,
             specs: {
               engine: found.motor || 'Convencional',
               hours: found.hours ? `${found.hours}` : '0'

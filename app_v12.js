@@ -630,19 +630,7 @@ function initPartsPage() {
   });
 }
 
-  // Initialize Parts Cart Engine
-  PartsCart.init();
 
-  // Check URL params for quick home redirects
-  const urlParams = new URLSearchParams(window.location.search);
-  const searchParam = urlParams.get("search");
-  if (searchParam && partsSearchInput) {
-    partsSearchInput.value = searchParam;
-    applyPartsFilter();
-  } else {
-    renderPartsList(currentSpareParts);
-  }
-}
 
 // 6. PRODUCT DETAIL LOADER
 function initDetailPage() {

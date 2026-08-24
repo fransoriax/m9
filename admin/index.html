@@ -309,10 +309,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
             Autoelevadores
           </button>
-          <button class="cat-tab" data-tab="repuestos">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93a10 10 0 0 0 14.14 14.14"/><circle cx="12" cy="12" r="7"/></svg>
-            Repuestos
-          </button>
+
           <button class="cat-tab" data-tab="camiones">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
             Camiones
@@ -329,13 +326,7 @@
             <span class="crm-mcat-sub">5 Unidades</span>
           </div>
 
-          <div class="crm-mcat-card" data-tab="repuestos">
-            <div class="crm-mcat-icon-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93a10 10 0 0 0 14.14 14.14"/><circle cx="12" cy="12" r="7"/></svg>
-            </div>
-            <span class="crm-mcat-title">Repuestos</span>
-            <span class="crm-mcat-sub">6 Repuestos</span>
-          </div>
+
 
           <div class="crm-mcat-card" data-tab="camiones">
             <div class="crm-mcat-icon-wrap">
@@ -832,90 +823,7 @@
     </div>
   </div>
 
-  <!-- Modal: Repuesto -->
-  <div id="modal-repuesto" class="modal-overlay" aria-hidden="true">
-    <div class="modal-box">
-      <div class="modal-hdr">
-        <h3 id="modal-repuesto-title">Nuevo Repuesto</h3>
-        <button class="modal-close-btn" data-close="modal-repuesto">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <form id="form-repuesto" class="modal-form" novalidate>
-        <div class="form-grid-2">
-          <div class="mf-group">
-            <label class="mf-label">Código OEM / N° Pieza *</label>
-            <input type="text" class="mf-input mf-input--oem" id="r-oem" placeholder="Ej: OEM-BAT-48500">
-          </div>
-          <div class="mf-group">
-            <label class="mf-label">Nombre del Repuesto *</label>
-            <input type="text" class="mf-input" id="r-name" placeholder="Ej: Batería 48V 500Ah">
-          </div>
-          <div class="mf-group">
-            <label class="mf-label">Categoría</label>
-            <select class="mf-input" id="r-category">
-              <option value="">Seleccionar</option>
-              <option>Eléctrico</option><option>Hidráulico</option><option>Frenos</option>
-              <option>Transmisión</option><option>Motor</option><option>Estructura</option><option>Otros</option>
-            </select>
-          </div>
-          <div class="mf-row">
-            <div class="mf-group">
-              <label class="mf-label">Moneda</label>
-              <select class="mf-input" id="r-currency">
-                <option value="USD">USD</option>
-                <option value="ARS">ARS</option>
-              </select>
-            </div>
-            <div class="mf-group">
-              <label class="mf-label">Precio *</label>
-              <input type="number" class="mf-input" id="r-price" placeholder="Ej: 350" min="0">
-            </div>
-          </div>
-          <div class="mf-group">
-            <label class="mf-label">Descuento (%)</label>
-            <input type="number" class="mf-input" id="r-discount" placeholder="Ej: 15 (Opcional)" min="0" max="100">
-          </div>
-          <div class="mf-group">
-            <label class="mf-label">Stock Actual</label>
-            <div class="stock-ctrl">
-              <button type="button" class="stock-btn" id="stock-minus">−</button>
-              <input type="number" class="mf-input stock-num" id="r-stock" value="0" min="0">
-              <button type="button" class="stock-btn" id="stock-plus">+</button>
-            </div>
-          </div>
-          <div class="mf-group">
-            <label class="mf-label">Estado</label>
-            <select class="mf-input" id="r-status">
-              <option value="active">✅ Activo</option>
-              <option value="paused">⏸ Pausado</option>
-            </select>
-          </div>
-        </div>
-        <div class="mf-group mf-group--full" style="margin-top:.75rem">
-          <label class="mf-label">Compatibilidad con Modelos</label>
-          <input type="text" class="mf-input" id="r-compat" placeholder="Ej: Hangcha XS-20, HELI CPD15, Universal">
-        </div>
-        <div class="mf-group mf-group--full" style="margin-top:.75rem">
-          <label class="mf-label">Foto / Imagen del Repuesto</label>
-          <div class="upload-zone img-drop-zone" id="r-img-zone" tabindex="0">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <p>Arrastrá una imagen aquí o <span class="upload-link">hacé clic para seleccionar</span></p>
-            <small id="r-img-filename">JPG, PNG, WebP — Foto de producto del repuesto</small>
-            <input type="file" id="r-img-input" accept="image/*" style="display:none">
-          </div>
-          <div class="img-preview-grid" id="r-img-preview" style="margin-top:0.75rem"></div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn-secondary" data-close="modal-repuesto">Cancelar</button>
-          <button type="submit" class="btn-primary">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Guardar Repuesto
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
+
 
   <!-- Modal: Lead Detail + Quote Generator -->
   <div id="modal-lead" class="modal-overlay" aria-hidden="true">

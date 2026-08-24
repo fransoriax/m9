@@ -585,238 +585,50 @@ function getMergedSpareParts() {
   return list;
 }
 
-// 5. TECHNICAL PARTS SEARCH ENGINE (image_2.png style)
+// 5. TECHNICAL PARTS SEARCH ENGINE (BLIND SEARCH)
 function initPartsPage() {
-  const partsContainer = document.getElementById("parts-ml-container");
-  const partsSearchInput = document.getElementById("parts-search-input");
-  const partsCountLabel = document.getElementById("parts-count-val");
+  const searchInput = document.getElementById("blind-search-input");
+  const searchBtn = document.getElementById("blind-search-btn");
+  const searchResult = document.getElementById("blind-search-result");
+  const queryDisplay = document.getElementById("blind-search-query-display");
+  const whatsappBtn = document.getElementById("blind-search-whatsapp-btn");
   
-  if (!partsContainer) return;
+  if (!searchInput || !searchBtn) return;
 
-  const currentSpareParts = getMergedSpareParts();
-
-  // Populate Categories
-  const categoriesList = document.getElementById("ecommerce-categories-list");
-  let activeCategory = "";
-  if (categoriesList) {
-    const cats = [...new Set(currentSpareParts.map(p => p.category).filter(Boolean))];
-    let html = '<li><a href="#" class="active" data-cat="">TODAS LAS CATEGORÍAS</a></li>';
-    cats.forEach(c => {
-      html += '<li><a href="#" data-cat="' + c + '">' + formatCategoryName(c).toUpperCase() + '</a></li>';
-    });
-    categoriesList.innerHTML = html;
-
-    categoriesList.querySelectorAll("a").forEach(a => {
-      a.addEventListener("click", (e) => {
-        e.preventDefault();
-        categoriesList.querySelectorAll("a").forEach(lnk => lnk.classList.remove("active"));
-        a.classList.add("active");
-        activeCategory = a.dataset.cat;
-        applyPartsFilter();
-      });
-    });
-  }
-
-  // Populate Brands
-  const brandsList = document.getElementById("ecommerce-brands-list");
-  if (brandsList) {
-    const brands = [...new Set(currentSpareParts.map(p => p.machine).filter(Boolean))];
-    let html = '';
-    brands.forEach(b => {
-      const count = currentSpareParts.filter(p => p.machine === b).length;
-      html += '<li><label class="ecommerce-checkbox-label"><input type="checkbox" class="brand-filter-cb" value="' + b + '"> ' + b + ' <span class="ecommerce-checkbox-count">(' + count + ')</span></label></li>';
-    });
-    brandsList.innerHTML = html;
-
-    brandsList.querySelectorAll(".brand-filter-cb").forEach(cb => {
-      cb.addEventListener("change", applyPartsFilter);
-    });
-  }
-
-  // Search input
-  if (partsSearchInput) {
-    partsSearchInput.addEventListener("input", applyPartsFilter);
-  }
-
-  // Sort select
-  const sortSelect = document.getElementById("ecommerce-sort-select");
-  if (sortSelect) {
-    sortSelect.addEventListener("change", applyPartsFilter);
-  }
-
-  // Formatting helpers
-  function formatCategoryName(cat) {
-    const names = {
-      bombas: "Bombas e Hidráulica",
-      carburadores: "Carburadores y Motor",
-      neumaticos: "Neumáticos y Ruedas",
-      valvulas: "Válvulas de Comando",
-      sellos: "Kits de Sellos y Empaques",
-      filtros: "Filtros Técnicos",
-      baterias: "Baterías e Inversores",
-      controladores: "Controladores y Joysticks",
-      luces: "Luces e Iluminación",
-      mecanico: "Componentes Mecánicos"
-    };
-    return names[cat] || cat;
-  }
-
-  let partsCurrentPage = 1;
-  const PARTS_PER_PAGE = 12;
-
-  function applyPartsFilter() {
-    partsCurrentPage = 1;
-    const searchQuery = partsSearchInput ? partsSearchInput.value.toLowerCase().trim() : "";
-    
-    // Get checked brands
-    const activeBrands = [];
-    if (brandsList) {
-      brandsList.querySelectorAll(".brand-filter-cb:checked").forEach(cb => activeBrands.push(cb.value));
-    }
-
-    let matchedParts = currentSpareParts.filter(part => {
-      const matchCat = !activeCategory || part.category === activeCategory;
-      const matchBrand = activeBrands.length === 0 || activeBrands.includes(part.machine);
-      const matchSearch = !searchQuery || 
-        part.oem.toLowerCase().includes(searchQuery) ||
-        part.name.toLowerCase().includes(searchQuery) ||
-        (part.machine && part.machine.toLowerCase().includes(searchQuery));
-
-      return matchCat && matchBrand && matchSearch;
-    });
-
-    // Sort
-    if (sortSelect) {
-      const val = sortSelect.value;
-      if (val === "price-asc") {
-        matchedParts.sort((a, b) => (a.price || 0) - (b.price || 0));
-      } else if (val === "price-desc") {
-        matchedParts.sort((a, b) => (b.price || 0) - (a.price || 0));
-      }
-    }
-
-    renderPartsList(matchedParts);
-  }
-
-  function renderPartsList(items) {
-    if (!partsContainer) return;
-
-    partsContainer.innerHTML = "";
-    if (partsCountLabel) partsCountLabel.textContent = items.length;
-    const paginationContainer = document.getElementById("parts-pagination");
-
-    if (items.length === 0) {
-      partsContainer.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; border: 1px dashed var(--border-color); border-radius: 8px;">
-          <h3 style="font-family: var(--font-headings); font-size: 1.4rem; margin-bottom: 0.5rem;">No se encontraron repuestos</h3>
-          <p style="color: var(--text-secondary);">Intente modificar los filtros o realice una búsqueda diferente.</p>
-        </div>`;
-      if (paginationContainer) paginationContainer.innerHTML = "";
+  function doSearch() {
+    const query = searchInput.value.trim();
+    if (query.length === 0) {
+      searchResult.style.display = "none";
       return;
     }
-
-    const totalPages = Math.ceil(items.length / PARTS_PER_PAGE);
-    if (partsCurrentPage > totalPages) partsCurrentPage = 1;
-
-    const pageSlice = items.slice((partsCurrentPage - 1) * PARTS_PER_PAGE, partsCurrentPage * PARTS_PER_PAGE);
-
-    pageSlice.forEach(item => {
-      const fallbackImg = "assets/forklift_parts.png";
-      const isStockIn = item.stock === "in";
-      let badgeHtml = "";
-      if (!isStockIn) {
-        badgeHtml = `<span class="ecommerce-card-badge" style="background:#ffaa00;">CONSULTAR</span>`;
-      } else if (item.discount > 0) {
-        badgeHtml = `<span class="ecommerce-card-badge">-${item.discount}%</span>`;
-      } else if (item.price > 100000) {
-        badgeHtml = `<span class="ecommerce-card-badge" style="background:var(--primary-yellow); color:#000;">ENVÍO GRATIS</span>`;
-      }
-
-      const card = document.createElement("div");
-      card.className = "ecommerce-card";
-      
-      const p = item.price || 0;
-      let installmentsText = "";
-      if (p > 0) {
-        const dPrice = item.discount ? p * (1 - item.discount / 100) : p;
-        const iPrice = (dPrice / 3).toLocaleString('es-AR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        installmentsText = `3 x $${iPrice} sin interés`;
-      }
-
-      const sym = (item.currency === 'ARS') ? '$' : 'U$S';
-      let promoText = (item.stock > 0 && item.stock < 5) ? "¡No te lo pierdas, es el último!" : "";
-
-      card.innerHTML = `
-        <div class="ecommerce-card-img-wrap">
-          ${badgeHtml}
-          <img src="${item.image || fallbackImg}" alt="${item.name}" loading="lazy">
-        </div>
-        <div class="ecommerce-card-body">
-          <p class="ecommerce-card-oem">OEM: ${item.oem}</p>
-          <h3 class="ecommerce-card-title">${item.name}</h3>
-          <div class="ecommerce-card-price">
-            ${formatPriceHTML(item)}
-          </div>
-          ${installmentsText ? `<div class="ecommerce-card-installments">${installmentsText}</div>` : ''}
-          ${promoText ? `<div class="ecommerce-card-promo">${promoText}</div>` : ''}
-        </div>
-      `;
-
-      card.addEventListener("click", () => {
-        openPartDetailModal(item);
-      });
-
-      partsContainer.appendChild(card);
-    });
-
-    renderPagination(paginationContainer, partsCurrentPage, totalPages, (newPage) => {
-      partsCurrentPage = newPage;
-      renderPartsList(items);
-      if (partsContainer) partsContainer.scrollIntoView({ behavior: 'smooth' });
-    });
-  }
-
-function openPartDetailModal(item) {
-    const modal = document.getElementById("part-detail-modal");
-    if (!modal) return;
-
-    const imgEl = document.getElementById("part-modal-img");
-    const titleEl = document.getElementById("part-modal-title");
-    const oemEl = document.getElementById("part-modal-oem");
-    const compatEl = document.getElementById("part-modal-compat");
-    const priceEl = document.getElementById("part-modal-price");
-    const stockEl = document.getElementById("part-modal-stock");
-    const addCartBtn = document.getElementById("part-modal-add-cart");
-    const quoteBtn = document.getElementById("part-modal-quote-btn");
-
-    const fallbackImg = "assets/forklift_parts.png";
-    if (imgEl) imgEl.src = item.image || fallbackImg;
-    if (titleEl) titleEl.textContent = item.name;
-    if (oemEl) oemEl.textContent = `OEM: ${item.oem}`;
-    if (compatEl) compatEl.innerHTML = `<strong>Compatibilidad:</strong> ${item.machine}<br><span style="margin-top: 0.3rem; display: inline-block;">${item.desc}</span>`;
-    if (priceEl) priceEl.innerHTML = formatPriceHTML(item);
     
-    if (stockEl) {
-      const isStockIn = item.stock === "in";
-      stockEl.innerHTML = isStockIn 
-        ? `✓ Stock Inmediato` 
-        : `<span style="color: #ffaa00;">⚡ Stock Bajo - Consultar</span>`;
-    }
-
-    if (addCartBtn) {
-      addCartBtn.onclick = (e) => {
-        e.stopPropagation();
-        PartsCart.addItem(item.oem);
-        modal.classList.remove("active");
-      };
-    }
-
-    if (quoteBtn) {
-      const waText = encodeURIComponent(`Hola, quisiera cotizar el repuesto OEM ${item.oem} - ${item.name}`);
-      quoteBtn.href = `https://wa.me/5491121699968?text=${waText}`;
-    }
-
-    modal.classList.add("active");
+    queryDisplay.textContent = query;
+    const waText = encodeURIComponent(`Hola, necesito cotizar disponibilidad y plazo de entrega para el siguiente repuesto: ${query}`);
+    whatsappBtn.href = `https://wa.me/5491121699968?text=${waText}`;
+    
+    searchResult.style.display = "flex";
   }
+
+  searchBtn.addEventListener("click", doSearch);
+  searchInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") doSearch();
+  });
+
+  // Wire up category cards to auto-search
+  document.querySelectorAll(".part-cat-card").forEach(card => {
+    card.style.cursor = "pointer";
+    card.addEventListener("click", () => {
+      const catName = card.querySelector("h3").textContent;
+      searchInput.value = `Repuestos para ${catName}`;
+      doSearch();
+      
+      const searchSection = document.querySelector(".blind-search-section");
+      if (searchSection) {
+        searchSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  });
+}
 
   // Initialize Parts Cart Engine
   PartsCart.init();
@@ -1644,188 +1456,7 @@ function openNotificationModal(title, text) {
 
 })();
 
-// ================================================================
-// PARTS SHOPPING CART ENGINE (Exclusive for Spare Parts)
-// ================================================================
-const PartsCart = {
-  items: [],
 
-  init() {
-    this.loadFromStorage();
-    this.setupUI();
-    this.updateUI();
-  },
-
-  loadFromStorage() {
-    try {
-      const saved = localStorage.getItem('m9-parts-cart');
-      if (saved) this.items = JSON.parse(saved);
-    } catch(e) { this.items = []; }
-  },
-
-  saveToStorage() {
-    try {
-      localStorage.setItem('m9-parts-cart', JSON.stringify(this.items));
-    } catch(e) {}
-  },
-
-  addItem(oem) {
-    const allParts = getMergedSpareParts();
-    const part = allParts.find(p => p.oem === oem);
-    if (!part) return;
-
-    const existing = this.items.find(i => i.oem === oem);
-    if (existing) {
-      existing.quantity += 1;
-    } else {
-      this.items.push({
-        oem: part.oem,
-        name: part.name,
-        price: part.price || 100,
-        image: part.image || "assets/forklift_parts.png",
-        machine: part.machine,
-        quantity: 1
-      });
-    }
-
-    this.saveToStorage();
-    this.updateUI();
-    this.openDrawer();
-  },
-
-  updateQuantity(oem, delta) {
-    const item = this.items.find(i => i.oem === oem);
-    if (!item) return;
-    item.quantity += delta;
-    if (item.quantity <= 0) {
-      this.removeItem(oem);
-    } else {
-      this.saveToStorage();
-      this.updateUI();
-    }
-  },
-
-  removeItem(oem) {
-    this.items = this.items.filter(i => i.oem !== oem);
-    this.saveToStorage();
-    this.updateUI();
-  },
-
-  clearCart() {
-    this.items = [];
-    this.saveToStorage();
-    this.updateUI();
-  },
-
-  getTotalPrice() {
-    return this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  },
-
-  getTotalCount() {
-    return this.items.reduce((sum, item) => sum + item.quantity, 0);
-  },
-
-  openDrawer() {
-    const overlay = document.getElementById("cart-drawer-overlay");
-    if (overlay) overlay.classList.add("open");
-  },
-
-  closeDrawer() {
-    const overlay = document.getElementById("cart-drawer-overlay");
-    if (overlay) overlay.classList.remove("open");
-  },
-
-  setupUI() {
-    const toggleBtn = document.getElementById("cart-toggle-btn");
-    const closeBtn = document.getElementById("cart-close-btn");
-    const overlay = document.getElementById("cart-drawer-overlay");
-    const clearBtn = document.getElementById("cart-clear-btn");
-    const checkoutBtn = document.getElementById("cart-checkout-whatsapp");
-
-    toggleBtn?.addEventListener("click", () => this.openDrawer());
-    closeBtn?.addEventListener("click", () => this.closeDrawer());
-    
-    overlay?.addEventListener("click", (e) => {
-      if (e.target === overlay) this.closeDrawer();
-    });
-
-    clearBtn?.addEventListener("click", () => this.clearCart());
-
-    checkoutBtn?.addEventListener("click", () => this.checkoutWhatsApp());
-  },
-
-  updateUI() {
-    const badge = document.getElementById("cart-badge-count");
-    const totalFloating = document.getElementById("cart-floating-total");
-    const totalDrawer = document.getElementById("cart-total-price");
-    const container = document.getElementById("cart-items-container");
-
-    const totalCount = this.getTotalCount();
-    const totalPrice = this.getTotalPrice();
-
-    if (badge) badge.textContent = totalCount;
-    if (totalFloating) totalFloating.textContent = `USD $${totalPrice.toLocaleString('es-AR')}`;
-    if (totalDrawer) totalDrawer.textContent = `USD $${totalPrice.toLocaleString('es-AR')}`;
-
-    if (!container) return;
-
-    if (this.items.length === 0) {
-      container.innerHTML = `
-        <div style="text-align: center; padding: 3rem 1rem; color: var(--text-secondary);">
-          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="var(--text-muted)" stroke-width="1.5" style="margin-bottom: 1rem;">
-            <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-          </svg>
-          <h4 style="font-family: var(--font-headings); font-size: 1.1rem; color: var(--text-primary); margin-bottom: 0.4rem;">Carrito Vacío</h4>
-          <p style="font-size: 0.85rem;">Agregá los repuestos que necesites para generar el pedido rápido por WhatsApp.</p>
-        </div>
-      `;
-      return;
-    }
-
-    container.innerHTML = this.items.map(item => `
-      <div class="cart-item-row">
-        <img src="${item.image}" alt="${item.name}" class="cart-item-img">
-        <div class="cart-item-details">
-          <div class="cart-item-name">${item.name}</div>
-          <div class="cart-item-oem">OEM: ${item.oem}</div>
-          <div class="cart-item-price-unit">USD $${item.price.toLocaleString('es-AR')} c/u</div>
-          <div class="cart-item-controls">
-            <button class="cart-qty-btn" onclick="PartsCart.updateQuantity('${item.oem}', -1)">−</button>
-            <span class="cart-qty-num">${item.quantity}</span>
-            <button class="cart-qty-btn" onclick="PartsCart.updateQuantity('${item.oem}', 1)">+</button>
-          </div>
-        </div>
-        <div class="cart-item-subtotal">USD $${(item.price * item.quantity).toLocaleString('es-AR')}</div>
-        <button class="cart-item-remove" onclick="PartsCart.removeItem('${item.oem}')" title="Quitar item">✕</button>
-      </div>
-    `).join('');
-  },
-
-  checkoutWhatsApp() {
-    if (this.items.length === 0) {
-      alert("Tu carrito está vacío. Agregá al menos un repuesto antes de continuar.");
-      return;
-    }
-
-    const number = "5491199999999";
-    let message = `*SOLICITUD DE PEDIDO DE REPUESTOS — MAQUINARIAS 9 DE ABRIL*\n\n`;
-    message += `Hola, quisiera realizar el pedido de los siguientes repuestos:\n\n`;
-
-    this.items.forEach((item, index) => {
-      message += `${index + 1}. *${item.name}*\n`;
-      message += `   • Código OEM: ${item.oem}\n`;
-      message += `   • Cantidad: ${item.quantity} u.\n`;
-      message += `   • Subtotal: USD $${(item.price * item.quantity).toLocaleString('es-AR')}\n\n`;
-    });
-
-    message += `*TOTAL ESTIMADO: USD $${this.getTotalPrice().toLocaleString('es-AR')}*\n\n`;
-    message += `Aguardamos confirmación de stock y métodos de pago. Gracias.`;
-
-    const encoded = encodeURIComponent(message);
-    window.open(`https://wa.me/${number}?text=${encoded}`, '_blank');
-  }
-};
 
 // --- TRUCKS DIVISION ENGINE ---
 const staticTrucks = [];

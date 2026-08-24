@@ -125,117 +125,31 @@
       </div>
     </div>
 
-    <!-- E-Commerce Layout -->
-    <div class="ecommerce-layout">
+    <!-- --- SEARCH SECTION --- -->
+    <div class="blind-search-section" style="max-width: 800px; margin: 0 auto 4rem auto; text-align: center;">
+      <h2 style="font-family: var(--font-headings); font-size: 1.8rem; font-weight: 800; margin-bottom: 1.5rem;">Buscador Rápido por OEM o Nombre</h2>
+      <div style="display: flex; gap: 0.5rem; max-width: 600px; margin: 0 auto; position: relative;">
+        <input type="text" id="blind-search-input" placeholder="Ej: Filtro de aire Toyota 4Y..." style="flex: 1; padding: 1.2rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 1.1rem; outline: none; transition: border-color 0.2s;">
+        <button id="blind-search-btn" class="btn btn-primary" style="padding: 0 1.5rem; font-size: 1.1rem;">
+          <span class="icon">🔍</span> Buscar
+        </button>
+      </div>
       
-      <!-- Left Sidebar -->
-      <aside class="ecommerce-sidebar">
-        <h3 class="ecommerce-sidebar-title">Filtrar por</h3>
-        
-        <div class="ecommerce-filter-group">
-          <h4 class="ecommerce-filter-heading">CATEGORÍAS</h4>
-          <ul class="ecommerce-filter-list" id="ecommerce-categories-list">
-            <!-- Populated dynamically by app_v12.js -->
-            <li><a href="#" class="active">TODAS LAS CATEGORÍAS</a></li>
-          </ul>
+      <!-- Contenedor dinámico de resultados -->
+      <div id="blind-search-result" style="margin-top: 2rem; display: none; background: rgba(255, 184, 0, 0.05); border: 1px solid rgba(255, 184, 0, 0.3); border-radius: 8px; padding: 2rem; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto; flex-direction: column; gap: 1rem; align-items: center;">
+        <div style="text-align: center; margin-bottom: 1rem;">
+          <span style="font-size: 0.9rem; color: var(--primary-yellow); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Pieza Buscada (Consulta Técnica)</span>
+          <h3 id="blind-search-query-display" style="font-family: var(--font-headings); font-size: 1.5rem; color: var(--text-primary); margin-top: 0.5rem; margin-bottom: 0;"></h3>
         </div>
-
-        <div class="ecommerce-filter-group" style="margin-top: 2rem;">
-          <h4 class="ecommerce-filter-heading">MARCA</h4>
-          <ul class="ecommerce-filter-list" id="ecommerce-brands-list">
-            <!-- Populated dynamically by app_v12.js -->
-          </ul>
-        </div>
-      </aside>
-
-      <!-- Main Results Content -->
-      <section class="ecommerce-main">
-        
-        <!-- Search and Sort Top Bar -->
-        <div class="ecommerce-top-bar">
-          <div class="ecommerce-search-box">
-            <input type="text" id="parts-search-input" placeholder="Escriba código OEM o nombre...">
-            <span class="icon">🔍</span>
-          </div>
-          <div class="ecommerce-sort-box">
-            <span style="font-size: 0.85rem; color: var(--text-secondary); margin-right: 0.5rem;">Ordenar por</span>
-            <div class="custom-select-wrapper" style="width: 200px; display: inline-block;">
-              <select id="ecommerce-sort-select">
-                <option value="relevant">Más relevantes</option>
-                <option value="price-asc">Menor precio</option>
-                <option value="price-desc">Mayor precio</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        
-        <div class="ecommerce-results-meta">
-          <span>Repuestos coincidentes: <strong id="parts-count-val" style="color: var(--primary-yellow);">0</strong></span>
-        </div>
-
-        <!-- Products Grid -->
-        <div class="ecommerce-products-grid" id="parts-ml-container">
-          <!-- Populated dynamically by app_v12.js initPartsPage() -->
-        </div>
-
-        <!-- Pagination Container -->
-        <div id="parts-pagination" class="pagination-wrapper" style="margin-top: 3rem;"></div>
-
-      </section>
-
-    </div>
-
-
-  </main>
-
-  <!-- --- FLOATING CART TOGGLE BUTTON --- -->
-  <button id="cart-toggle-btn" class="cart-floating-btn" aria-label="Abrir Carrito de Repuestos">
-    <div class="cart-floating-icon">
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-      </svg>
-      <span id="cart-badge-count" class="cart-badge">0</span>
-    </div>
-    <div class="cart-floating-info">
-      <span class="cart-floating-label">Carrito Repuestos</span>
-      <span id="cart-floating-total" class="cart-floating-total">USD $0</span>
-    </div>
-  </button>
-
-  <!-- --- SHOPPING CART DRAWER OVERLAY --- -->
-  <div id="cart-drawer-overlay" class="cart-drawer-overlay" aria-hidden="true">
-    <div class="cart-drawer">
-      <div class="cart-drawer-header">
-        <div class="cart-drawer-title">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--primary-yellow)" stroke-width="2">
-            <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-          </svg>
-          <h3>Carrito de Repuestos</h3>
-        </div>
-        <button id="cart-close-btn" class="cart-close-btn" aria-label="Cerrar Carrito">✕</button>
-      </div>
-
-      <div id="cart-items-container" class="cart-drawer-body">
-        <!-- Cart items list rendered by JS -->
-      </div>
-
-      <div class="cart-drawer-footer">
-        <div class="cart-total-row">
-          <span>Total Estimado (USD)</span>
-          <strong id="cart-total-price">USD $0</strong>
-        </div>
-        <button id="cart-checkout-whatsapp" class="btn btn-primary btn-full" style="padding: 0.9rem 1.2rem; font-size: 0.95rem; width: 100%;">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-          Finalizar Pedido por WhatsApp
-        </button>
-        <button id="cart-clear-btn" class="btn btn-secondary btn-full" style="padding: 0.6rem 1rem; font-size: 0.85rem; width: 100%; margin-top: 0.5rem;">
-          Vaciar Carrito
-        </button>
+        <p style="color: var(--text-secondary); text-align: center; line-height: 1.5;">
+          Nuestro equipo técnico procesará su solicitud para esta pieza. Cotizaremos disponibilidad y plazo de entrega con el distribuidor oficial.
+        </p>
+        <a href="#" id="blind-search-whatsapp-btn" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="font-size: 1.05rem; padding: 0.8rem 2rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.8rem; width: 100%;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Solicitar Cotización por WhatsApp
+        </a>
       </div>
     </div>
-  </div>
 
   <!-- --- FOOTER --- -->
   <footer class="footer">
@@ -333,35 +247,7 @@
     </div>
   </div>
 
-  <!-- --- SPARE PART QUICK DETAIL MODAL --- -->
-  <div class="modal" id="part-detail-modal">
-    <div class="modal-overlay"></div>
-    <div class="modal-content" style="max-width: 720px; width: 92%; padding: 1.8rem; border-radius: 12px; position: relative;">
-      <button type="button" class="modal-close-x" aria-label="Cerrar">&times;</button>
-      <div class="part-modal-grid">
-        <div class="part-modal-img-container">
-          <img id="part-modal-img" src="" alt="Repuesto OEM" loading="lazy">
-        </div>
-        <div class="part-modal-info">
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
-            <span id="part-modal-oem" class="parts-ml-oem-badge" style="font-size: 0.8rem;"></span>
-            <span id="part-modal-stock" class="parts-ml-stock-tag"></span>
-          </div>
-          <h2 id="part-modal-title" style="font-size: 1.35rem; font-weight: 800; color: var(--text-primary); margin: 0.4rem 0 0.2rem 0; line-height: 1.3;"></h2>
-          <div id="part-modal-compat" style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 0.5rem;"></div>
-          <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary-yellow); margin-top: 0.4rem;" id="part-modal-price"></div>
-          <div style="display: flex; gap: 0.6rem; margin-top: 1.2rem; flex-wrap: wrap;">
-            <button id="part-modal-add-cart" class="btn btn-primary" style="flex: 1; padding: 0.65rem 1rem; font-size: 0.88rem;">
-              🛒 Agregar al Carrito
-            </button>
-            <a id="part-modal-quote-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline-yellow" style="flex: 1; padding: 0.65rem 1rem; font-size: 0.88rem; text-align: center; text-decoration: none;">
-              Cotizar por WhatsApp
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+
 
   <!-- WHATSAPP FLOATING BUTTON -->
   <a href="https://wa.me/5491126738983?text=Hola%2C%20quisiera%20consultar%20sobre%20sus%20productos" target="_blank" rel="noopener noreferrer" class="whatsapp-float" id="whatsapp-btn" aria-label="Contactar por WhatsApp">

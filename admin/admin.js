@@ -934,36 +934,7 @@ const Inv = {
       SupabaseUI.syncNow(true);
     }
   },
-  saveRepuesto() {
-    const oem  = $('r-oem').value.trim();
-    const name = $('r-name').value.trim();
-    const price = parseFloat($('r-price').value);
-    const currency = $('r-currency').value || 'USD';
-    const discount = parseInt($('r-discount').value) || 0;
-    if (!oem || !name || isNaN(price)) { toast('Completá los campos obligatorios (*)', 'error'); return; }
-    const item = {
-      oem, name,
-      category: $('r-category').value,
-      price,
-      currency,
-      discount,
-      stock:    parseInt($('r-stock').value) || 0,
-      status:   $('r-status').value,
-      compat:   $('r-compat').value.trim(),
-      img:      state.editingRepImg || '',
-    };
-    if (state.editingId) {
-      const idx = DB.repuestos.findIndex(x => x.id === state.editingId);
-      if (idx !== -1) DB.repuestos[idx] = { ...DB.repuestos[idx], ...item };
-      toast('Repuesto actualizado correctamente');
-    } else {
-      DB.repuestos.unshift({ id: nextId.rep++, ...item });
-      toast('Repuesto agregado correctamente');
-    }
-    Modal.close('modal-repuesto');
-    this.publish();
-    this.render();
-  },
+
   init() {
     this.publish();
     // Tabs & Mobile Visual Category Cards
@@ -1001,12 +972,11 @@ const Inv = {
     $('btn-add-item').addEventListener('click', () => this.openAdd());
     // Forms
     $('form-machinery').addEventListener('submit', e => { e.preventDefault(); this.saveMachinery(); });
-    $('form-repuesto').addEventListener('submit',  e => { e.preventDefault(); this.saveRepuesto(); });
+
     // Delete confirm
     $('confirm-delete-btn').addEventListener('click', () => this.doDelete());
     // Stock controls
-    $('stock-plus').addEventListener('click',  () => { const v = parseInt($('r-stock').value)||0; $('r-stock').value = v+1; });
-    $('stock-minus').addEventListener('click', () => { const v = parseInt($('r-stock').value)||0; if(v>0) $('r-stock').value = v-1; });
+
     // Toggle label
     $('m-visible').addEventListener('change', e => {
       $('m-vis-lbl').textContent = e.target.checked ? 'Visible en el sitio' : 'Oculto en el sitio';

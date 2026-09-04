@@ -29,6 +29,7 @@ const SupabaseUI = {
           if (res.DB.camiones && res.DB.camiones.length) DB.camiones = res.DB.camiones;
           if (res.DB.repuestos && res.DB.repuestos.length) DB.repuestos = res.DB.repuestos;
           syncInventoryWithWeb(DB);
+          updateNextIds(DB);
         }
         if (res.leads && Array.isArray(res.leads)) {
           // Group flat leads back into DB.leads object
@@ -930,9 +931,6 @@ const Inv = {
   },
   publish() {
     saveDatabase();
-    if (typeof SupabaseUI !== 'undefined') {
-      SupabaseUI.syncNow(true);
-    }
   },
 
   init() {

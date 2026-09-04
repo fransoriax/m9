@@ -911,47 +911,56 @@ const Inv = {
     }
   },
   saveMachinery() {
-    const name = $('m-name').value.trim();
-    const brand = $('m-brand').value;
-    const price = parseFloat($('m-price').value);
-    const currency = $('m-currency').value || 'USD';
-    const discount = parseInt($('m-discount').value) || 0;
-    if (!name || !brand || isNaN(price)) { toast('Completá los campos obligatorios (*)', 'error'); return; }
-    const savedPortada = state.editingImages[state.editingPortadaIndex] || state.editingImages[0] || '';
-    const savedImages = [...(state.editingImages || [])];
-    const item = {
-      name, brand,
-      capacity: $('m-capacity').value.trim(),
-      motor:    $('m-motor').value,
-      hours:    parseInt($('m-hours').value) || 0,
-      price,
-      currency,
-      discount,
-      status:   $('m-status').value,
-      visible:  $('m-visible').checked,
-      description: $('m-description') ? $('m-description').value.trim() : '',
-      img:      savedPortada,
-      images:   savedImages,
-      year:     parseInt($('m-year').value) || null,
-    };
-    if (state.editingId) {
-      const idx = DB[state.activeTab].findIndex(x => x.id === state.editingId);
-      if (idx !== -1) DB[state.activeTab][idx] = { ...DB[state.activeTab][idx], ...item };
-      toast('Equipo actualizado correctamente');
-    } else {
-      const tab = state.activeTab;
-      const newId = tab === 'camiones' ? nextId.cam++ : nextId.auto++;
-      DB[state.activeTab].unshift({ id: newId, ...item });
-      toast('Equipo agregado correctamente');
+    try {
+      const name = $('m-name').value.trim();
+      const brand = $('m-brand').value;
+      const price = parseFloat($('m-price').value);
+      const currency = $('m-currency').value || 'USD';
+      const discount = parseInt($('m-discount').value) || 0;
+      if (!name || !brand || isNaN(price)) { toast('Completá los campos obligatorios (*)', 'error'); return; }
+      const savedPortada = state.editingImages[state.editingPortadaIndex] || state.editingImages[0] || '';
+      const savedImages = [...(state.editingImages || [])];
+      const item = {
+        name, brand,
+        capacity: $('m-capacity').value.trim(),
+        motor:    $('m-motor').value,
+        hours:    parseInt($('m-hours').value) || 0,
+        price,
+        currency,
+        discount,
+        status:   $('m-status').value,
+        visible:  $('m-visible').checked,
+        description: $('m-description') ? $('m-description').value.trim() : '',
+        img:      savedPortada,
+        images:   savedImages,
+        year:     parseInt($('m-year').value) || null,
+      };
+      if (state.editingId) {
+        const idx = DB[state.activeTab].findIndex(x => x.id === state.editingId);
+        if (idx !== -1) DB[state.activeTab][idx] = { ...DB[state.activeTab][idx], ...item };
+        toast('Equipo actualizado correctamente');
+      } else {
+        const tab = state.activeTab;
+        const newId = tab === 'camiones' ? nextId.cam++ : nextId.auto++;
+        DB[state.activeTab].unshift({ id: newId, ...item });
+        toast('Equipo agregado correctamente');
+      }
+      Modal.close('modal-machinery');
+      this.publish();
+      this.render();
+    } catch(err) {
+      alert('Error en saveMachinery: ' + err.message);
+      console.error(err);
     }
-    Modal.close('modal-machinery');
-    this.publish();
-    this.render();
   },
   publish() {
-    saveDatabase();
+    try {
+      saveDatabase();
+      if (typeof notifyChanges === 'function') notifyChanges();
+    } catch(err) {
+      alert('Error al publicar: ' + err.message);
+    }
   },
-
   init() {
     this.publish();
     // Tabs & Mobile Visual Category Cards

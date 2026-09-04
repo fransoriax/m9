@@ -38,7 +38,14 @@
         return null;
       }
       try {
-        _client = global.supabase.createClient(this.getUrl(), this.getKey());
+        const url = this.getUrl();
+        const key = this.getKey();
+        _client = global.supabase.createClient(url, key, {
+          auth: { persistSession: false },
+          global: {
+            fetch: (...args) => fetch(args[0], { ...args[1], cache: 'no-store' })
+          }
+        });
         return _client;
       } catch (err) {
         console.error('Error al inicializar cliente Supabase:', err);

@@ -5929,7 +5929,7 @@ select option {
     display: flex;
     flex-direction: row;
     padding: 0;
-    height: 175px;
+    height: 195px;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
   }

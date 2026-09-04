@@ -1649,6 +1649,14 @@ function initCamionesPage() {
               <span class="spec-label" style="display:block; font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Capacidad</span>
               <span class="spec-value" style="font-size:0.92rem; color:var(--text-primary); font-weight:600;">${truck.capacity}</span>
             </div>
+            <div class="spec-item">
+              <span class="spec-label" style="display:block; font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Año</span>
+              <span class="spec-value" style="font-size:0.92rem; color:var(--text-primary); font-weight:600;">${truck.year}</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label" style="display:block; font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Kilometraje</span>
+              <span class="spec-value" style="font-size:0.92rem; color:var(--text-primary); font-weight:600;">${truck.specs && truck.specs.hours ? truck.specs.hours : "0 km"}</span>
+            </div>
           </div>
           
           <div class="product-card-footer truck-card-footer-mobile" style="display:flex; align-items:center; justify-content:space-between; gap:0.6rem; margin-top:auto;">

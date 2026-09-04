@@ -408,7 +408,7 @@ function initCatalogPage() {
         </div>
         <div class="product-card-body truck-card-body-v2" style="padding: 1rem; display: flex; flex-direction: column; flex-grow: 1;">
           <div class="product-card-brand truck-card-category-v2" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-secondary); margin-bottom:0.3rem;">${fork.brand}</div>
-          <h3 class="product-card-title truck-card-title-v2" style="font-size:1.1rem; font-weight:700; color:var(--text-primary); margin-bottom: 0.5rem; line-height:1.3;">${fork.name}</h3>
+          <h3 class="product-card-title truck-card-title-v2" style="font-size:1.1rem; font-weight:700; color:var(--text-primary); margin-bottom: 0.5rem; line-height:1.3; min-height:2.9rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${fork.name}</h3>
           
           <div class="product-card-specs truck-card-specs-v2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.45rem 0.8rem; margin: 0.5rem 0 1rem 0; background: rgba(255,255,255,0.02); border-radius: 6px;">
             <div class="product-card-spec">
@@ -1652,7 +1652,7 @@ function initCamionesPage() {
         </div>
         <div class="product-card-body truck-card-body-v2" style="padding: 1.2rem; display: flex; flex-direction: column; flex-grow: 1;">
           <div class="product-category truck-card-category-v2" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-secondary); margin-bottom:0.3rem;">${truck.type} • ${truck.axles}</div>
-          <h3 class="product-title truck-card-title-v2" style="font-family:var(--font-headings); font-size:1.15rem; font-weight:700; color:var(--text-primary); margin-bottom: 0.8rem; line-height:1.3;">${truck.name}</h3>
+          <h3 class="product-title truck-card-title-v2" style="font-family:var(--font-headings); font-size:1.15rem; font-weight:700; color:var(--text-primary); margin-bottom: 0.8rem; line-height:1.3; min-height:3rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${truck.name}</h3>
           
           <div class="product-specs-grid truck-card-specs-v2" style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; margin: 0.8rem 0 1.2rem 0; padding: 0.6rem 0.8rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 6px;">
             <div class="spec-item">

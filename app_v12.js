@@ -14,6 +14,7 @@ async function syncWithSupabaseIfAvailable() {
     try {
       const res = await window.M9Supabase.fetchAllAndCache();
       if (res.ok && res.DB) {
+        window.M9_DB_CACHE = res.DB;
         const path = window.location.pathname.replace(/\/+$/, "");
         const rawPage = path.split("/").pop() || "index.html";
         const cleanPage = rawPage.replace(".html", "").toLowerCase();
@@ -306,8 +307,8 @@ function initCatalogPage() {
   let allEquipments = [];
   try {
     const rawDB = localStorage.getItem('m9-inventory-db');
-    if (rawDB) {
-      const parsedDB = JSON.parse(rawDB);
+    const parsedDB = rawDB ? JSON.parse(rawDB) : (window.M9_DB_CACHE || null);
+    if (parsedDB) {
       if (parsedDB.autoelevadores && Array.isArray(parsedDB.autoelevadores)) {
         parsedDB.autoelevadores.forEach(crmItem => {
           if (crmItem.visible !== false && crmItem.status !== 'paused') {
@@ -540,8 +541,8 @@ function getMergedSpareParts() {
   let list = [];
   try {
     const rawDB = localStorage.getItem('m9-inventory-db');
-    if (rawDB) {
-      const parsedDB = JSON.parse(rawDB);
+    const parsedDB = rawDB ? JSON.parse(rawDB) : (window.M9_DB_CACHE || null);
+    if (parsedDB) {
       if (parsedDB.repuestos && Array.isArray(parsedDB.repuestos)) {
         parsedDB.repuestos.forEach(r => {
           if (r.status !== 'paused' && r.visible !== false) {
@@ -643,8 +644,8 @@ function initDetailPage() {
   }
   try {
     const rawDB = localStorage.getItem('m9-inventory-db');
-    if (rawDB) {
-      const parsedDB = JSON.parse(rawDB);
+    const parsedDB = rawDB ? JSON.parse(rawDB) : (window.M9_DB_CACHE || null);
+    if (parsedDB) {
       const allEquip = [...(parsedDB.autoelevadores || []), ...(parsedDB.camiones || [])];
       const found = allEquip.find(e => e.id.toString() === id.toString() || `crm-auto-${e.id}` === id || `crm-truck-${e.id}` === id || (item && e.name.toLowerCase() === item.name.toLowerCase()));
       if (found) {
@@ -901,7 +902,7 @@ function setupGlobalModals() {
   const addLeadToCRM = (client, product, phone, email, message) => {
     try {
       const rawDB = localStorage.getItem('m9-inventory-db');
-      const db = rawDB ? JSON.parse(rawDB) : {};
+      const db = rawDB ? JSON.parse(rawDB) : (window.M9_DB_CACHE || {});
       if (!db.leads) {
         db.leads = { nuevas: [], enproceso: [], cotizado: [], ganado: [], perdido: [] };
       }
@@ -1465,8 +1466,8 @@ function initCamionesPage() {
   let allTrucks = [];
   try {
     const rawDB = localStorage.getItem('m9-inventory-db');
-    if (rawDB) {
-      const parsedDB = JSON.parse(rawDB);
+    const parsedDB = rawDB ? JSON.parse(rawDB) : (window.M9_DB_CACHE || null);
+    if (parsedDB) {
       if (parsedDB.camiones && Array.isArray(parsedDB.camiones)) {
         parsedDB.camiones.forEach(crmItem => {
           if (crmItem.visible !== false && crmItem.status !== 'paused') {

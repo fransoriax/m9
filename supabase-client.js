@@ -13,10 +13,18 @@
 
   const M9Supabase = {
     getUrl() {
-      return localStorage.getItem('m9-supabase-url') || DEFAULT_URL;
+      try {
+        return localStorage.getItem('m9-supabase-url') || DEFAULT_URL;
+      } catch (e) {
+        return DEFAULT_URL;
+      }
     },
     getKey() {
-      return localStorage.getItem('m9-supabase-key') || DEFAULT_KEY;
+      try {
+        return localStorage.getItem('m9-supabase-key') || DEFAULT_KEY;
+      } catch (e) {
+        return DEFAULT_KEY;
+      }
     },
     isConfigured() {
       const key = this.getKey();
@@ -237,7 +245,10 @@
         if (autosRes.error || camsRes.error || repsRes.error) {
           throw new Error('Error consultando tablas desde Supabase');
         }
-        const currentDBStr = localStorage.getItem('m9-inventory-db');
+        let currentDBStr = null;
+        try {
+          currentDBStr = localStorage.getItem('m9-inventory-db');
+        } catch(e) {}
         let currentDB = {};
         if (currentDBStr) {
           try { currentDB = JSON.parse(currentDBStr); } catch(e) {}
@@ -248,10 +259,12 @@
           camiones: camsRes.data || [],
           repuestos: repsRes.data || []
         };
-        localStorage.setItem('m9-inventory-db', JSON.stringify(syncedDB));
-        if (leadsRes.data) {
-          localStorage.setItem('m9-crm-leads', JSON.stringify(leadsRes.data));
-        }
+        try {
+          localStorage.setItem('m9-inventory-db', JSON.stringify(syncedDB));
+          if (leadsRes.data) {
+            localStorage.setItem('m9-crm-leads', JSON.stringify(leadsRes.data));
+          }
+        } catch(e) {}
         return { ok: true, DB: syncedDB, leads: leadsRes.data || [] };
       } catch (err) {
         console.warn('No se pudo refrescar caché desde Supabase:', err.message);

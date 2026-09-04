@@ -758,12 +758,16 @@ const Inv = {
       const item = items.find(x => x.id === id);
       if (!item) return;
       state.editingId = id;
-      $('modal-machinery-title').textContent = 'Editar Equipo';
+      $('modal-machinery-title').textContent = state.activeTab === 'camiones' ? 'Editar Camión' : 'Editar Equipo';
+      if ($('m-hours-lbl')) {
+        $('m-hours-lbl').textContent = state.activeTab === 'camiones' ? 'Kilometraje' : 'Horas de Uso';
+      }
       $('m-name').value = item.name;
       $('m-brand').value = item.brand;
       $('m-capacity').value = item.capacity || '';
       $('m-motor').value = item.motor || '';
       $('m-hours').value = item.hours || 0;
+      $('m-year').value = item.year || '';
       $('m-price').value = item.price;
       $('m-currency').value = item.currency || 'USD';
       $('m-discount').value = item.discount || '';
@@ -880,7 +884,11 @@ const Inv = {
       Modal.open('modal-repuesto');
     } else {
       $('modal-machinery-title').textContent = state.activeTab === 'camiones' ? 'Nuevo Camión' : 'Nueva Maquinaria';
+      if ($('m-hours-lbl')) {
+        $('m-hours-lbl').textContent = state.activeTab === 'camiones' ? 'Kilometraje' : 'Horas de Uso';
+      }
       $('form-machinery').reset();
+      $('m-year').value = '';
       $('m-visible').checked = true;
       $('m-vis-lbl').textContent = 'Visible en el sitio';
       $('m-currency').value = 'USD';
@@ -914,6 +922,7 @@ const Inv = {
       description: $('m-description') ? $('m-description').value.trim() : '',
       img:      savedPortada,
       images:   savedImages,
+      year:     parseInt($('m-year').value) || null,
     };
     if (state.editingId) {
       const idx = DB[state.activeTab].findIndex(x => x.id === state.editingId);

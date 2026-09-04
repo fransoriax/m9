@@ -305,20 +305,23 @@ function initCatalogPage() {
 
   // 1. Combine static forklifts dataset with CRM items from localStorage
   let allEquipments = [];
+  let parsedDB = window.M9_DB_CACHE || null;
   try {
     const rawDB = localStorage.getItem('m9-inventory-db');
-    const parsedDB = rawDB ? JSON.parse(rawDB) : (window.M9_DB_CACHE || null);
-    
-    if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {
-      grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; border: 1px dashed var(--border-color); border-radius: 8px;">
-          <div class="spinner" style="margin: 0 auto 1rem auto; width: 40px; height: 40px; border: 4px solid rgba(255, 198, 0, 0.2); border-left-color: var(--primary-yellow); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-          <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem;">Cargando catálogo...</h3>
-          <p>Sincronizando con la base de datos.</p>
-          <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
-        </div>`;
-      return;
-    }
+    if (rawDB) parsedDB = JSON.parse(rawDB);
+  } catch(e) {}
+  
+  if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; border: 1px dashed var(--border-color); border-radius: 8px;">
+        <div class="spinner" style="margin: 0 auto 1rem auto; width: 40px; height: 40px; border: 4px solid rgba(255, 198, 0, 0.2); border-left-color: var(--primary-yellow); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem;">Cargando catálogo...</h3>
+        <p>Sincronizando con la base de datos.</p>
+        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+      </div>`;
+    return;
+  }
 
+  try {
     if (parsedDB) {
       if (parsedDB.autoelevadores && Array.isArray(parsedDB.autoelevadores)) {
         parsedDB.autoelevadores.forEach(crmItem => {
@@ -550,9 +553,13 @@ function initCatalogPage() {
 
 function getMergedSpareParts() {
   let list = [];
+  let parsedDB = window.M9_DB_CACHE || null;
   try {
     const rawDB = localStorage.getItem('m9-inventory-db');
-    const parsedDB = rawDB ? JSON.parse(rawDB) : (window.M9_DB_CACHE || null);
+    if (rawDB) parsedDB = JSON.parse(rawDB);
+  } catch(e) {}
+  
+  try {
     if (parsedDB) {
       if (parsedDB.repuestos && Array.isArray(parsedDB.repuestos)) {
         parsedDB.repuestos.forEach(r => {
@@ -653,35 +660,39 @@ function initDetailPage() {
   if (!item && typeof staticTrucks !== "undefined") {
     item = staticTrucks.find(t => t.id.toString() === id.toString());
   }
+  let parsedDB = window.M9_DB_CACHE || null;
   try {
     const rawDB = localStorage.getItem('m9-inventory-db');
-    const parsedDB = rawDB ? JSON.parse(rawDB) : (window.M9_DB_CACHE || null);
-    
-    if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {
-      const layout = document.querySelector(".detail-layout");
-      if (layout) {
-        layout.style.display = 'none';
-        if (!document.getElementById("detail-loading-spinner")) {
-          const spinner = document.createElement("div");
-          spinner.id = "detail-loading-spinner";
-          spinner.style = "text-align: center; padding: 8rem 0;";
-          spinner.innerHTML = `
+    if (rawDB) parsedDB = JSON.parse(rawDB);
+  } catch(e) {}
+  
+  if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {
+    const detailContainer = document.querySelector(".detail-layout");
+    if (detailContainer) {
+      if (!document.getElementById("detail-loading-overlay")) {
+        detailContainer.style.display = 'none';
+        const loader = document.createElement("div");
+        loader.id = "detail-loading-overlay";
+        loader.innerHTML = `
+          <div style="text-align: center; padding: 6rem 2rem; width: 100%;">
             <div class="spinner" style="margin: 0 auto 1rem auto; width: 40px; height: 40px; border: 4px solid rgba(255, 198, 0, 0.2); border-left-color: var(--primary-yellow); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-            <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem;">Cargando equipo...</h3>
-            <p>Obteniendo información desde la base de datos.</p>
-            <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
-          `;
-          layout.parentNode.insertBefore(spinner, layout);
-        }
+            <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem;">Cargando detalles...</h3>
+          </div>
+        `;
+        detailContainer.parentNode.insertBefore(loader, detailContainer);
       }
-      return;
     }
+    return;
+  }
 
-    const spinner = document.getElementById("detail-loading-spinner");
-    if (spinner) spinner.remove();
-    const layout = document.querySelector(".detail-layout");
-    if (layout) layout.style.display = '';
+  const spinner = document.getElementById("detail-loading-spinner");
+  if (spinner) spinner.remove();
+  const overlay = document.getElementById("detail-loading-overlay");
+  if (overlay) overlay.remove();
+  const layout = document.querySelector(".detail-layout");
+  if (layout) layout.style.display = '';
 
+  try {
     if (parsedDB) {
       const allEquip = [...(parsedDB.autoelevadores || []), ...(parsedDB.camiones || [])];
       const found = allEquip.find(e => e.id.toString() === id.toString() || `crm-auto-${e.id}` === id || `crm-truck-${e.id}` === id || (item && e.name.toLowerCase() === item.name.toLowerCase()));
@@ -1501,19 +1512,22 @@ function initCamionesPage() {
 
   // 1. Gather static trucks + CRM trucks from localStorage
   let allTrucks = [];
+  let parsedDB = window.M9_DB_CACHE || null;
   try {
     const rawDB = localStorage.getItem('m9-inventory-db');
-    const parsedDB = rawDB ? JSON.parse(rawDB) : (window.M9_DB_CACHE || null);
-    
-    if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {
-      grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; border: 1px dashed var(--border-color); border-radius: 8px;">
-          <div class="spinner" style="margin: 0 auto 1rem auto; width: 40px; height: 40px; border: 4px solid rgba(255, 198, 0, 0.2); border-left-color: var(--primary-yellow); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-          <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem;">Cargando catálogo...</h3>
-          <p>Sincronizando con la base de datos.</p>
-        </div>`;
-      return;
-    }
+    if (rawDB) parsedDB = JSON.parse(rawDB);
+  } catch(e) {}
+  
+  if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; border: 1px dashed var(--border-color); border-radius: 8px;">
+        <div class="spinner" style="margin: 0 auto 1rem auto; width: 40px; height: 40px; border: 4px solid rgba(255, 198, 0, 0.2); border-left-color: var(--primary-yellow); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem;">Cargando catálogo...</h3>
+        <p>Sincronizando con la base de datos.</p>
+      </div>`;
+    return;
+  }
 
+  try {
     if (parsedDB) {
       if (parsedDB.camiones && Array.isArray(parsedDB.camiones)) {
         parsedDB.camiones.forEach(crmItem => {

@@ -109,7 +109,10 @@ const SupabaseUI = {
       btn.textContent = '⏳ Subiendo a la nube...';
     }
     try {
-      const leads = (typeof DB !== 'undefined' && DB.leads) ? DB.leads : JSON.parse(localStorage.getItem('m9-crm-leads') || 'null');
+      let leads = (typeof DB !== 'undefined' && DB.leads) ? DB.leads : null;
+      if (!leads) {
+        try { leads = JSON.parse(localStorage.getItem('m9-crm-leads') || 'null'); } catch(e){}
+      }
       const res = await window.M9Supabase.syncAllToSupabase(DB, leads);
       if (btn) {
         btn.disabled = false;
@@ -223,15 +226,22 @@ function loadDatabase() {
 function saveDatabase() {
   try {
     localStorage.setItem('m9-inventory-db', JSON.stringify(DB));
+  } catch(e) {
+    console.warn('No se pudo guardar m9-inventory-db en localStorage:', e);
+  }
+  try {
     if (DB.reviews) {
       const visible = DB.reviews.filter(r => r.visible !== false);
       localStorage.setItem('m9-reviews', JSON.stringify(visible));
     }
+  } catch(e) {}
+  
+  try {
     if (typeof SupabaseUI !== 'undefined' && window.M9Supabase && window.M9Supabase.isConfigured()) {
       SupabaseUI.syncNow(true);
     }
   } catch(e) {
-    console.error('Error al guardar base de datos:', e);
+    console.error('Error al sincronizar con Supabase:', e);
   }
 }
 

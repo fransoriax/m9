@@ -5929,21 +5929,21 @@ select option {
     display: flex;
     flex-direction: row;
     padding: 0;
-    min-height: 160px;
+    height: 175px;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
   }
   .truck-card-v2 .product-card-img-wrapper {
-    width: 155px;
-    height: auto;
+    width: 140px;
+    height: 100%;
     aspect-ratio: auto !important;
-    min-height: 100% !important;
-    max-height: none !important;
     flex-shrink: 0;
     padding: 0;
   }
   .truck-card-v2 .product-card-img {
     border-radius: 6px 0 0 6px;
+    height: 100%;
+    object-fit: cover;
   }
   .truck-card-v2 .badge, .truck-card-v2 .truck-brand-badge {
     display: none !important;

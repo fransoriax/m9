@@ -436,9 +436,14 @@ function initCatalogPage() {
             </div>
             
             <div class="truck-card-mobile-info-v2" style="display:none; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.6rem;">
-              <div style="font-weight: 500; color: var(--text-primary); margin-bottom: 0.1rem;">${fork.year || new Date().getFullYear()}</div>
-              <div style="font-size: 0.7rem;">Capital Federal - Capital Federal</div>
-            </div>
+                <div style="font-weight: 500; color: var(--text-primary); margin-bottom: 0.2rem; display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                  <span style="background: rgba(255,184,0,0.1); color: var(--primary-yellow); padding: 0.15rem 0.4rem; border-radius: 4px;">Año ${fork.year || '-'}</span>
+                  <span style="background: rgba(255,255,255,0.05); padding: 0.15rem 0.4rem; border-radius: 4px;">${fork.specs && fork.specs.hours ? fork.specs.hours + ' hs' : '0 hs'}</span>
+                </div>
+                <div style="font-size: 0.75rem; line-height: 1.3;">
+                  ${fork.motor || 'Motor estándar'} • ${fork.capacity || 'Sin cap. especificada'}
+                </div>
+              </div>
 
             <div class="truck-card-actions-v2" style="display:flex; gap:0.4rem; width:auto; justify-content: flex-end;">
               <a href="detalle.html?id=${fork.id}&cb=${Date.now()}" class="btn btn-secondary btn-sm truck-btn-detail" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">Ver Detalle</a>
@@ -1680,9 +1685,14 @@ function initCamionesPage() {
             </div>
             
             <div class="truck-card-mobile-info-v2" style="display:none; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.6rem;">
-              <div style="font-weight: 500; color: var(--text-primary); margin-bottom: 0.1rem;">${truck.year || new Date().getFullYear()}</div>
-              <div style="font-size: 0.7rem;">Capital Federal - Capital Federal</div>
-            </div>
+                <div style="font-weight: 500; color: var(--text-primary); margin-bottom: 0.2rem; display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                  <span style="background: rgba(255,184,0,0.1); color: var(--primary-yellow); padding: 0.15rem 0.4rem; border-radius: 4px;">Año ${truck.year || '-'}</span>
+                  <span style="background: rgba(255,255,255,0.05); padding: 0.15rem 0.4rem; border-radius: 4px;">${truck.specs && truck.specs.hours ? truck.specs.hours : '0 km'}</span>
+                </div>
+                <div style="font-size: 0.75rem; line-height: 1.3;">
+                  ${truck.power || 'Potencia estándar'} • ${truck.capacity || 'Sin cap. especificada'}
+                </div>
+              </div>
 
             <div class="truck-card-actions-v2" style="display:flex; gap:0.4rem; width:auto; justify-content: flex-end;">
               <a href="detalle.html?id=${truck.id}&cb=${Date.now()}" class="btn btn-secondary btn-sm truck-btn-detail" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;">Ver Detalle</a>

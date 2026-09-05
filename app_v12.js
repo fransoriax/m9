@@ -12,9 +12,20 @@ function ensureDatabaseSeeded() {
 async function syncWithSupabaseIfAvailable() {
   if (window.M9Supabase && window.M9Supabase.isConfigured()) {
     try {
+      const CACHE_DURATION_MS = 10 * 60 * 1000; // 10 minutes
+      const lastSync = localStorage.getItem('m9-db-last-sync');
+      const rawDB = localStorage.getItem('m9-inventory-db');
+      
+      // If we have data and it's fresh, skip background fetch to prevent unnecessary re-renders
+      if (rawDB && lastSync && (Date.now() - parseInt(lastSync)) < CACHE_DURATION_MS) {
+        window.M9_DB_CACHE = JSON.parse(rawDB);
+        return;
+      }
+
       const res = await window.M9Supabase.fetchAllAndCache();
       if (res.ok && res.DB) {
         window.M9_DB_CACHE = res.DB;
+        localStorage.setItem('m9-db-last-sync', Date.now().toString());
         const path = window.location.pathname.replace(/\/+$/, "");
         const rawPage = path.split("/").pop() || "index.html";
         const cleanPage = rawPage.replace(".html", "").toLowerCase();
@@ -312,7 +323,12 @@ function initCatalogPage() {
   } catch(e) {}
   
   if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {
-    return; // Wait for background sync
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; border: 1px dashed var(--border-color); border-radius: 8px;">
+        <div class="spinner" style="margin: 0 auto 1rem auto; width: 40px; height: 40px; border: 4px solid rgba(255, 198, 0, 0.2); border-left-color: var(--primary-yellow); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem;">Cargando catálogo...</h3>
+        <p>Sincronizando con la base de datos.</p>
+        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+      </div>`;
     return;
   }
 
@@ -671,8 +687,17 @@ async function initDetailPage() {
   if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {
     const detailContainer = document.querySelector(".detail-layout");
     if (detailContainer && !document.getElementById("detail-loading-overlay")) {
-      /* silent wait */
-      /* silent wait */
+      detailContainer.style.display = 'none';
+      const loader = document.createElement("div");
+      loader.id = "detail-loading-overlay";
+      loader.innerHTML = `
+        <div style="text-align: center; padding: 6rem 2rem; width: 100%;">
+          <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+          <div style="margin: 0 auto 1rem auto; width: 40px; height: 40px; border: 4px solid rgba(255, 198, 0, 0.2); border-left-color: var(--primary-yellow); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+          <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem;">Cargando detalles...</h3>
+        </div>
+      `;
+      detailContainer.parentNode.insertBefore(loader, detailContainer);
     }
     try {
       const res = await window.M9Supabase.fetchAllAndCache();
@@ -683,7 +708,8 @@ async function initDetailPage() {
     } catch(err) {
       console.warn('Error fetching Supabase data in detail page:', err);
     }
-    
+    const overlay = document.getElementById("detail-loading-overlay");
+    if (overlay) overlay.remove();
     if (detailContainer) detailContainer.style.display = '';
   }
 
@@ -1528,7 +1554,11 @@ function initCamionesPage() {
   } catch(e) {}
   
   if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {
-    return; // Wait for background sync
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; border: 1px dashed var(--border-color); border-radius: 8px;">
+        <div class="spinner" style="margin: 0 auto 1rem auto; width: 40px; height: 40px; border: 4px solid rgba(255, 198, 0, 0.2); border-left-color: var(--primary-yellow); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem;">Cargando catálogo...</h3>
+        <p>Sincronizando con la base de datos.</p>
+      </div>`;
     return;
   }
 

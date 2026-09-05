@@ -312,12 +312,7 @@ function initCatalogPage() {
   } catch(e) {}
   
   if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {
-    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; border: 1px dashed var(--border-color); border-radius: 8px;">
-        <div class="spinner" style="margin: 0 auto 1rem auto; width: 40px; height: 40px; border: 4px solid rgba(255, 198, 0, 0.2); border-left-color: var(--primary-yellow); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-        <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem;">Cargando catálogo...</h3>
-        <p>Sincronizando con la base de datos.</p>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
-      </div>`;
+    return; // Wait for background sync
     return;
   }
 
@@ -676,17 +671,8 @@ async function initDetailPage() {
   if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {
     const detailContainer = document.querySelector(".detail-layout");
     if (detailContainer && !document.getElementById("detail-loading-overlay")) {
-      detailContainer.style.display = 'none';
-      const loader = document.createElement("div");
-      loader.id = "detail-loading-overlay";
-      loader.innerHTML = `
-        <div style="text-align: center; padding: 6rem 2rem; width: 100%;">
-          <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
-          <div style="margin: 0 auto 1rem auto; width: 40px; height: 40px; border: 4px solid rgba(255, 198, 0, 0.2); border-left-color: var(--primary-yellow); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-          <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem;">Cargando detalles...</h3>
-        </div>
-      `;
-      detailContainer.parentNode.insertBefore(loader, detailContainer);
+      /* silent wait */
+      /* silent wait */
     }
     try {
       const res = await window.M9Supabase.fetchAllAndCache();
@@ -697,8 +683,7 @@ async function initDetailPage() {
     } catch(err) {
       console.warn('Error fetching Supabase data in detail page:', err);
     }
-    const overlay = document.getElementById("detail-loading-overlay");
-    if (overlay) overlay.remove();
+    
     if (detailContainer) detailContainer.style.display = '';
   }
 
@@ -1543,11 +1528,7 @@ function initCamionesPage() {
   } catch(e) {}
   
   if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {
-    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; border: 1px dashed var(--border-color); border-radius: 8px;">
-        <div class="spinner" style="margin: 0 auto 1rem auto; width: 40px; height: 40px; border: 4px solid rgba(255, 198, 0, 0.2); border-left-color: var(--primary-yellow); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-        <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem;">Cargando catálogo...</h3>
-        <p>Sincronizando con la base de datos.</p>
-      </div>`;
+    return; // Wait for background sync
     return;
   }
 

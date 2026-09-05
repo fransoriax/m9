@@ -696,6 +696,8 @@ function initDetailPage() {
   if (overlay) overlay.remove();
   const layout = document.querySelector(".detail-layout");
   if (layout) layout.style.display = '';
+  const notFoundMsg = document.getElementById("not-found-msg");
+  if (notFoundMsg) notFoundMsg.remove();
 
   try {
     if (parsedDB) {
@@ -762,13 +764,18 @@ function initDetailPage() {
   } catch(e) {}
 
   if (!item) {
-    document.querySelector(".detail-layout").innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 8rem 0;">
+    const dl = document.querySelector(".detail-layout");
+    dl.style.display = 'none';
+    if (!document.getElementById("not-found-msg")) {
+      const msg = document.createElement("div");
+      msg.id = "not-found-msg";
+      msg.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 8rem 0;">
         <h2>Unidad no encontrada</h2>
         <p style="margin-bottom: 2rem;">El equipo especificado no se encuentra en nuestro catálogo activo.</p>
         <a href="catalog.html" class="btn btn-primary">Volver al Catálogo</a>
-      </div>
-    `;
+      </div>`;
+      dl.parentNode.insertBefore(msg, dl);
+    }
     return;
   }
 

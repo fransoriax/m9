@@ -6111,3 +6111,58 @@ select option {
     height: 60px !important;
   }
 }
+
+/* Fix for grid blowout on mobile */
+@media (max-width: 1200px) {
+  .catalog-layout > *, .parts-layout > *, .detail-layout > * {
+    min-width: 0 !important;
+  }
+  .detail-layout {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+}
+@media (max-width: 768px) {
+  .detail-layout {
+    overflow: hidden !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Global blowout prevention for mobile */
+@media (max-width: 768px) {
+  body, html {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  .detail-specs-grid {
+    grid-template-columns: 1fr !important; /* Stack specs on mobile to avoid blowout */
+    gap: 0.8rem !important;
+  }
+  .quote-form-container {
+    padding: 1.2rem !important;
+  }
+  .pdf-download-box {
+    padding: 1.2rem !important;
+  }
+  .btn {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    height: auto !important;
+    min-height: 44px;
+  }
+  #detail-whatsapp-direct, #modal-whatsapp-direct {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    height: auto !important;
+    min-height: 44px;
+  }
+  .gallery-thumbnails {
+    width: 100vw !important; /* Let it stretch full screen width */
+    margin-left: -1.2rem; /* Pull it out of the container padding */
+    padding-left: 1.2rem !important; /* Add padding inside so first thumb aligns */
+    padding-right: 1.2rem !important; /* Add padding so last thumb doesn't hug edge */
+    box-sizing: border-box !important;
+  }
+}

@@ -2335,8 +2335,6 @@ select option {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 2.5rem;
-  position: sticky;
-  top: 100px;
 }
 
 .quote-form-container h3 {
@@ -6028,5 +6026,19 @@ select option {
   .detail-layout {
     overflow: hidden;
     width: 100%;
+  }
+}
+
+/* Fix for sticky Quote Form overlapping PDF Box */
+.detail-sticky-sidebar {
+  position: sticky;
+  top: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+@media (max-width: 1200px) {
+  .detail-sticky-sidebar {
+    position: static;
   }
 }

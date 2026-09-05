@@ -653,11 +653,8 @@ function initPartsPage() {
     });
   });
 }
-
-
-
 // 6. PRODUCT DETAIL LOADER
-function initDetailPage() {
+async function initDetailPage() {
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id") || "toyota-8fg25";
 
@@ -665,45 +662,57 @@ function initDetailPage() {
   if (!item && typeof staticTrucks !== "undefined") {
     item = staticTrucks.find(t => t.id.toString() === id.toString());
   }
+
   let parsedDB = window.M9_DB_CACHE || null;
   try {
     const rawDB = localStorage.getItem('m9-inventory-db');
     if (rawDB) parsedDB = JSON.parse(rawDB);
   } catch(e) {}
-  
+
+  // If still no data, fetch directly from Supabase (handles localhost & first visits)
   if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {
     const detailContainer = document.querySelector(".detail-layout");
-    if (detailContainer) {
-      if (!document.getElementById("detail-loading-overlay")) {
-        detailContainer.style.display = 'none';
-        const loader = document.createElement("div");
-        loader.id = "detail-loading-overlay";
-        loader.innerHTML = `
-          <div style="text-align: center; padding: 6rem 2rem; width: 100%;">
-            <div class="spinner" style="margin: 0 auto 1rem auto; width: 40px; height: 40px; border: 4px solid rgba(255, 198, 0, 0.2); border-left-color: var(--primary-yellow); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-            <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem;">Cargando detalles...</h3>
-          </div>
-        `;
-        detailContainer.parentNode.insertBefore(loader, detailContainer);
-      }
+    if (detailContainer && !document.getElementById("detail-loading-overlay")) {
+      detailContainer.style.display = 'none';
+      const loader = document.createElement("div");
+      loader.id = "detail-loading-overlay";
+      loader.innerHTML = `
+        <div style="text-align: center; padding: 6rem 2rem; width: 100%;">
+          <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+          <div style="margin: 0 auto 1rem auto; width: 40px; height: 40px; border: 4px solid rgba(255, 198, 0, 0.2); border-left-color: var(--primary-yellow); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+          <h3 style="font-family: var(--font-headings); font-size: 1.5rem; margin-bottom: 0.5rem;">Cargando detalles...</h3>
+        </div>
+      `;
+      detailContainer.parentNode.insertBefore(loader, detailContainer);
     }
-    return;
+    try {
+      const res = await window.M9Supabase.fetchAllAndCache();
+      if (res.ok && res.DB) {
+        window.M9_DB_CACHE = res.DB;
+        parsedDB = res.DB;
+      }
+    } catch(err) {
+      console.warn('Error fetching Supabase data in detail page:', err);
+    }
+    const overlay = document.getElementById("detail-loading-overlay");
+    if (overlay) overlay.remove();
+    if (detailContainer) detailContainer.style.display = '';
   }
 
+  // Cleanup any leftover loaders
   const spinner = document.getElementById("detail-loading-spinner");
   if (spinner) spinner.remove();
-  const overlay = document.getElementById("detail-loading-overlay");
-  if (overlay) overlay.remove();
-  const layout = document.querySelector(".detail-layout");
-  if (layout) layout.style.display = '';
   const notFoundMsg = document.getElementById("not-found-msg");
   if (notFoundMsg) notFoundMsg.remove();
+  const layout = document.querySelector(".detail-layout");
+  if (layout) layout.style.display = '';
 
   try {
     if (parsedDB) {
       const allEquip = [...(parsedDB.autoelevadores || []), ...(parsedDB.camiones || [])];
       const found = allEquip.find(e => e.id.toString() === id.toString() || `crm-auto-${e.id}` === id || `crm-truck-${e.id}` === id || (item && e.name.toLowerCase() === item.name.toLowerCase()));
       if (found) {
+
         let parsedImages = [];
         if (Array.isArray(found.images)) {
           parsedImages = found.images;

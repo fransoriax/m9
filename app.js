@@ -1984,7 +1984,7 @@ function initCamionesPage() {
           
           <div class="product-specs-grid truck-card-specs-v2" style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; margin: 0.8rem 0 1.2rem 0; padding: 0.6rem 0.8rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 6px;">
             <div class="spec-item">
-              <span class="spec-label" style="display:block; font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Potencia</span>
+              <span class="spec-label" style="display:block; font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Motorización</span>
               <span class="spec-value" style="font-size:0.92rem; color:var(--primary-yellow); font-weight:700;">${truck.power}</span>
             </div>
             <div class="spec-item">

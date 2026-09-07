@@ -14,11 +14,11 @@ async function syncWithSupabaseIfAvailable() {
     try {
       const CACHE_DURATION_MS = 10 * 60 * 1000; // 10 minutes
       const lastSync = localStorage.getItem('m9-db-last-sync');
-      const rawDB = localStorage.getItem('m9-inventory-db');
+      const rawDB = window.M9Cache ? await window.M9Cache.get('m9-inventory-db') : null;
       
       // If we have data and it's fresh, skip background fetch to prevent unnecessary re-renders
       if (rawDB && lastSync && (Date.now() - parseInt(lastSync)) < CACHE_DURATION_MS) {
-        window.M9_DB_CACHE = JSON.parse(rawDB);
+        window.M9_DB_CACHE = rawDB;
         return;
       }
 
@@ -127,7 +127,7 @@ function formatPriceHTML(item) {
   return `<span class="price-discounted">${sym} ${price.toLocaleString('es-AR')}</span>`;
 }
 
-function initHomePage() {
+async function initHomePage() {
 
   // ── Entrance animations ──────────────────────────────────────
   const heroText    = document.getElementById('hero-text-parallax');
@@ -307,7 +307,7 @@ function renderExpandableBrandList(container, brands, filterDataAttr) {
 }
 
 // 4. CATALOG PAGE ENGINE
-function initCatalogPage() {
+async function initCatalogPage() {
   const grid = document.getElementById("catalog-grid");
   const capacityRange = document.getElementById("filter-capacity");
   const capacityVal = document.getElementById("capacity-val");
@@ -318,8 +318,7 @@ function initCatalogPage() {
   let allEquipments = [];
   let parsedDB = window.M9_DB_CACHE || null;
   try {
-    const rawDB = localStorage.getItem('m9-inventory-db');
-    if (rawDB) parsedDB = JSON.parse(rawDB);
+    if (!parsedDB && window.M9Cache) { parsedDB = await window.M9Cache.get('m9-inventory-db'); }
   } catch(e) {}
   
   if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {
@@ -571,8 +570,7 @@ function getMergedSpareParts() {
   let list = [];
   let parsedDB = window.M9_DB_CACHE || null;
   try {
-    const rawDB = localStorage.getItem('m9-inventory-db');
-    if (rawDB) parsedDB = JSON.parse(rawDB);
+    if (!parsedDB && window.M9Cache) { parsedDB = await window.M9Cache.get('m9-inventory-db'); }
   } catch(e) {}
   
   try {
@@ -621,7 +619,7 @@ function getMergedSpareParts() {
 }
 
 // 5. TECHNICAL PARTS SEARCH ENGINE (BLIND SEARCH)
-function initPartsPage() {
+async function initPartsPage() {
   const searchInput = document.getElementById("blind-search-input");
   const searchBtn = document.getElementById("blind-search-btn");
   const searchResult = document.getElementById("blind-search-result");
@@ -679,8 +677,7 @@ async function initDetailPage() {
 
   let parsedDB = window.M9_DB_CACHE || null;
   try {
-    const rawDB = localStorage.getItem('m9-inventory-db');
-    if (rawDB) parsedDB = JSON.parse(rawDB);
+    if (!parsedDB && window.M9Cache) { parsedDB = await window.M9Cache.get('m9-inventory-db'); }
   } catch(e) {}
 
   // If still no data, fetch directly from Supabase (handles localhost & first visits)
@@ -984,8 +981,8 @@ function setupGlobalModals() {
   // Function to create lead in CRM
   const addLeadToCRM = (client, product, phone, email, message) => {
     try {
-      const rawDB = localStorage.getItem('m9-inventory-db');
-      const db = rawDB ? JSON.parse(rawDB) : (window.M9_DB_CACHE || {});
+      const rawDB = window.M9Cache ? await window.M9Cache.get('m9-inventory-db') : null;
+      const db = rawDB || window.M9_DB_CACHE || {};
       if (!db.leads) {
         db.leads = { nuevas: [], enproceso: [], cotizado: [], ganado: [], perdido: [] };
       }
@@ -1002,7 +999,7 @@ function setupGlobalModals() {
         notes: message ? [message] : [],
         source: 'Formulario Web'
       });
-      localStorage.setItem('m9-inventory-db', JSON.stringify(db));
+      if (window.M9Cache) { window.M9Cache.set('m9-inventory-db', db); }
       if (window.M9Supabase && window.M9Supabase.isConfigured()) {
         window.M9Supabase.syncAllToSupabase(db, db.leads || null).catch(err => {
           console.error("Error syncing lead to Supabase:", err);
@@ -1533,7 +1530,7 @@ function openNotificationModal(title, text) {
 // --- TRUCKS DIVISION ENGINE ---
 const staticTrucks = [];
 
-function initCamionesPage() {
+async function initCamionesPage() {
   const grid = document.getElementById("trucks-grid");
   const searchInput = document.getElementById("search-trucks");
   const brandContainer = document.getElementById("truck-brand-filters");
@@ -1549,8 +1546,7 @@ function initCamionesPage() {
   let allTrucks = [];
   let parsedDB = window.M9_DB_CACHE || null;
   try {
-    const rawDB = localStorage.getItem('m9-inventory-db');
-    if (rawDB) parsedDB = JSON.parse(rawDB);
+    if (!parsedDB && window.M9Cache) { parsedDB = await window.M9Cache.get('m9-inventory-db'); }
   } catch(e) {}
   
   if (!parsedDB && window.M9Supabase && window.M9Supabase.isConfigured()) {

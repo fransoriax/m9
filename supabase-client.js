@@ -254,11 +254,10 @@
         }
         let currentDBStr = null;
         try {
-          currentDBStr = localStorage.getItem('m9-inventory-db');
+          currentDBStr = null; currentDB = await global.M9Cache.get('m9-inventory-db') || {};
         } catch(e) {}
         let currentDB = {};
-        if (currentDBStr) {
-          try { currentDB = JSON.parse(currentDBStr); } catch(e) {}
+         catch(e) {}
         }
         const syncedDB = {
           ...currentDB,
@@ -267,7 +266,7 @@
           repuestos: repsRes.data || []
         };
         try {
-          localStorage.setItem('m9-inventory-db', JSON.stringify(syncedDB));
+          await global.M9Cache.set('m9-inventory-db', syncedDB);
           if (leadsRes.data) {
             localStorage.setItem('m9-crm-leads', JSON.stringify(leadsRes.data));
           }
@@ -281,4 +280,42 @@
   };
 
   global.M9Supabase = M9Supabase;
+  const M9Cache = {
+    _db: null,
+    async _getDB() {
+      if (this._db) return this._db;
+      return new Promise((resolve) => {
+        const req = indexedDB.open('M9_CACHE_DB', 1);
+        req.onupgradeneeded = e => e.target.result.createObjectStore('cache');
+        req.onsuccess = e => { this._db = e.target.result; resolve(this._db); };
+        req.onerror = () => resolve(null);
+      });
+    },
+    async set(key, val) {
+      try {
+        const db = await this._getDB();
+        if (!db) return;
+        return new Promise(resolve => {
+          const tx = db.transaction('cache', 'readwrite');
+          tx.objectStore('cache').put(val, key);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        });
+      } catch(e) {}
+    },
+    async get(key) {
+      try {
+        const db = await this._getDB();
+        if (!db) return null;
+        return new Promise(resolve => {
+          const tx = db.transaction('cache', 'readonly');
+          const req = tx.objectStore('cache').get(key);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => resolve(null);
+        });
+      } catch(e) { return null; }
+    }
+  };
+  global.M9Cache = M9Cache;
+
 })(window);

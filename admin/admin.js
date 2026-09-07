@@ -185,11 +185,11 @@ let DB = {
   quotes: []
 };
 
-function loadDatabase() {
+async function loadDatabase() {
   try {
-    const saved = localStorage.getItem('m9-inventory-db');
+    const saved = window.M9Cache ? await window.M9Cache.get('m9-inventory-db') : null;
     if (saved) {
-      const parsed = JSON.parse(saved);
+      const parsed = saved;
       DB = { ...DB, ...parsed };
       if (!parsed.accounts) DB.accounts = DB.accounts || [];
       if (DB.accounts) {
@@ -225,7 +225,7 @@ function loadDatabase() {
 
 function saveDatabase() {
   try {
-    localStorage.setItem('m9-inventory-db', JSON.stringify(DB));
+    window.M9Cache.set('m9-inventory-db', DB);
   } catch(e) {
     console.warn('No se pudo guardar m9-inventory-db en localStorage:', e);
   }
@@ -341,7 +341,7 @@ const Auth = {
     if (bnav) bnav.style.display = 'none';
   },
   init() {
-    loadDatabase();
+    await loadDatabase();
     if (this.check()) {
       this.showApp();
     } else {
@@ -2577,7 +2577,7 @@ const App = {
   },
 
   init() {
-    loadDatabase();
+    await loadDatabase();
     Modal.init();
     Router.init();
     Inv.init();

@@ -608,7 +608,7 @@ const Inv = {
       thead.innerHTML = `<tr>
         <th style="width:40px"><input type="checkbox" id="inv-select-all" onchange="Inv.toggleSelectAll(event)"></th>
         <th></th><th>Nombre</th><th>Marca</th>
-        <th>Capacidad</th><th>Motorización</th><th>Precio</th>
+        <th>Capacidad</th><th>Motorización</th><th>Año</th><th>Precio</th>
         <th>Estado</th><th>Web</th><th>Acciones</th>
       </tr>`;
     }
@@ -704,11 +704,12 @@ const Inv = {
           <td>${thumb}</td>
           <td><div class="td-name">${item.name}</div></td>
           <td><span class="badge badge--brand">${item.brand}</span></td>
-          <td><div class="td-specs-row"><span class="td-spec-chip">Capacidad: ${item.capacity||'—'}</span> <span class="td-spec-chip">Motor: ${item.motor||'—'}</span></div></td>
-          <td></td>
-          <td><div style="display:flex; align-items:center;"><span class="td-price-tag">${item.currency||'USD'} ${item.price.toLocaleString('es-AR')}</span>${item.discount > 0 ? `<span style="color:#ffaa00; font-size:0.75rem; font-weight:700; margin-left:6px; background:rgba(255,170,0,0.15); padding:2px 5px; border-radius:4px;">-${item.discount}%</span>` : ''}</div></td>
-          <td><div class="td-badges-group">${statusBadge} ${visBadge}</div></td>
-          <td></td>
+          <td><div class="td-specs-row"><span class="td-spec-chip">Capacidad: ${item.capacity||'—'}</span></div></td>
+            <td><div class="td-specs-row"><span class="td-spec-chip">Motor: ${item.motor||item.power||'—'}</span></div></td>
+            <td><div class="td-specs-row"><span class="td-spec-chip">Año: ${item.year||'—'}</span></div></td>
+            <td><div style="display:flex; align-items:center;"><span class="td-price-tag">${item.currency||'USD'} ${item.price.toLocaleString('es-AR')}</span>${item.discount > 0 ? `<span style="color:#ffaa00; font-size:0.75rem; font-weight:700; margin-left:6px; background:rgba(255,170,0,0.15); padding:2px 5px; border-radius:4px;">-${item.discount}%</span>` : ''}</div></td>
+            <td>${statusBadge}</td>
+            <td>${visBadge}</td>
           <td><div class="td-actions">
             <button class="action-btn action-btn--edit" title="Editar" onclick="Inv.edit('mach',${item.id})">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>

@@ -6166,3 +6166,20 @@ select option {
     box-sizing: border-box !important;
   }
 }
+
+/* Fix mobile price wrapping on cards */
+@media (max-width: 768px) {
+  .truck-card-price-wrap-v2 {
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
+  }
+  .truck-card-price-val-v2 {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: baseline !important;
+    gap: 0.2rem 0.5rem !important;
+  }
+  .truck-card-price-val-v2 .price-original {
+    margin-right: 0 !important;
+  }
+}

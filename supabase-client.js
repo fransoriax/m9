@@ -252,13 +252,10 @@
         if (autosRes.error || camsRes.error || repsRes.error) {
           throw new Error('Error consultando tablas desde Supabase');
         }
-        let currentDBStr = null;
-        try {
-          currentDBStr = null; currentDB = await global.M9Cache.get('m9-inventory-db') || {};
-        } catch(e) {}
         let currentDB = {};
-         catch(e) {}
-        }
+        try {
+          currentDB = await global.M9Cache.get('m9-inventory-db') || {};
+        } catch(e) {}
         const syncedDB = {
           ...currentDB,
           autoelevadores: autosRes.data || [],

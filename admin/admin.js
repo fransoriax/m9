@@ -340,7 +340,7 @@ const Auth = {
     const bnav = $('bottom-nav');
     if (bnav) bnav.style.display = 'none';
   },
-  init() {
+  async init() {
     await loadDatabase();
     if (this.check()) {
       this.showApp();
@@ -2576,7 +2576,7 @@ const App = {
     if (accBadge && DB.accounts) accBadge.textContent = DB.accounts.length;
   },
 
-  init() {
+  async init() {
     await loadDatabase();
     Modal.init();
     Router.init();

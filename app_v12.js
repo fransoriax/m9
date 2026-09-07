@@ -566,7 +566,7 @@ async function initCatalogPage() {
   applyFilters();
 }
 
-function getMergedSpareParts() {
+async function getMergedSpareParts() {
   let list = [];
   let parsedDB = window.M9_DB_CACHE || null;
   try {
@@ -979,7 +979,7 @@ function setupGlobalModals() {
   }
 
   // Function to create lead in CRM
-  const addLeadToCRM = (client, product, phone, email, message) => {
+  const addLeadToCRM = async (client, product, phone, email, message) => {
     try {
       const rawDB = window.M9Cache ? await window.M9Cache.get('m9-inventory-db') : null;
       const db = rawDB || window.M9_DB_CACHE || {};
